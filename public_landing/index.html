@@ -1,0 +1,262 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="FitTime: reservá turnos en tu gimnasio sin horarios llenos y seguí rutinas simples desde el celular.">
+  <title>FitTime — Turnos y rutinas para tu gimnasio</title>
+  <link rel="stylesheet" href="styles.css">
+  <style>
+    /* Complementos de styles.css para esta versión de la landing */
+    a { color: inherit; }
+    .logo { text-decoration: none; color: var(--text-main); }
+    .hero h1 .accent { color: var(--accent); }
+    .cta-note { margin-top: 14px; color: var(--text-muted); font-size: 0.9rem; }
+
+    .split { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; }
+    .list-check { list-style: none; display: grid; gap: 10px; margin-top: 8px; }
+    .list-check li { color: var(--text-muted); padding-left: 28px; position: relative; }
+    .list-check li::before { content: "✕"; position: absolute; left: 0; color: var(--danger); font-weight: 700; }
+    .list-check.ok li::before { content: "✓"; color: var(--success); }
+
+    .feature-group-title { font-size: 1.1rem; color: var(--accent); margin: 8px 0 16px; font-weight: 700; }
+    .grid-features { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 16px; margin-bottom: 36px; }
+    .grid-features .card { padding: 22px; }
+    .grid-features h3 { font-size: 1.05rem; margin-bottom: 6px; }
+    .icon { font-size: 1.6rem; display: block; margin-bottom: 10px; }
+
+    .steps { list-style: none; counter-reset: paso; display: grid; gap: 16px; }
+    .steps li { counter-increment: paso; display: grid; grid-template-columns: 48px 1fr; gap: 16px; align-items: start;
+                background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius-md); padding: 20px; }
+    .steps li::before { content: counter(paso); width: 48px; height: 48px; border-radius: 50%; background: var(--primary); color: #fff;
+                        display: grid; place-items: center; font-weight: 800; font-size: 1.2rem; }
+    .steps h3 { font-size: 1.05rem; margin-bottom: 4px; }
+    .steps p { color: var(--text-muted); font-size: 0.95rem; }
+
+    .download { display: grid; grid-template-columns: auto 1fr; gap: 36px; align-items: center; }
+    .qr-box { width: 220px; height: 220px; background: #fff; border-radius: var(--radius-md); padding: 12px;
+              display: grid; place-items: center; color: #334155; text-align: center; font-size: 0.9rem; }
+    .qr-box img, .qr-box canvas { width: 196px !important; height: 196px !important; }
+    .download .cta-group { justify-content: flex-start; margin: 18px 0; }
+    .install-steps { color: var(--text-muted); padding-left: 20px; display: grid; gap: 6px; font-size: 0.95rem; }
+
+    .faq details { background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius-md); padding: 18px 22px; margin-bottom: 12px; }
+    .faq summary { cursor: pointer; font-weight: 600; }
+    .faq details p { color: var(--text-muted); margin-top: 10px; }
+
+    footer a { color: var(--accent); }
+
+    @media (max-width: 760px) {
+      .container { padding: 0 16px; }
+      .hero { padding: 48px 0 36px; }
+      .hero h1 { font-size: 2.1rem; }
+      .section-header h2 { font-size: 1.7rem; }
+      .split, .download { grid-template-columns: 1fr; }
+      .qr-box { margin: 0 auto; }
+      .nav-links a:not(.keep) { display: none; }
+      .grid-3 { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+  <header class="navbar">
+    <div class="container nav-content">
+      <a class="logo" href="#inicio">Fit<span>Time</span></a>
+      <nav class="nav-links" aria-label="Navegación principal">
+        <a href="#funciones">Funciones</a>
+        <a href="#como-empezar">Cómo empezar</a>
+        <a href="#preguntas">Preguntas</a>
+        <a class="keep" href="#descarga">Descargar</a>
+        <button class="theme-toggle-btn" id="themeToggle" type="button" aria-label="Cambiar tema">🌙</button>
+      </nav>
+    </div>
+  </header>
+
+  <main>
+    <!-- HERO -->
+    <section class="hero" id="inicio">
+      <div class="container">
+        <p class="badge">Proyecto final · Técnica en Programación · 2026</p>
+        <h1>Entrená sin esperas.<br><span class="accent">Reservá tu turno en segundos.</span></h1>
+        <p class="hero-subtitle">
+          FitTime es la app de tu gimnasio para ver horarios con lugares libres, reservar o cancelar turnos
+          y seguir rutinas simples desde el celular.
+        </p>
+        <div class="cta-group">
+          <a class="btn btn-primary" id="ctaApk" href="#descarga">⬇ Descargar para Android</a>
+          <a class="btn btn-secondary" id="ctaWeb" href="#descarga">🌐 Abrir versión web</a>
+        </div>
+        <p class="cta-note">Gratis para quienes entrenan · Ingreso con correo o Google</p>
+      </div>
+    </section>
+
+    <!-- PROBLEMA / SOLUCIÓN -->
+    <section class="section">
+      <div class="container split">
+        <article class="card">
+          <h3>El problema</h3>
+          <ul class="list-check">
+            <li>Llegás al gimnasio y está lleno, sin máquinas libres.</li>
+            <li>No sabés qué horario conviene ni cuántos lugares quedan.</li>
+            <li>La rutina está en un papel que se pierde o en un mensaje viejo.</li>
+          </ul>
+        </article>
+        <article class="card">
+          <h3>La solución</h3>
+          <ul class="list-check ok">
+            <li>Cupos de cada horario en tiempo real.</li>
+            <li>Reserva con un toque y recordatorio antes de entrenar.</li>
+            <li>Tu rutina, con series y repeticiones, siempre a mano.</li>
+          </ul>
+        </article>
+      </div>
+    </section>
+
+    <!-- FUNCIONES -->
+    <section class="section" id="funciones">
+      <div class="container">
+        <div class="section-header">
+          <h2>Qué podés hacer</h2>
+          <p>Una app para quienes entrenan y un panel para quienes administran el gimnasio.</p>
+        </div>
+
+        <p class="feature-group-title">Si entrenás</p>
+        <div class="grid-features">
+          <article class="card"><span class="icon">📅</span><h3>Turnos con cupo en vivo</h3><p>Elegí el día, mirá cuántos lugares quedan y reservá con un toque.</p></article>
+          <article class="card"><span class="icon">↩️</span><h3>Cancelación simple</h3><p>¿No podés ir? Cancelá y el lugar queda libre para otra persona.</p></article>
+          <article class="card"><span class="icon">💪</span><h3>Rutinas por categoría</h3><p>Fuerza, Cardio, Tren superior, Tren inferior y Cuerpo completo, con series y descansos.</p></article>
+          <article class="card"><span class="icon">🔔</span><h3>Recordatorios</h3><p>Notificación al confirmar y aviso antes de tu turno.</p></article>
+          <article class="card"><span class="icon">👤</span><h3>Tu perfil</h3><p>Datos, foto, contraseña y tema claro u oscuro.</p></article>
+          <article class="card"><span class="icon">🔐</span><h3>Acceso rápido</h3><p>Entrá con tu correo o con tu cuenta de Google.</p></article>
+        </div>
+
+        <p class="feature-group-title">Si administrás un gimnasio</p>
+        <div class="grid-features">
+          <article class="card"><span class="icon">📊</span><h3>Panel con estadísticas</h3><p>Clientes activos, turnos del día y de la semana, horarios más concurridos.</p></article>
+          <article class="card"><span class="icon">🕒</span><h3>Horarios y cupos</h3><p>Creá, editá o pausá franjas horarias y definí el cupo máximo.</p></article>
+          <article class="card"><span class="icon">📋</span><h3>Rutinas y ejercicios</h3><p>Armá rutinas con tu catálogo de ejercicios y asignalas a cada cliente.</p></article>
+          <article class="card"><span class="icon">✅</span><h3>Control de turnos</h3><p>Mirá quién reservó, marcá asistencia o cancelá con un motivo.</p></article>
+        </div>
+      </div>
+    </section>
+
+    <!-- CÓMO EMPEZAR -->
+    <section class="section" id="como-empezar">
+      <div class="container">
+        <div class="section-header">
+          <h2>Cómo empezar en 5 pasos</h2>
+          <p>De la descarga a tu primer entrenamiento en menos de dos minutos.</p>
+        </div>
+        <ol class="steps">
+          <li><div><h3>Descargá la app</h3><p>Escaneá el código QR con la cámara del celular o tocá "Descargar para Android". Si tenés iPhone, usá la versión web.</p></div></li>
+          <li><div><h3>Creá tu cuenta</h3><p>Tocá <strong>Crear cuenta</strong> e ingresá tu nombre, correo y una contraseña de al menos 8 caracteres, o tocá <strong>Continuar con Google</strong>.</p></div></li>
+          <li><div><h3>Reservá tu primer turno</h3><p>Andá a <strong>Turnos</strong>, elegí el día y tocá <strong>Reservar</strong> en un horario con lugares libres. Aceptá las notificaciones para recibir la confirmación y el recordatorio.</p></div></li>
+          <li><div><h3>Elegí tu rutina</h3><p>En <strong>Rutinas</strong> filtrá por categoría, abrí una para ver los ejercicios y guardala con la ⭐. Si tu entrenador te asigna una, aparece en <strong>Inicio</strong>.</p></div></li>
+          <li><div><h3>Personalizá tu perfil</h3><p>En <strong>Perfil</strong> podés cambiar tus datos, tu foto, tu contraseña y el tema claro u oscuro.</p></div></li>
+        </ol>
+      </div>
+    </section>
+
+    <!-- DESCARGA -->
+    <section class="section" id="descarga">
+      <div class="container">
+        <div class="section-header">
+          <h2>Descargá FitTime</h2>
+          <p>Disponible para Android y en el navegador.</p>
+        </div>
+        <div class="card download">
+          <div class="qr-box" id="qr" role="img" aria-label="Código QR para descargar la app">
+            Link de descarga<br>próximamente
+          </div>
+          <div>
+            <h3>Escaneá el QR con la cámara de tu celular</h3>
+            <div class="cta-group">
+              <a class="btn btn-primary" id="btnApk" href="#descarga">⬇ Descargar APK</a>
+              <a class="btn btn-secondary" id="btnWeb" href="#descarga">🌐 Versión web</a>
+            </div>
+            <p><strong>Cómo instalar el APK en Android</strong></p>
+            <ol class="install-steps">
+              <li>Tocá <strong>Descargar APK</strong> y esperá a que termine.</li>
+              <li>Abrí <code>FitTime.apk</code> desde las notificaciones o desde <em>Descargas</em>.</li>
+              <li>Si el teléfono bloquea "apps desconocidas", tocá <strong>Configuración</strong> y activá <strong>Permitir de esta fuente</strong>.</li>
+              <li>Volvé atrás y tocá <strong>Instalar</strong>. Si Play Protect muestra un aviso, elegí <strong>Instalar de todas formas</strong>.</li>
+              <li>Abrí FitTime e iniciá sesión.</li>
+            </ol>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- PREGUNTAS -->
+    <section class="section faq" id="preguntas">
+      <div class="container">
+        <div class="section-header">
+          <h2>Preguntas frecuentes</h2>
+        </div>
+        <details><summary>¿Es gratis?</summary><p>Sí, para quienes entrenan. Los gimnasios pueden usar el panel de administración con una suscripción mensual.</p></details>
+        <details><summary>¿Necesito internet?</summary><p>Sí, para ver los cupos en tiempo real y reservar. La sesión queda guardada, así que no tenés que iniciar sesión cada vez.</p></details>
+        <details><summary>¿Funciona en iPhone?</summary><p>Por ahora la app instalable es para Android. Desde iPhone podés usar la versión web en Safari.</p></details>
+        <details><summary>¿Qué pasa si el horario está lleno?</summary><p>La app te avisa que no quedan lugares y no te deja reservar. Probá otro horario o volvé más tarde por si alguien cancela.</p></details>
+        <details><summary>¿Mis datos están seguros?</summary><p>Las contraseñas se guardan cifradas y cada persona sólo puede ver sus propios turnos y datos.</p></details>
+        <details><summary>Olvidé mi contraseña</summary><p>En la pantalla de inicio tocá <strong>¿Olvidaste tu contraseña?</strong>. Te llega un código de 6 dígitos al correo para crear una nueva.</p></details>
+      </div>
+    </section>
+  </main>
+
+  <footer>
+    <div class="container">
+      <p><strong>FitTime</strong> — Turnos y rutinas para gimnasios locales.</p>
+      <p>Desarrollado por Constanza Castillo · Técnica en Programación · 2026</p>
+      <p>
+        <a href="mailto:constanzacastillo@epet12smandes.edu.ar">constanzacastillo@epet12smandes.edu.ar</a>
+        · <a id="lnkRepo" href="#">Documentación técnica</a>
+      </p>
+    </div>
+  </footer>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+  <script>
+    // ==== COMPLETAR ANTES DE PUBLICAR ====
+    // Pegá acá los links reales. Mientras empiecen con "COMPLETAR", la página muestra "próximamente".
+    const APK_URL  = 'COMPLETAR_link_del_APK_de_EAS';
+    const WEB_URL  = 'COMPLETAR_url_de_la_version_web';
+    const REPO_URL = 'COMPLETAR_url_del_repositorio';
+    // =====================================
+
+    const listo = (url) => url && !url.startsWith('COMPLETAR');
+
+    const enlazar = (ids, url) => ids.forEach((id) => {
+      const el = document.getElementById(id);
+      if (!el) return;
+      if (listo(url)) { el.href = url; el.target = '_blank'; el.rel = 'noopener'; }
+      else { el.title = 'Disponible próximamente'; }
+    });
+    enlazar(['ctaApk', 'btnApk'], APK_URL);
+    enlazar(['ctaWeb', 'btnWeb'], WEB_URL);
+    enlazar(['lnkRepo'], REPO_URL);
+
+    if (listo(APK_URL) && window.QRCode) {
+      const qr = document.getElementById('qr');
+      qr.textContent = '';
+      new QRCode(qr, { text: APK_URL, width: 196, height: 196, correctLevel: QRCode.CorrectLevel.M });
+    }
+
+    // Tema claro / oscuro (respeta la preferencia del sistema)
+    const root = document.documentElement;
+    const btn = document.getElementById('themeToggle');
+    const aplicar = (tema) => {
+      if (tema === 'light') root.setAttribute('data-theme', 'light'); else root.removeAttribute('data-theme');
+      btn.textContent = tema === 'light' ? '🌙' : '☀️';
+    };
+    let tema = null;
+    try { tema = localStorage.getItem('fittime-tema'); } catch (e) {}
+    if (!tema) tema = window.matchMedia('(prefers-color-scheme: light)').matches ? 'light' : 'dark';
+    aplicar(tema);
+    btn.addEventListener('click', () => {
+      tema = tema === 'light' ? 'dark' : 'light';
+      aplicar(tema);
+      try { localStorage.setItem('fittime-tema', tema); } catch (e) {}
+    });
+  </script>
+</body>
+</html>

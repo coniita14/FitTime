@@ -1,0 +1,223 @@
+import React, { createContext, useState, useEffect, useContext } from 'react';
+import { Platform } from 'react-native';
+import * as WebBrowser from 'expo-web-browser';
+import { supabase, supabaseConfigError } from '../config/supabase';
+
+const AuthContext = createContext();
+
+const PERFIL_COLUMNAS = 'id, nombre, apellido, email, rol, telefono, activo, avatar_url, notificaciones_activas, recordatorio_minutos';
+
+WebBrowser.maybeCompleteAuthSession();
+
+const getProfile = async (authUser) => {
+  if (supabaseConfigError) throw new Error(supabaseConfigError);
+  const { data, error } = await supabase
+    .from('usuarios')
+    .select(PERFIL_COLUMNAS)
+    .eq('auth_user_id', authUser.id)
+    .maybeSingle();
+
+  if (error) throw error;
+  if (!data) {
+    throw new Error('No se encontró el perfil. Verifica que init_fittime.sql esté instalado en Supabase.');
+  }
+  return { ...data, authId: authUser.id };
+};
+
+export const AuthProvider = ({ children }) => {
+  const [token, setToken] = useState(null);
+  const [user, setUser] = useState(null);
+  const [isLoading, setIsLoading] = useState(true);
+
+  useEffect(() => {
+    let mounted = true;
+    const { data: listener } = supabase.auth.onAuthStateChange((event, session) => {
+      if (!mounted) return;
+      setToken(session?.access_token || null);
+      if (event === 'SIGNED_OUT') setUser(null);
+    });
+
+    const restoreSession = async () => {
+      if (Platform.OS === 'web') {
+        const callback = new URL(window.location.href);
+        const code = callback.searchParams.get('code');
+        if (code) {
+          const { error: exchangeError } = await supabase.auth.exchangeCodeForSession(code);
+          if (exchangeError) throw exchangeError;
+          window.history.replaceState({}, document.title, callback.pathname);
+        }
+      }
+      const { data, error } = await supabase.auth.getSession();
+      if (error) throw error;
+      if (data.session) {
+        const profile = await getProfile(data.session.user);
+        if (mounted) {
+          setToken(data.session.access_token);
+          setUser(profile);
+        }
+      }
+    };
+
+    restoreSession().catch((error) => {
+      console.error('No se pudo restaurar el perfil:', error);
+    }).finally(() => {
+      if (mounted) setIsLoading(false);
+    });
+
+    return () => {
+      mounted = false;
+      listener.subscription.unsubscribe();
+    };
+  }, []);
+
+  const login = async (email, password) => {
+    if (supabaseConfigError) throw new Error(supabaseConfigError);
+    setIsLoading(true);
+    try {
+      const { data, error } = await supabase.auth.signInWithPassword({
+        email: email.trim().toLowerCase(),
+        password,
+      });
+      if (error) throw error;
+      const profile = await getProfile(data.user);
+      setToken(data.session.access_token);
+      setUser(profile);
+      return profile;
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const signup = async ({ nombre, email, password }) => {
+    if (supabaseConfigError) throw new Error(supabaseConfigError);
+    const { data, error } = await supabase.auth.signUp({
+      email: email.trim().toLowerCase(),
+      password,
+      options: { data: { nombre: nombre.trim() } },
+    });
+    if (error) throw error;
+    if (data.session && data.user) {
+      const profile = await getProfile(data.user);
+      setToken(data.session.access_token);
+      setUser(profile);
+    }
+    return { needsEmailConfirmation: !data.session };
+  };
+
+  const loginWithGoogle = async () => {
+    if (supabaseConfigError) throw new Error(supabaseConfigError);
+    const redirectTo = Platform.OS === 'web'
+      ? window.location.origin
+      : 'fittime://auth/callback';
+    const { data, error } = await supabase.auth.signInWithOAuth({
+      provider: 'google',
+      options: { redirectTo, skipBrowserRedirect: true },
+    });
+    if (error) throw error;
+    if (!data.url) throw new Error('Supabase no devolvió la dirección de inicio con Google.');
+
+    if (Platform.OS === 'web') {
+      window.location.assign(data.url);
+      return;
+    }
+
+    const result = await WebBrowser.openAuthSessionAsync(data.url, redirectTo);
+    if (result.type !== 'success' || !result.url) return;
+    const callback = new URL(result.url);
+    const code = callback.searchParams.get('code');
+    if (code) {
+      const { data: sessionData, error: sessionError } = await supabase.auth.exchangeCodeForSession(code);
+      if (sessionError) throw sessionError;
+      if (!sessionData.user || !sessionData.session) throw new Error('Google no devolvió una sesión válida.');
+      setToken(sessionData.session.access_token);
+      setUser(await getProfile(sessionData.user));
+      return;
+    }
+
+    const params = new URLSearchParams(callback.hash.slice(1));
+    const access_token = params.get('access_token');
+    const refresh_token = params.get('refresh_token');
+    if (!access_token || !refresh_token) {
+      throw new Error('No se recibió una sesión de Google. Comprueba la URL de redirección de Supabase.');
+    }
+    const { data: sessionData, error: sessionError } = await supabase.auth.setSession({
+      access_token,
+      refresh_token,
+    });
+    if (sessionError) throw sessionError;
+    if (!sessionData.user || !sessionData.session) throw new Error('Google no devolvió una sesión válida.');
+    setToken(sessionData.session.access_token);
+    setUser(await getProfile(sessionData.user));
+  };
+
+  const requestPasswordReset = async (email) => {
+    if (supabaseConfigError) throw new Error(supabaseConfigError);
+    const { error } = await supabase.auth.resetPasswordForEmail(email.trim().toLowerCase());
+    if (error) throw error;
+  };
+
+  const resetPassword = async (email, code, password) => {
+    if (supabaseConfigError) throw new Error(supabaseConfigError);
+    const { error: verifyError } = await supabase.auth.verifyOtp({
+      email: email.trim().toLowerCase(),
+      token: code.trim(),
+      type: 'recovery',
+    });
+    if (verifyError) throw verifyError;
+    const { error } = await supabase.auth.updateUser({ password });
+    if (error) throw error;
+    const { error: signOutError } = await supabase.auth.signOut();
+    if (signOutError) throw signOutError;
+  };
+
+  const updateProfile = async ({ nombre, apellido, telefono }) => {
+    if (supabaseConfigError) throw new Error(supabaseConfigError);
+    if (!user?.id) throw new Error('No se encontró el perfil autenticado.');
+    const { data, error } = await supabase
+      .from('usuarios')
+      .update({ nombre: nombre.trim(), apellido: apellido.trim(), telefono: (telefono || '').trim() || null })
+      .eq('id', user.id)
+      .select(PERFIL_COLUMNAS)
+      .single();
+    if (error) throw error;
+    setUser({ ...data, authId: user.authId });
+  };
+
+  const changePassword = async (password) => {
+    if (supabaseConfigError) throw new Error(supabaseConfigError);
+    const { error } = await supabase.auth.updateUser({ password });
+    if (error) throw error;
+  };
+
+  // Actualiza campos del perfil en memoria (por ejemplo, la foto o las preferencias ya guardadas).
+  const patchUser = (cambios) => setUser((prev) => (prev ? { ...prev, ...cambios } : prev));
+
+  const logout = async () => {
+    const { error } = await supabase.auth.signOut();
+    if (error) throw error;
+  };
+
+  return (
+    <AuthContext.Provider
+      value={{
+        token,
+        user,
+        isLoading,
+        isAuthenticated: !!token && !!user,
+        login,
+        signup,
+        loginWithGoogle,
+        requestPasswordReset,
+        resetPassword,
+        updateProfile,
+        changePassword,
+        patchUser,
+        logout,
+      }}
+    >
+      {children}
+    </AuthContext.Provider>
+  );
+};
+
+export const useAuth = () => useContext(AuthContext);

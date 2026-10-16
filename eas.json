@@ -1,0 +1,17 @@
+{
+  "build": {
+    "preview": {
+      "android": {
+        "buildType": "apk"
+      },
+      "env": {
+        "EXPO_PUBLIC_SUPABASE_URL": "https://wkjdocveagfjhbbiainn.supabase.co",
+        "EXPO_PUBLIC_SUPABASE_PUBLISHABLE_KEY": "sb_publishable_XzY6bK0U5WzVY2omoF_yrw_RkzXYpyu"
+      },
+      "distribution": "internal"
+    }
+  },
+  "cli": {
+    "appVersionSource": "remote"
+  }
+}

@@ -1,0 +1,43 @@
+{
+  "expo": {
+    "name": "FitTime",
+    "slug": "fittime-gym",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "userInterfaceStyle": "automatic",
+    "scheme": "fittime",
+    "splash": {
+      "resizeMode": "contain",
+      "backgroundColor": "#0b1120"
+    },
+    "ios": {
+      "supportsTablet": true
+    },
+    "android": {
+      "adaptiveIcon": {
+        "backgroundColor": "#0b1120"
+      },
+      "package": "com.constanza.fittime"
+    },
+    "web": {
+      "bundler": "metro"
+    },
+    "extra": {
+      "eas": {
+        "projectId": "a3607b97-441e-4582-8f8f-7711cf79c799"
+      }
+    },
+    "plugins": [
+      "expo-web-browser",
+      "expo-notifications",
+      "expo-secure-store",
+      [
+        "expo-image-picker",
+        {
+          "photosPermission": "FitTime usa tus fotos para tu imagen de perfil.",
+          "cameraPermission": false
+        }
+      ]
+    ]
+  }
+}
