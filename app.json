@@ -17,15 +17,13 @@
       "adaptiveIcon": {
         "backgroundColor": "#0b1120"
       },
-      "package": "com.constanza.fittime"
+      "package": "com.constanza.fittime",
+      "permissions": [
+        "android.permission.RECORD_AUDIO"
+      ]
     },
     "web": {
       "bundler": "metro"
-    },
-    "extra": {
-      "eas": {
-        "projectId": "a3607b97-441e-4582-8f8f-7711cf79c799"
-      }
     },
     "plugins": [
       "expo-web-browser",
@@ -38,6 +36,11 @@
           "cameraPermission": false
         }
       ]
-    ]
+    ],
+    "extra": {
+      "eas": {
+        "projectId": "b98a7ed5-ecfe-4989-b693-60600abc5361"
+      }
+    }
   }
 }
