@@ -12,7 +12,9 @@ export const supabaseConfigError =
   configuredUrl.includes('your-project') ||
   configuredKey.includes('your-supabase')
     ? 'Configura la URL y la clave publicable de Supabase en el archivo .env.'
-    : null;
+    : !/^(sb_publishable_|eyJ)/.test(configuredKey)
+      ? 'La clave de Supabase del archivo .env no es válida: debe empezar con "sb_publishable_". Copiala de Project Settings → API Keys y reiniciá con "npx expo start -c".'
+      : null;
 
 const supabaseUrl = configuredUrl || 'https://TU-PROYECTO.supabase.co';
 const supabaseAnonKey = configuredKey || 'TU_CLAVE_PUBLICABLE';

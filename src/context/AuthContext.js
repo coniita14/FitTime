@@ -5,7 +5,7 @@ import { supabase, supabaseConfigError } from '../config/supabase';
 
 const AuthContext = createContext();
 
-const PERFIL_COLUMNAS = 'id, nombre, apellido, email, rol, telefono, activo, avatar_url, notificaciones_activas, recordatorio_minutos';
+const PERFIL_COLUMNAS = 'id, nombre, apellido, email, rol, telefono, activo, avatar_url, notificaciones_activas, recordatorio_minutos, creado_en';
 
 WebBrowser.maybeCompleteAuthSession();
 
@@ -70,30 +70,40 @@ export const AuthProvider = ({ children }) => {
     };
   }, []);
 
-  const login = async (email, password) => {
+  // rolEsperado: el tipo de cuenta que la persona eligió en el login (CLIENTE, ENTRENADOR o ADMIN).
+  // Si no coincide con el rol guardado en la base, se cierra la sesión y no se entra.
+  const login = async (email, password, rolEsperado) => {
     if (supabaseConfigError) throw new Error(supabaseConfigError);
-    setIsLoading(true);
-    try {
-      const { data, error } = await supabase.auth.signInWithPassword({
-        email: email.trim().toLowerCase(),
-        password,
-      });
-      if (error) throw error;
-      const profile = await getProfile(data.user);
-      setToken(data.session.access_token);
-      setUser(profile);
-      return profile;
-    } finally {
-      setIsLoading(false);
+    const { data, error } = await supabase.auth.signInWithPassword({
+      email: email.trim().toLowerCase(),
+      password,
+    });
+    if (error) throw error;
+    const profile = await getProfile(data.user);
+    if (rolEsperado && profile.rol !== rolEsperado) {
+      await supabase.auth.signOut();
+      const sugerencia = {
+        CLIENTE: 'Esta es una cuenta de cliente. Elegí "Cliente" para ingresar.',
+        ENTRENADOR: 'Esta es una cuenta de entrenador. Elegí "Entrenador" para ingresar.',
+        ADMIN: 'Esta es una cuenta de administrador. Usá "Acceso administrador", abajo de todo.',
+      };
+      throw new Error(sugerencia[profile.rol] || 'El tipo de cuenta elegido no coincide con tu usuario.');
     }
+    if (!profile.activo) {
+      await supabase.auth.signOut();
+      throw new Error('Tu cuenta está dada de baja. Consultá en el gimnasio.');
+    }
+    setToken(data.session.access_token);
+    setUser(profile);
+    return profile;
   };
 
-  const signup = async ({ nombre, email, password }) => {
+  const signup = async ({ nombre, apellido = '', telefono = '', email, password }) => {
     if (supabaseConfigError) throw new Error(supabaseConfigError);
     const { data, error } = await supabase.auth.signUp({
       email: email.trim().toLowerCase(),
       password,
-      options: { data: { nombre: nombre.trim() } },
+      options: { data: { nombre: nombre.trim(), apellido: apellido.trim(), telefono: telefono.trim() } },
     });
     if (error) throw error;
     if (data.session && data.user) {
@@ -183,8 +193,13 @@ export const AuthProvider = ({ children }) => {
     setUser({ ...data, authId: user.authId });
   };
 
-  const changePassword = async (password) => {
+  const changePassword = async (password, passwordActual) => {
     if (supabaseConfigError) throw new Error(supabaseConfigError);
+    if (passwordActual !== undefined) {
+      // Verifica la contraseña actual antes de cambiarla (pantalla 3D).
+      const { error: authError } = await supabase.auth.signInWithPassword({ email: user.email, password: passwordActual });
+      if (authError) throw new Error('La contraseña actual no es correcta.');
+    }
     const { error } = await supabase.auth.updateUser({ password });
     if (error) throw error;
   };

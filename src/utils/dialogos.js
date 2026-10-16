@@ -34,13 +34,14 @@ export const DIA_LABEL = {
   LUNES: 'Lunes', MARTES: 'Martes', MIERCOLES: 'Miércoles', JUEVES: 'Jueves',
   VIERNES: 'Viernes', SABADO: 'Sábado', DOMINGO: 'Domingo',
 };
-export const CATEGORIAS = ['FUERZA', 'CARDIO', 'TREN_SUPERIOR', 'TREN_INFERIOR', 'CUERPO_COMPLETO', 'MOVILIDAD'];
+export const CATEGORIAS = ['FUERZA', 'CARDIO', 'MOVILIDAD', 'PERDIDA_PESO', 'TREN_SUPERIOR', 'TREN_INFERIOR', 'CUERPO_COMPLETO'];
 export const CATEGORIA_LABEL = {
   FUERZA: 'Fuerza', CARDIO: 'Cardio', TREN_SUPERIOR: 'Tren superior',
-  TREN_INFERIOR: 'Tren inferior', CUERPO_COMPLETO: 'Cuerpo completo', MOVILIDAD: 'Movilidad',
+  TREN_INFERIOR: 'Tren inferior', CUERPO_COMPLETO: 'Cuerpo completo', MOVILIDAD: 'Flexibilidad', PERDIDA_PESO: 'Pérdida de peso',
 };
 export const NIVELES = ['PRINCIPIANTE', 'INTERMEDIO', 'AVANZADO'];
 export const NIVEL_LABEL = { PRINCIPIANTE: 'Principiante', INTERMEDIO: 'Intermedio', AVANZADO: 'Avanzado' };
+export const ROL_LABEL = { CLIENTE: 'Cliente', ENTRENADOR: 'Entrenador', ADMIN: 'Administrador' };
 export const ESTADO_LABEL = {
   CONFIRMADO: 'Confirmado', CANCELADO: 'Cancelado', COMPLETADO: 'Asistió', AUSENTE: 'Ausente',
 };

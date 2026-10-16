@@ -47,112 +47,65 @@ Las funciones SQL `SECURITY DEFINER` cumplen el rol que tendrían los *controlle
 
 ## 2. Estructura de carpetas
 
-### 2.1 Estructura objetivo
-
-Los elementos marcados con ✱ todavía no existen y hay que crearlos. Los marcados con ↻ existen pero se mueven o se renombran.
+### 2.1 Estructura implementada
 
 ```
 Gimnasio-proyectoFinal/
-├── App.js                       # Providers: SafeArea → Theme → Auth → Navigator
-├── app.json                     # Nombre, scheme fittime://, package Android, plugins
-├── eas.json                     # Perfil "preview" = APK
-├── .env.example                 # EXPO_PUBLIC_SUPABASE_URL / _PUBLISHABLE_KEY
-│
-├── database/                    # Backend: todo el SQL versionado, en orden
-│   ├── init_fittime.sql         # 01 · Tablas base, RLS, reservar/cancelar turno
-│   ├── 02_mejoras_fittime.sql   # 02 · Categorías, perfil, favoritas, notificaciones, admin, storage
-│   └── 03_cuentas_prueba.sql    # 03 · Rol ADMIN y datos de la cuenta de evaluación
-│
-├── supabase/functions/          # ✱ (opcional) Edge Function "enviar-push" para push remoto
-│
-├── docs/
-│   ├── ARQUITECTURA.md          # Este documento
-│   ├── MODELO_DATOS.md          # Diagrama ER y diccionario de datos
-│   ├── GUIA_PRUEBA.md           # Guía del profesor con credenciales
-│   ├── LANDING_CONTENIDO.md     # Textos de la landing
-│   └── DEFENSA_ORAL.md
-│
-├── public_landing/              # Sitio público estático
-│   ├── index.html
-│   ├── styles.css
-│   └── assets/                  # ✱ capturas de pantalla, logo
-│
+├── App.js · app.json · eas.json · .env.example
+├── assets/bienvenida.jpg          # Foto de la pantalla 1B
+├── database/                      # SQL versionado, en orden: init → 02 → 03 → 05a → 05b → 06
+├── docs/                          # Arquitectura, modelo de datos, guía de pruebas, landing, defensa
+├── public_landing/                # Landing pública (index.html + styles.css)
 └── src/
-    ├── config/
-    │   └── supabase.js          # Cliente Supabase + sesión persistente (SecureStore)
-    ├── context/
-    │   ├── AuthContext.js       # user, rol, login, signup, Google, logout, reset
-    │   └── ThemeContext.js      # claro / oscuro persistido
-    ├── navigation/
-    │   ├── AppNavigator.js      # Decide: sin sesión → Auth · CLIENTE → ClienteTabs · ADMIN → AdminNavigator
-    │   ├── AuthStack.js         # ✱
-    │   ├── ClienteTabs.js       # ✱ Inicio · Turnos · Rutinas · Perfil
-    │   └── AdminNavigator.js    # ✱ Sidebar en web / tabs en móvil
-    ├── services/                # ↻ hoy se llama src/api/
-    │   ├── turnos.service.js    # ↻ separar de gym.service.js
-    │   ├── rutinas.service.js   # ↻ separar de gym.service.js (+ categorías y favoritas)
-    │   ├── perfil.service.js    # ✱ datos, avatar (Storage), preferencias
-    │   ├── notificaciones.service.js  # ✱ historial + recordatorio local
-    │   └── admin.service.js     # ✱ ABM horarios/rutinas/ejercicios, usuarios, turnos, estadísticas
-    ├── hooks/                   # ✱ useAsync (loading/error), useResponsive (web vs móvil)
-    ├── utils/
-    │   ├── errores.js           # ✱ Traduce códigos de PostgreSQL/Auth a mensajes claros
-    │   ├── fechas.js            # ✱ localDate, próximo día del horario
-    │   └── validaciones.js      # ✱ email, contraseña (≥ 8), teléfono
+    ├── api/
+    │   ├── cliente.service.js     # Horarios por fecha, reservas, mis turnos, rutinas, progreso, perfil, foto
+    │   ├── gym.service.js         # Cancelar turno y recordatorios locales
+    │   └── admin.service.js       # Panel: estadísticas, ABM, usuarios/roles, turnos, reportes
     ├── components/
-    │   ├── common/              # CustomButton, CustomInput, StatusBadge, LoadingState ✱, EmptyState ✱, ErrorBanner ✱
-    │   ├── cliente/             # ✱ TurnoCard, HorarioItem, RutinaCard, CategoriaChips
-    │   └── admin/               # ✱ StatCard, DataTable, FormModal, ConfirmDialog
+    │   ├── cliente/ui.js          # Kit visual de los wireframes (Screen, Card, Button, Chip, TabBar, BottomSheet…)
+    │   ├── cliente/NotificacionesModal.js
+    │   ├── admin/AdminUI.js       # Kit del panel (tarjetas, modales, chips)
+    │   └── CustomButton / CustomInput
+    ├── config/  supabase.js · gimnasio.js
+    ├── context/ AuthContext.js · ThemeContext.js
+    ├── navigation/AppNavigator.js # Splash → Bienvenida → Login/Registro → app según rol
     ├── screens/
-    │   ├── auth/                # ↻ Login, Signup, ForgotPassword, ResetPassword
-    │   ├── cliente/             # ↻ dividir HomeScreen.js (36 KB) en:
-    │   │   ├── HomeClienteScreen.js       # próximos turnos + rutina activa
-    │   │   ├── TurnosScreen.js            # horarios por día, reservar/cancelar
-    │   │   ├── RutinasScreen.js           # ✱ catálogo por categoría + favoritas
-    │   │   ├── RutinaDetalleScreen.js
-    │   │   └── NotificacionesScreen.js    # ✱
-    │   ├── admin/               # ✱
-    │   │   ├── DashboardScreen.js         # estadísticas + accesos rápidos
-    │   │   ├── HorariosScreen.js          # ABM horarios
-    │   │   ├── RutinasAdminScreen.js      # ABM rutinas + ejercicios de cada rutina
-    │   │   ├── EjerciciosScreen.js        # ABM catálogo de ejercicios
-    │   │   ├── UsuariosScreen.js          # listado, rol, alta/baja, asignar rutina
-    │   │   └── TurnosAdminScreen.js       # turnos por fecha, marcar asistió/ausente/cancelar
-    │   └── comun/
-    │       └── PerfilScreen.js            # datos, foto, clave, tema, notificaciones, logout
-    └── styles/
-        └── theme.js             # Paletas claro/oscuro
+    │   ├── auth/                  # 1A Splash, 1B Bienvenida, 1C Login, 1D Registro, Recuperar contraseña
+    │   ├── cliente/               # ClienteApp (barra Horarios·Turnos·Rutinas·Perfil) + 2A–2F y 3A–3D
+    │   └── admin/                 # AdminScreen (rol ADMIN o ENTRENADOR) y sus secciones
+    ├── styles/theme.js            # brand (colores de los wireframes) + colores del panel
+    └── utils/                     # errores.js · dialogos.js · fechas.js · exportar.js
 ```
 
-### 2.2 Archivos heredados que conviene borrar
+### 2.2 Correspondencia con los wireframes
 
-Estos archivos vienen de otro proyecto (gestión de materias/profesores) y apuntan a una API en `http://172.16.3.24:3000`, que **no existe en FitTime** y rompe el requisito de "no depender de localhost":
-
-- `src/api/client.js`, `src/api/auth.service.js`, `src/api/user.service.js`, `src/api/materia.service.js`
-- `src/config/api.config.js`
-- `src/components/MateriaCard.js`, `src/components/ProfesorCard.js`
-- En `StatusBadge.js` y `SignupScreen.js` quedan referencias a roles `ALUMNO` / `PROFESOR`: cambiarlas por `CLIENTE` / `ADMIN`.
-
-Antes de borrar, verificar con "Buscar en archivos" de VS Code que ninguna pantalla los importe.
+| Wireframe | Archivo |
+|---|---|
+| 1A Splash · 1B Bienvenida · 1C Login · 1D Registro | `screens/auth/*` |
+| 2A Horarios (calendario) · 2B Bloques · 2C Confirmar reserva | `HorariosScreen`, `BloquesScreen` |
+| 2D Mis Turnos · 2E Detalle del turno | `MisTurnosScreen`, `TurnoDetalleScreen` |
+| 2F Rutinas · 3A Detalle de rutina · 3B Ejercicio | `RutinasScreen`, `RutinaDetalleScreen`, `EjercicioDetalleScreen` |
+| 3C Perfil · 3D Cambiar contraseña | `PerfilScreen`, `CambiarClaveScreen` |
+| Menú administrador (workframe) | `screens/admin/*` |
 
 ## 3. Roles y permisos (defensa en dos capas)
 
 | Capa | Cómo se aplica |
 |---|---|
-| **Frontend** | `AppNavigator` lee `user.rol` y muestra `ClienteTabs` o `AdminNavigator`. Un cliente nunca ve pantallas de admin. |
+| **Frontend** | `AppNavigator` lee `user.rol`: CLIENTE → `ClienteApp` (Horarios / Turnos / Rutinas / Perfil), ENTRENADOR → `AdminScreen rol="ENTRENADOR"`, ADMIN → `AdminScreen rol="ADMIN"`. |
 | **Backend** | RLS en todas las tablas + funciones que verifican `current_user_is_admin()`. Aunque alguien llame a la API a mano con un token de cliente, PostgreSQL rechaza la operación. |
 
 Reglas principales:
 
-| Recurso | Cliente | Administrador |
-|---|---|---|
-| Su perfil (nombre, teléfono, foto, preferencias) | Leer / editar | Leer / editar |
-| Rol y estado activo de usuarios | — | `admin_actualizar_usuario()` (no puede cambiarse a sí mismo) |
-| Horarios | Ver activos | ABM completo |
-| Turnos | Reservar / cancelar los propios (`reservar_turno`, `cancelar_turno`) | Ver todos, cambiar estado con motivo (`admin_gestionar_turno`) |
-| Rutinas y ejercicios | Ver activos, guardar favoritas | ABM completo, asignar a clientes (`admin_asignar_rutina`) |
-| Notificaciones | Ver y marcar como leídas las propias | Enviar avisos generales |
-| Estadísticas | — | `admin_estadisticas()` |
+| Recurso | Cliente | Entrenador | Administrador |
+|---|---|---|---|
+| Su perfil (nombre, teléfono, foto, preferencias) | Leer / editar | Leer / editar | Leer / editar |
+| Rol y estado activo de usuarios | — | — | `admin_actualizar_usuario()` (no puede cambiarse a sí mismo) |
+| Horarios | Ver activos | Ver los suyos | ABM completo y asignar instructor |
+| Turnos | Reservar / cancelar los propios | Ver y gestionar los de **sus** clases | Ver todos y gestionar con motivo |
+| Rutinas y ejercicios | Ver activos, guardar favoritas, marcar completados | ABM, consejos y asignar a clientes | ABM y asignar a clientes |
+| Notificaciones | Ver y marcar como leídas las propias | — | Enviar avisos generales |
+| Estadísticas | — | `entrenador_resumen()` | `admin_estadisticas()` |
 
 El rol se guarda en `usuarios.rol`. Todo registro nuevo nace como `CLIENTE`; el primer `ADMIN` se asigna desde el SQL Editor de Supabase (`03_cuentas_prueba.sql`) y, después, desde el dashboard.
 

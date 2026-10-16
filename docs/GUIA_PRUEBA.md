@@ -23,10 +23,13 @@ Esta guía permite evaluar los 12 requisitos obligatorios en unos 20 minutos. No
 |---|---|---|---|
 | Administrador | `admin@fittime.com` | `FitTime2026!` | Dashboard, ABM, usuarios, turnos, estadísticas |
 | Cliente | `cliente@fittime.com` | `FitTime2026!` | Reservas, rutinas, perfil, notificaciones |
+| Entrenador | `entrenador@fittime.com` | `FitTime2026!` | Sus clases, alumnos, rutinas y consejos de ejercicios |
 
 Son cuentas de demostración sin datos reales; la contraseña se cambiará después de la evaluación.
 
-**Para probar el registro y la recuperación de contraseña**, crear una cuenta nueva con un correo propio: el código de recuperación llega a esa casilla (las cuentas `@fittime.com` no reciben correo).
+**Registro:** se puede usar cualquier correo (no se envía mail de confirmación).
+
+**Recuperación de contraseña:** el código se envía por mail. Con el servicio de correo gratuito de Supabase sólo llega a las casillas de los miembros del proyecto, por eso esta prueba se demuestra con la cuenta de la autora (las cuentas `@fittime.com` no reciben correo).
 
 ---
 
@@ -35,7 +38,7 @@ Son cuentas de demostración sin datos reales; la contraseña se cambiará despu
 Marcar cada casilla al verificarla.
 
 ### R1 · Autenticación y seguridad
-- [ ] **Registro:** "Crear cuenta" con nombre, correo propio y contraseña de 8 o más caracteres → la cuenta se crea con rol Cliente (pide confirmar el correo si está activado).
+- [ ] **Registro:** "Crear cuenta" con nombre, apellido, teléfono, cualquier correo y contraseña de 8 o más caracteres, aceptando los términos → la cuenta se crea con rol Cliente y entra directo (sin confirmación por mail).
 - [ ] **Login inválido:** `cliente@fittime.com` con contraseña `123` → *"Correo o contraseña incorrectos"*, sin entrar.
 - [ ] **Login válido:** `cliente@fittime.com` / `FitTime2026!` → entra al Inicio del cliente.
 - [ ] **Sesión persistente:** cerrar la app por completo y volver a abrirla → sigue logueado.
@@ -43,6 +46,9 @@ Marcar cada casilla al verificarla.
 - [ ] **Recuperar contraseña:** "¿Olvidaste tu contraseña?" con el correo propio → llega un código de 6 dígitos → ingresar código y clave nueva → iniciar sesión con la clave nueva.
 - [ ] **Google:** "Continuar con Google" → elegir cuenta → entra como Cliente.
 - [ ] **JWT:** (técnico) en la web, DevTools → Network → cualquier pedido a `supabase.co` lleva `Authorization: Bearer eyJ...`.
+
+- [ ] **Ingresar como Cliente o Entrenador:** en *Iniciar Sesión* elegir el tipo de cuenta. Con `entrenador@fittime.com` en "Entrenador" se abre el panel del entrenador; con `cliente@fittime.com` en "Cliente", la app del cliente.
+- [ ] **Tipo equivocado:** `entrenador@fittime.com` con "Cliente" seleccionado → *"Esta es una cuenta de entrenador. Elegí 'Entrenador' para ingresar."* y no entra. El administrador usa "Acceso administrador".
 
 ### R2 · Pantalla principal según rol
 - [ ] Como **cliente**: el Inicio muestra próximos turnos y la rutina asignada.
@@ -57,6 +63,14 @@ Marcar cada casilla al verificarla.
 ### R4 · Multiusuario y roles
 - [ ] Logueado como cliente no aparece ningún menú de administración.
 - [ ] (técnico) Con la sesión de cliente, ejecutar `admin_estadisticas()` desde la API → error `SOLO_ADMIN`. Las reglas están en PostgreSQL (RLS), no sólo en la interfaz.
+
+### R4b · Entrenador
+- [ ] Entrar como `entrenador@fittime.com`: se abre el **panel del entrenador** (sin Horarios ni Usuarios).
+- [ ] *Inicio* muestra sus clases de hoy y la ocupación.
+- [ ] *Alumnos* → asignar "Fuerza Base 5x5" a un cliente con una indicación → el cliente la ve en *Rutinas → Tu rutina* con "Asignada por …" y la indicación.
+- [ ] *Ejercicios* → editar los consejos de "Sentadilla Libre" → el cliente los ve en el detalle del ejercicio ("Consejos del entrenador").
+- [ ] *Mis clases* → marcar a un alumno como "Asistió".
+- [ ] Como cliente, el detalle del turno muestra el **Instructor** de la clase.
 
 ### R5 · Interacción entre usuarios
 - [ ] Como **cliente**, reservar un turno → como **admin**, verlo en la lista de turnos de esa fecha con el nombre del cliente.

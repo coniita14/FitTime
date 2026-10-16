@@ -33,7 +33,87 @@ const base64ABytes = (base64) => {
   return bytes.slice(0, j);
 };
 
+const hoyLocal = () => {
+  const d = new Date();
+  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+};
+
+const COLUMNAS_EJERCICIO = 'id, nombre, grupo_muscular, descripcion, video_url, musculos, consejos';
+
 export const clienteService = {
+  // ---------- Horarios y reservas (2A–2C) ----------
+  diasConClases: async () => {
+    listo();
+    const data = await run(supabase.from('horarios').select('dia').eq('activo', true));
+    return [...new Set(data.map((h) => h.dia))];
+  },
+  horariosPorFecha: (fecha) => { listo(); return run(supabase.rpc('horarios_por_fecha', { p_fecha: fecha })); },
+  reservar: (horarioId, fecha) => {
+    listo();
+    return run(supabase.rpc('reservar_turno', { p_horario_id: horarioId, p_fecha_turno: fecha }));
+  },
+
+  // ---------- Mis turnos (2D–2E) ----------
+  misTurnos: () => {
+    listo();
+    return run(supabase.from('turnos')
+      .select('id, fecha_turno, estado, creado_en, cancelado_en, horario_id, horarios(dia, hora_inicio, hora_fin, cupo_maximo, usuarios(nombre, apellido))')
+      .order('fecha_turno', { ascending: false })
+      .order('id', { ascending: false }));
+  },
+
+  // ---------- Rutinas (2F, 3A, 3B) ----------
+  miRutinaAsignada: (usuarioId) => {
+    listo();
+    return run(supabase.from('rutina_asignada')
+      .select('id, rutina_id, observaciones, fecha_inicio, rutinas(id, nombre, objetivo, nivel, categoria), asignador:usuarios!rutina_asignada_asignada_por_fkey(nombre, apellido, rol)')
+      .eq('usuario_id', usuarioId)
+      .eq('activa', true)
+      .order('fecha_inicio', { ascending: false })
+      .limit(1)
+      .maybeSingle());
+  },
+  catalogo: () => {
+    listo();
+    return run(supabase.from('rutinas')
+      .select('id, nombre, objetivo, descripcion, nivel, categoria, duracion_minutos, rutina_detalle(count)')
+      .eq('activa', true)
+      .order('nombre'));
+  },
+  rutina: (id) => {
+    listo();
+    return run(supabase.from('rutinas')
+      .select(`id, nombre, objetivo, descripcion, nivel, categoria, duracion_minutos, rutina_detalle(id, orden, series, repeticiones, descanso_segundos, ejercicios(${COLUMNAS_EJERCICIO}))`)
+      .eq('id', id)
+      .single());
+  },
+  completadosHoy: async () => {
+    listo();
+    const data = await run(supabase.from('ejercicios_completados').select('rutina_detalle_id').eq('fecha', hoyLocal()));
+    return data.map((c) => c.rutina_detalle_id);
+  },
+  marcarCompletado: (detalleId, completado) => {
+    listo();
+    return completado
+      ? run(supabase.from('ejercicios_completados').insert({ rutina_detalle_id: detalleId, fecha: hoyLocal() }))
+      : run(supabase.from('ejercicios_completados').delete().eq('rutina_detalle_id', detalleId).eq('fecha', hoyLocal()));
+  },
+
+  // ---------- Perfil (3C) ----------
+  estadisticasPerfil: async () => {
+    listo();
+    const contar = async (q) => {
+      const { count, error } = await q;
+      if (error) throw error;
+      return count || 0;
+    };
+    const [turnos, guardadas] = await Promise.all([
+      contar(supabase.from('turnos').select('id', { count: 'exact', head: true }).in('estado', ['CONFIRMADO', 'COMPLETADO'])),
+      contar(supabase.from('rutinas_guardadas').select('rutina_id', { count: 'exact', head: true })),
+    ]);
+    return { turnos, guardadas };
+  },
+
   // ---------- Catálogo de rutinas ----------
   listarRutinas: () => {
     listo();

@@ -1,6 +1,6 @@
 # Modelo de datos de FitTime (PostgreSQL)
 
-Scripts, en orden de ejecución: `database/init_fittime.sql` → `database/02_mejoras_fittime.sql` → `database/03_cuentas_prueba.sql`.
+Scripts, en orden de ejecución: `init_fittime.sql` → `02_mejoras_fittime.sql` → `03_cuentas_prueba.sql` → `05a_roles_y_categorias.sql` → `05b_entrenadores_y_diseno.sql`.
 
 ## 1. Diagrama entidad-relación
 
@@ -142,11 +142,11 @@ erDiagram
 
 | Tipo | Valores |
 |---|---|
-| `rol_usuario` | `CLIENTE`, `ADMIN` |
+| `rol_usuario` | `CLIENTE`, `ENTRENADOR`, `ADMIN` |
 | `estado_turno` | `CONFIRMADO`, `CANCELADO`, `COMPLETADO`, `AUSENTE` |
 | `dia_semana` | `LUNES` … `DOMINGO` |
 | `nivel_dificultad` | `PRINCIPIANTE`, `INTERMEDIO`, `AVANZADO` |
-| `categoria_rutina` | `FUERZA`, `CARDIO`, `TREN_SUPERIOR`, `TREN_INFERIOR`, `CUERPO_COMPLETO`, `MOVILIDAD` |
+| `categoria_rutina` | `FUERZA`, `CARDIO`, `MOVILIDAD` (Flexibilidad), `PERDIDA_PESO`, `TREN_SUPERIOR`, `TREN_INFERIOR`, `CUERPO_COMPLETO` |
 
 ### Restricciones de integridad importantes
 
@@ -181,3 +181,17 @@ erDiagram
 | `turnos_notificar` | `turnos` | Notificación de confirmación o cancelación. |
 | `rutina_asignada_notificar` | `rutina_asignada` | Notificación "Nueva rutina asignada". |
 | `usuarios_set_actualizado_en` | `usuarios` | Actualiza la fecha de modificación. |
+
+## 4. Cambios de la versión con Entrenador y diseño final (05a / 05b)
+
+| Cambio | Para qué pantalla |
+|---|---|
+| Rol `ENTRENADOR` | Panel del entrenador: sus clases, alumnos, rutinas y ejercicios |
+| `horarios.entrenador_id` → `usuarios` | "Instructor" en Confirmar Reserva (2C) y Detalle del Turno (2E) |
+| `ejercicios.musculos TEXT[]`, `ejercicios.consejos` | "Músculos involucrados" y "Consejos del entrenador" (3B) |
+| Tabla `ejercicios_completados (usuario_id, rutina_detalle_id, fecha)` | Progreso "3/8 completados" (3A) y "Marcar como completado" (3B) |
+| Función `horarios_por_fecha(fecha)` | Bloques del día elegido en el calendario (2A / 2B) |
+| Función `entrenador_resumen()` | Inicio del entrenador |
+| `current_user_is_staff()` | RLS: administrador **o** entrenador pueden crear rutinas/ejercicios y asignar rutinas |
+| Política de `turnos` | El entrenador sólo ve los turnos de **sus** clases |
+| Trigger de registro | Guarda apellido y teléfono del formulario 1D |

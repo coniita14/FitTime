@@ -1,23 +1,21 @@
 import React, { useCallback, useEffect, useState } from 'react';
-import { View, Text, StyleSheet } from 'react-native';
-import { useTheme } from '../../context/ThemeContext';
+import { View } from 'react-native';
 import { adminService } from '../../api/admin.service';
 import { mensajeDeError } from '../../utils/errores';
 import { avisar, confirmar } from '../../utils/dialogos';
-import { CustomInput } from '../../components/CustomInput';
 import {
-  ScreenHeader, LoadingState, ErrorState, EmptyState, Card, Badge, IconButton, FormModal,
+  ScreenHeader, Toolbar, SearchBox, Select, DataTable, CellText, Actions, Badge, IconButton, FormModal, FormField, FormRow,
 } from '../../components/admin/AdminUI';
 
-const VACIO = { id: null, nombre: '', grupo_muscular: '', descripcion: '', video_url: '' };
+const VACIO = { id: null, nombre: '', grupo_muscular: '', descripcion: '', video_url: '', musculos: '', consejos: '' };
 
-export const EjerciciosAdmin = () => {
-  const { theme } = useTheme();
-  const s = createStyles(theme);
+// 3D · Gestión de Ejercicios
+export const EjerciciosAdmin = ({ busqueda = '', setBusqueda = () => {} }) => {
   const [items, setItems] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const [busqueda, setBusqueda] = useState('');
+  const [grupo, setGrupo] = useState('TODOS');
+  const [estado, setEstado] = useState('TODOS');
   const [form, setForm] = useState(null);
   const [errores, setErrores] = useState({});
   const [saving, setSaving] = useState(false);
@@ -37,7 +35,10 @@ export const EjerciciosAdmin = () => {
 
   const abrir = (ej) => {
     setErrores({});
-    setForm(ej ? { ...VACIO, ...ej, descripcion: ej.descripcion || '', video_url: ej.video_url || '' } : { ...VACIO });
+    setForm(ej ? {
+      ...VACIO, ...ej, descripcion: ej.descripcion || '', video_url: ej.video_url || '',
+      musculos: (ej.musculos || []).join(', '), consejos: ej.consejos || '',
+    } : { ...VACIO });
   };
 
   const guardar = async () => {
@@ -69,7 +70,7 @@ export const EjerciciosAdmin = () => {
   };
 
   const eliminar = async (ej) => {
-    if (!(await confirmar('Eliminar ejercicio', `¿Eliminar "${ej.nombre}"?`, 'Eliminar'))) return;
+    if (!(await confirmar('Eliminar ejercicio', `¿Eliminar "${ej.nombre}"? Si forma parte de una rutina no se podrá borrar; en ese caso ocultalo.`, 'Eliminar'))) return;
     try {
       await adminService.eliminarEjercicio(ej.id);
       await cargar();
@@ -78,57 +79,65 @@ export const EjerciciosAdmin = () => {
     }
   };
 
-  if (loading) return <LoadingState />;
-  if (error) return <ErrorState message={error} onRetry={cargar} />;
-
+  const grupos = [...new Set(items.map((i) => i.grupo_muscular))].sort();
   const q = busqueda.trim().toLowerCase();
-  const filtrados = items.filter((i) => !q || i.nombre.toLowerCase().includes(q) || i.grupo_muscular.toLowerCase().includes(q));
+  const filas = items
+    .filter((i) => grupo === 'TODOS' || i.grupo_muscular === grupo)
+    .filter((i) => estado === 'TODOS' || (estado === 'ACTIVO' ? i.activo : !i.activo))
+    .filter((i) => !q || `${i.nombre} ${i.grupo_muscular} ${(i.musculos || []).join(' ')}`.toLowerCase().includes(q));
+
+  const columnas = [
+    { key: 'nombre', title: 'Ejercicio', flex: 1.5, render: (e) => <CellText bold>{e.nombre}</CellText> },
+    { key: 'grupo', title: 'Grupo muscular', flex: 1.3, render: (e) => <CellText>{e.grupo_muscular}</CellText> },
+    { key: 'musc', title: 'Músculos', flex: 1.6, render: (e) => <CellText muted>{e.musculos?.length ? e.musculos.join(', ') : '—'}</CellText> },
+    { key: 'cons', title: 'Consejo', flex: 0.9, render: (e) => <Badge text={e.consejos ? 'Cargado' : 'Falta'} tone={e.consejos ? 'success' : 'warning'} /> },
+    { key: 'estado', title: 'Estado', flex: 0.9, render: (e) => <Badge text={e.activo ? 'Activo' : 'Oculto'} tone={e.activo ? 'success' : 'neutral'} /> },
+    {
+      key: 'acc', title: 'Acciones', flex: 1.3, render: (e) => (
+        <Actions>
+          <IconButton icon="create-outline" label="Editar" tone="primary" onPress={() => abrir(e)} />
+          <IconButton icon={e.activo ? 'eye-off-outline' : 'eye-outline'} onPress={() => alternar(e)} />
+          <IconButton icon="trash-outline" tone="danger" onPress={() => eliminar(e)} />
+        </Actions>
+      ),
+    },
+  ];
 
   return (
     <View>
-      <ScreenHeader title="Ejercicios" subtitle={`${items.length} en el catálogo`} actionLabel="Nuevo ejercicio" onAction={() => abrir(null)} />
-      <CustomInput placeholder="Buscar por nombre o grupo muscular" value={busqueda} onChangeText={setBusqueda} iconName="search-outline" />
+      <ScreenHeader title="Gestión de Ejercicios" subtitle={`${items.length} ejercicios en el catálogo del gimnasio`}
+        actionLabel="Nuevo Ejercicio" onAction={() => abrir(null)} />
+      <Toolbar>
+        <SearchBox value={busqueda} onChangeText={setBusqueda} placeholder="Buscar ejercicio o músculo..." />
+        <Select label="Grupo" value={grupo} onChange={setGrupo}
+          options={[{ value: 'TODOS', label: 'Todos' }, ...grupos.map((g) => ({ value: g, label: g }))]} />
+        <Select label="Estado" value={estado} onChange={setEstado}
+          options={[{ value: 'TODOS', label: 'Todos' }, { value: 'ACTIVO', label: 'Activo' }, { value: 'OCULTO', label: 'Oculto' }]} />
+      </Toolbar>
+      <DataTable columns={columnas} rows={filas} loading={loading} error={error} onRetry={cargar}
+        emptyIcon="body-outline" emptyText="No hay ejercicios que coincidan." />
 
-      {filtrados.length === 0 && <EmptyState icon="body-outline" text="No hay ejercicios que coincidan." />}
-
-      {filtrados.map((ej) => (
-        <Card key={ej.id} muted={!ej.activo} style={s.row}>
-          <View style={{ flex: 1, minWidth: 200 }}>
-            <Text style={s.name}>{ej.nombre}</Text>
-            <Text style={s.group}>{ej.grupo_muscular}</Text>
-            {ej.descripcion ? <Text style={s.desc} numberOfLines={2}>{ej.descripcion}</Text> : null}
-          </View>
-          {!ej.activo && <Badge text="Inactivo" />}
-          <View style={s.actions}>
-            <IconButton icon="create-outline" label="Editar" tone="primary" onPress={() => abrir(ej)} />
-            <IconButton icon={ej.activo ? 'eye-off-outline' : 'eye-outline'} label={ej.activo ? 'Ocultar' : 'Mostrar'} onPress={() => alternar(ej)} />
-            <IconButton icon="trash-outline" tone="danger" onPress={() => eliminar(ej)} />
-          </View>
-        </Card>
-      ))}
-
-      <FormModal visible={!!form} title={form?.id ? 'Editar ejercicio' : 'Nuevo ejercicio'} onClose={() => setForm(null)} onSubmit={guardar} saving={saving}>
+      <FormModal visible={!!form} title={form?.id ? 'Editar Ejercicio' : 'Crear nuevo Ejercicio'} onClose={() => setForm(null)}
+        onSubmit={guardar} submitLabel="Guardar Ejercicio" saving={saving}>
         {form && (
           <>
-            <CustomInput label="Nombre" placeholder="Ej. Remo en máquina" value={form.nombre} error={errores.nombre}
-              onChangeText={(v) => setForm({ ...form, nombre: v })} autoCapitalize="sentences" />
-            <CustomInput label="Grupo muscular" placeholder="Ej. Espalda / Dorsales" value={form.grupo_muscular} error={errores.grupo_muscular}
-              onChangeText={(v) => setForm({ ...form, grupo_muscular: v })} autoCapitalize="sentences" />
-            <CustomInput label="Descripción / técnica" placeholder="Indicaciones de ejecución" value={form.descripcion}
-              onChangeText={(v) => setForm({ ...form, descripcion: v })} autoCapitalize="sentences" />
-            <CustomInput label="Video (opcional)" placeholder="https://…" value={form.video_url} error={errores.video_url}
-              onChangeText={(v) => setForm({ ...form, video_url: v })} keyboardType="url" />
+            <FormRow>
+              <FormField label="Nombre" placeholder="Ej. Remo en máquina" value={form.nombre} error={errores.nombre}
+                onChangeText={(v) => setForm({ ...form, nombre: v })} />
+              <FormField label="Grupo muscular" placeholder="Ej. Espalda" value={form.grupo_muscular} error={errores.grupo_muscular}
+                onChangeText={(v) => setForm({ ...form, grupo_muscular: v })} />
+            </FormRow>
+            <FormField label="Músculos involucrados (separados por coma)" placeholder="Cuádriceps, Glúteos, Core" value={form.musculos}
+              onChangeText={(v) => setForm({ ...form, musculos: v })} />
+            <FormField label="Descripción / técnica" placeholder="Indicaciones de ejecución" multiline value={form.descripcion}
+              onChangeText={(v) => setForm({ ...form, descripcion: v })} />
+            <FormField label="Consejos del entrenador" placeholder="Ej. Evitá que las rodillas sobrepasen la punta de los pies" multiline
+              value={form.consejos} onChangeText={(v) => setForm({ ...form, consejos: v })} />
+            <FormField label="Video (opcional)" placeholder="https://…" value={form.video_url} error={errores.video_url}
+              onChangeText={(v) => setForm({ ...form, video_url: v })} keyboardType="url" autoCapitalize="none" />
           </>
         )}
       </FormModal>
     </View>
   );
 };
-
-const createStyles = (theme) => StyleSheet.create({
-  row: { flexDirection: 'row', alignItems: 'center', gap: theme.spacing.md, flexWrap: 'wrap', marginBottom: theme.spacing.sm },
-  name: { color: theme.colors.textPrimary, fontWeight: '700', fontSize: theme.typography.sizes.md },
-  group: { color: theme.colors.primaryLight, fontSize: theme.typography.sizes.sm },
-  desc: { color: theme.colors.textSecondary, fontSize: theme.typography.sizes.sm, marginTop: 2 },
-  actions: { flexDirection: 'row', alignItems: 'center' },
-});

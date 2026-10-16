@@ -6,7 +6,7 @@ const ThemeContext = createContext(null);
 const THEME_KEY = '@fittime_theme_dark';
 
 export const ThemeProvider = ({ children }) => {
-  const [isDark, setIsDark] = useState(true);
+  const [isDark, setIsDark] = useState(false); // el diseño es claro (azul); el oscuro es opcional
 
   useEffect(() => {
     AsyncStorage.getItem(THEME_KEY)

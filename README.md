@@ -1,6 +1,6 @@
 # FitTime 🏋️ · Turnos y rutinas para tu gimnasio
 
-FitTime es una aplicación multiplataforma para gimnasios locales. Los **clientes** reservan turnos sin cruzarse con horarios llenos y consultan rutinas por categoría desde el celular; el **administrador** gestiona horarios, rutinas, usuarios y turnos desde un dashboard web.
+FitTime es una aplicación multiplataforma para gimnasios locales. Los **clientes** reservan turnos sin cruzarse con horarios llenos y siguen rutinas desde el celular; los **entrenadores** arman rutinas, cargan consejos de ejercicios y se las asignan a sus alumnos; el **administrador** gestiona horarios, usuarios y turnos desde un dashboard web.
 
 | | |
 |---|---|
@@ -23,11 +23,19 @@ FitTime es una aplicación multiplataforma para gimnasios locales. Los **cliente
 - **Notificaciones**: confirmación de turno, recordatorio antes de entrenar, avisos de cancelación y de rutina asignada.
 - **Perfil**: datos personales, foto, cambio de contraseña, tema claro/oscuro, preferencias de notificación y cerrar sesión.
 
+### Entrenador (panel web / móvil)
+- **Inicio**: sus clases de hoy con ocupación, reservas de la semana y alumnos con su rutina.
+- **Mis clases**: alumnos anotados en sus horarios; marcar asistencia o ausencia.
+- **Alumnos**: asignar rutinas con indicaciones (el cliente recibe una notificación).
+- **Rutinas y ejercicios**: crear y editar rutinas, músculos involucrados y "consejos del entrenador".
+
 ### Administrador (dashboard web)
 - **Inicio**: estadísticas (clientes activos, turnos de hoy y de la semana, cancelaciones, horarios más concurridos) y accesos rápidos.
 - **ABM** de horarios, rutinas y ejercicios.
-- **Usuarios**: listado, cambio de rol, alta/baja y asignación de rutinas.
+- **Usuarios**: listado, rol (Cliente / Entrenador / Administrador), alta/baja y asignación de rutinas.
+- **Horarios**: además de día, hora y cupo, se asigna el **instructor** de cada clase.
 - **Turnos**: control por fecha, marcar asistencia/ausencia o cancelar con motivo (queda auditado).
+- **Reportes**: turnos por día, horarios más concurridos, rutinas más usadas y **exportación a CSV** (turnos de un período y usuarios activos), que abre directo en Excel.
 
 ---
 
@@ -55,14 +63,17 @@ La arquitectura completa está en [docs/ARQUITECTURA.md](./docs/ARQUITECTURA.md)
 ├── docs/                  # Arquitectura, modelo de datos, guía de pruebas, defensa
 ├── public_landing/        # Landing pública (HTML + CSS)
 └── src/
-    ├── config/            # Cliente de Supabase
-    ├── context/           # AuthContext (sesión y rol), ThemeContext (tema)
-    ├── navigation/        # Navegación según rol
-    ├── api/               # Acceso a datos: gym.service (cliente), admin.service (admin)
-    ├── components/        # Componentes reutilizables
-    ├── screens/           # Login, registro, Home del cliente y admin/ (panel del gimnasio)
-    ├── utils/             # Errores, fechas, validaciones
-    └── styles/            # Temas claro y oscuro
+    ├── api/               # admin.service (panel), cliente.service y gym.service (app del cliente)
+    ├── components/        # admin/ (kit del panel) y cliente/ (kit visual de los wireframes)
+    ├── config/            # supabase.js (conexión) y gimnasio.js (nombre, dirección, soporte)
+    ├── context/           # AuthContext (sesión y rol) y ThemeContext (tema claro/oscuro)
+    ├── navigation/        # AppNavigator: Splash → Bienvenida → login → app según el rol
+    ├── screens/
+    │   ├── auth/          # 1A Splash · 1B Bienvenida · 1C Login · 1D Registro · Recuperar
+    │   ├── cliente/       # 2A–2F y 3A–3D: Horarios, Bloques, Mis Turnos, Detalle, Rutinas, Ejercicio, Perfil, Contraseña
+    │   └── admin/         # Panel del administrador y del entrenador
+    ├── styles/            # theme.js: colores de los wireframes (claro) y versión oscura
+    └── utils/             # errores, diálogos, fechas y exportar CSV
 ```
 
 ---
@@ -79,8 +90,12 @@ La arquitectura completa está en [docs/ARQUITECTURA.md](./docs/ARQUITECTURA.md)
 2. En **SQL Editor**, ejecutar en este orden:
    1. `database/init_fittime.sql`
    2. `database/02_mejoras_fittime.sql`
+   3. `database/05a_roles_y_categorias.sql` (solo, en una ejecución aparte)
+   4. `database/05b_entrenadores_y_diseno.sql`
+   5. `database/06_reportes.sql`
 3. En **Authentication → Users → Add user**, crear las cuentas de prueba (ver la guía) y ejecutar `database/03_cuentas_prueba.sql`.
 4. En **Authentication → Email Templates → Reset Password**, incluir `{{ .Token }}` para que llegue el código de 6 dígitos.
+   En **Authentication → Sign In / Providers → Email**, desactivar **Confirm email**: el servicio de correo gratuito de Supabase sólo envía a miembros del equipo y rechaza el registro de otros correos (`email_address_invalid`). Para que la recuperación de contraseña llegue a cualquier correo, configurar un SMTP propio en **Authentication → SMTP Settings**.
 5. **Google**: activar el proveedor en **Authentication → Providers → Google** con un Client ID de Google Cloud y agregar `fittime://auth/callback` y la URL web en **URL Configuration → Redirect URLs**.
 
 ### 2. Variables de entorno
@@ -143,7 +158,7 @@ Subir la carpeta `public_landing/` a cualquier hosting estático (Vercel, Netlif
 | 1 | Autenticación (registro, login, logout, recuperación, sesión, JWT, Google) | ✅ |
 | 2 | Home según rol | ✅ cliente y admin (estadísticas + accesos rápidos) |
 | 3 | ABM horarios, rutinas, ejercicios, turnos | ✅ |
-| 4 | Roles en backend y frontend | ✅ |
+| 4 | Roles en backend y frontend (Cliente, Entrenador, Administrador) | ✅ |
 | 5 | Interacción entre usuarios (reservas, asignación de rutinas) | ✅ |
 | 6 | Configuración de cuenta (datos, clave, foto, preferencias, logout) | ✅ |
 | 7 | Tema claro / oscuro | ✅ |

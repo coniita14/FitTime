@@ -16,17 +16,25 @@ const run = async (query) => {
 export const adminService = {
   // ---------- Estadísticas ----------
   estadisticas: () => { listo(); return run(supabase.rpc('admin_estadisticas')); },
+  resumenEntrenador: () => { listo(); return run(supabase.rpc('entrenador_resumen')); },
+  listarEntrenadores: () => {
+    listo();
+    return run(supabase.from('usuarios').select('id, nombre, apellido').eq('rol', 'ENTRENADOR').eq('activo', true).order('nombre'));
+  },
 
   // ---------- Horarios ----------
   listarHorarios: () => {
     listo();
     return run(supabase.from('horarios')
-      .select('id, dia, hora_inicio, hora_fin, cupo_maximo, activo')
+      .select('id, dia, hora_inicio, hora_fin, cupo_maximo, activo, observaciones, entrenador_id, entrenador:usuarios(nombre, apellido)')
       .order('dia').order('hora_inicio'));
   },
-  guardarHorario: ({ id, dia, hora_inicio, hora_fin, cupo_maximo, activo = true }) => {
+  guardarHorario: ({ id, dia, hora_inicio, hora_fin, cupo_maximo, activo = true, entrenador_id = null, observaciones = '' }) => {
     listo();
-    const fila = { dia, hora_inicio, hora_fin, cupo_maximo: Number(cupo_maximo), activo };
+    const fila = {
+      dia, hora_inicio, hora_fin, cupo_maximo: Number(cupo_maximo), activo, entrenador_id: entrenador_id || null,
+      observaciones: observaciones?.trim() || null,
+    };
     return run(id
       ? supabase.from('horarios').update(fila).eq('id', id).select().single()
       : supabase.from('horarios').insert(fila).select().single());
@@ -38,16 +46,18 @@ export const adminService = {
   listarEjercicios: () => {
     listo();
     return run(supabase.from('ejercicios')
-      .select('id, nombre, grupo_muscular, descripcion, video_url, activo')
+      .select('id, nombre, grupo_muscular, descripcion, video_url, activo, musculos, consejos')
       .order('nombre'));
   },
-  guardarEjercicio: ({ id, nombre, grupo_muscular, descripcion, video_url }) => {
+  guardarEjercicio: ({ id, nombre, grupo_muscular, descripcion, video_url, musculos = '', consejos }) => {
     listo();
     const fila = {
       nombre: nombre.trim(),
       grupo_muscular: grupo_muscular.trim(),
       descripcion: descripcion?.trim() || null,
       video_url: video_url?.trim() || null,
+      musculos: (Array.isArray(musculos) ? musculos : musculos.split(',')).map((m) => m.trim()).filter(Boolean),
+      consejos: consejos?.trim() || null,
     };
     return run(id
       ? supabase.from('ejercicios').update(fila).eq('id', id).select().single()
@@ -60,7 +70,7 @@ export const adminService = {
   listarRutinas: () => {
     listo();
     return run(supabase.from('rutinas')
-      .select('id, nombre, objetivo, descripcion, nivel, categoria, duracion_minutos, activa, rutina_detalle(id, orden, series, repeticiones, descanso_segundos, ejercicio_id, ejercicios(nombre, grupo_muscular))')
+      .select('id, nombre, objetivo, descripcion, nivel, categoria, duracion_minutos, activa, creada_por, creador:usuarios!rutinas_creada_por_fkey(nombre, apellido, rol), rutina_detalle(id, orden, series, repeticiones, descanso_segundos, ejercicio_id, ejercicios(nombre, grupo_muscular))')
       .order('nombre'));
   },
   guardarRutina: ({ id, nombre, objetivo, descripcion, nivel, categoria, duracion_minutos }, creadaPor) => {
@@ -94,11 +104,12 @@ export const adminService = {
   quitarEjercicioDeRutina: (detalleId) => { listo(); return run(supabase.from('rutina_detalle').delete().eq('id', detalleId)); },
 
   // ---------- Usuarios ----------
-  listarUsuarios: () => {
+  listarUsuarios: (soloClientes = false) => {
     listo();
-    return run(supabase.from('usuarios')
-      .select('id, nombre, apellido, email, rol, telefono, activo, creado_en, rutina_asignada!rutina_asignada_usuario_id_fkey(activa, rutinas(id, nombre))')
-      .order('rol').order('apellido'));
+    const q = supabase.from('usuarios')
+      .select('id, nombre, apellido, email, rol, telefono, activo, creado_en, rutina_asignada!rutina_asignada_usuario_id_fkey(activa, observaciones, rutinas(id, nombre))')
+      .order('rol').order('apellido');
+    return run(soloClientes ? q.eq('rol', 'CLIENTE') : q);
   },
   actualizarUsuario: (usuarioId, { rol = null, activo = null }) => {
     listo();
@@ -111,6 +122,53 @@ export const adminService = {
       p_rutina_id: rutinaId,
       p_observaciones: observaciones?.trim() || null,
     }));
+  },
+
+  // Alta de cuentas desde el panel (Edge Function "crear-usuario": usa la clave
+  // secreta en el servidor, nunca en la app, y verifica que quien llama sea admin).
+  crearUsuario: async ({ nombre, apellido, email, telefono, password, rol }) => {
+    listo();
+    const { data, error } = await supabase.functions.invoke('crear-usuario', {
+      body: { nombre: nombre.trim(), apellido: apellido.trim(), email: email.trim().toLowerCase(), telefono: telefono?.trim() || null, password, rol },
+    });
+    if (error) {
+      let detalle = null;
+      try { detalle = await error.context?.json(); } catch { /* sin cuerpo */ }
+      const msg = detalle?.error === 'SOLO_ADMIN' ? 'Sólo un administrador puede crear cuentas.'
+        : detalle?.error || 'No se pudo crear la cuenta. Revisá tu conexión.';
+      throw new Error(msg);
+    }
+    if (data?.error) throw new Error(data.error);
+    return data.usuario;
+  },
+
+  // ---------- Entrenadores ----------
+  entrenadores: () => { listo(); return run(supabase.rpc('admin_entrenadores')); },
+  // Deja asignadas al entrenador exactamente las clases indicadas
+  asignarClases: async (entrenadorId, horarioIds) => {
+    listo();
+    const ids = horarioIds.map(Number);
+    let q = supabase.from('horarios').update({ entrenador_id: null }).eq('entrenador_id', entrenadorId);
+    if (ids.length) q = q.not('id', 'in', `(${ids.join(',')})`);
+    await run(q);
+    if (ids.length) await run(supabase.from('horarios').update({ entrenador_id: entrenadorId }).in('id', ids));
+  },
+
+  // ---------- Reportes ----------
+  reporteTurnos: (desde, hasta) => {
+    listo();
+    return run(supabase.from('turnos')
+      .select('id, fecha_turno, estado, creado_en, cancelado_en, usuarios(nombre, apellido, email), horarios(dia, hora_inicio, hora_fin, usuarios(nombre, apellido))')
+      .gte('fecha_turno', desde)
+      .lte('fecha_turno', hasta)
+      .order('fecha_turno')
+      .order('horario_id'));
+  },
+  reporteUsuarios: () => {
+    listo();
+    return run(supabase.from('usuarios')
+      .select('id, nombre, apellido, email, telefono, rol, activo, creado_en, rutina_asignada!rutina_asignada_usuario_id_fkey(activa, rutinas(nombre))')
+      .order('rol').order('apellido'));
   },
 
   // ---------- Turnos ----------

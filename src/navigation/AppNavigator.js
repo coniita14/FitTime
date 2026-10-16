@@ -1,78 +1,55 @@
-import React, { useState } from 'react';
-import { View, ActivityIndicator, StyleSheet } from 'react-native';
+import React, { useEffect, useState } from 'react';
 import { useAuth } from '../context/AuthContext';
-import { LoginScreen } from '../screens/LoginScreen';
-import { SignupScreen } from '../screens/SignupScreen';
-import { ForgotPasswordScreen } from '../screens/ForgotPasswordScreen';
-import { ResetPasswordScreen } from '../screens/ResetPasswordScreen';
-import { HomeScreen } from '../screens/HomeScreen';
+import { SplashScreen } from '../screens/auth/SplashScreen';
+import { BienvenidaScreen } from '../screens/auth/BienvenidaScreen';
+import { LoginScreen } from '../screens/auth/LoginScreen';
+import { SignupScreen } from '../screens/auth/SignupScreen';
+import { RecuperarScreen } from '../screens/auth/RecuperarScreen';
+import { ClienteApp } from '../screens/cliente/ClienteApp';
 import { AdminScreen } from '../screens/admin/AdminScreen';
-import { useTheme } from '../context/ThemeContext';
 
-export const AppNavigator = () => {
-  const { isAuthenticated, isLoading, user } = useAuth();
-  const { theme } = useTheme();
-  
-  // Navigation stack state for Auth screens
-  const [currentScreen, setCurrentScreen] = useState('Login');
-  const [screenParams, setScreenParams] = useState({});
-  const [history, setHistory] = useState(['Login']);
-
-  if (isLoading) {
-    return (
-      <View style={[styles.loadingContainer, { backgroundColor: theme.colors.background }]}>
-        <ActivityIndicator size="large" color={theme.colors.primary} />
-      </View>
-    );
-  }
-
-  // If user is authenticated with JWT token, show HomeScreen
-  if (isAuthenticated) {
-    // El rol viene de la base de datos (usuarios.rol); los permisos reales se validan con RLS.
-    return user?.rol === 'ADMIN' ? <AdminScreen /> : <HomeScreen />;
-  }
-
-  // Navigation controller helper passed to auth screens
-  const navigation = {
-    navigate: (screenName, params = {}) => {
-      setScreenParams(params);
-      setCurrentScreen(screenName);
-      setHistory((prev) => [...prev, screenName]);
-    },
-    goBack: () => {
-      if (history.length > 1) {
-        const newHistory = [...history];
-        newHistory.pop();
-        const prevScreen = newHistory[newHistory.length - 1];
-        setHistory(newHistory);
-        setCurrentScreen(prevScreen);
-      } else {
-        setCurrentScreen('Login');
-      }
-    },
-  };
-
-  const route = {
-    params: screenParams,
-  };
-
-  switch (currentScreen) {
-    case 'Signup':
-      return <SignupScreen navigation={navigation} route={route} />;
-    case 'ForgotPassword':
-      return <ForgotPasswordScreen navigation={navigation} route={route} />;
-    case 'ResetPassword':
-      return <ResetPasswordScreen navigation={navigation} route={route} />;
-    case 'Login':
-    default:
-      return <LoginScreen navigation={navigation} route={route} />;
-  }
+const PANTALLAS_ACCESO = {
+  Bienvenida: BienvenidaScreen,
+  Login: LoginScreen,
+  Signup: SignupScreen,
+  ForgotPassword: RecuperarScreen,
 };
 
-const styles = StyleSheet.create({
-  loadingContainer: {
-    flex: 1,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-});
+// Flujo del workframe: Splash → Bienvenida → Iniciar sesión / Registrarse →
+// menú principal según el rol guardado en la base (usuarios.rol):
+//   CLIENTE → app móvil · ENTRENADOR → panel del entrenador · ADMIN → panel del gimnasio.
+export const AppNavigator = () => {
+  const { isAuthenticated, isLoading, user } = useAuth();
+  const [splashMinimo, setSplashMinimo] = useState(true);
+  const [pila, setPila] = useState([{ name: 'Bienvenida', params: {} }]);
+
+  useEffect(() => {
+    const t = setTimeout(() => setSplashMinimo(false), 1400);
+    return () => clearTimeout(t);
+  }, []);
+
+  // Al cerrar sesión se vuelve a la bienvenida
+  useEffect(() => {
+    if (!isAuthenticated) setPila([{ name: 'Bienvenida', params: {} }]);
+  }, [isAuthenticated]);
+
+  if (isLoading || splashMinimo) return <SplashScreen />;
+
+  if (isAuthenticated) {
+    if (user?.rol === 'ADMIN') return <AdminScreen rol="ADMIN" />;
+    if (user?.rol === 'ENTRENADOR') return <AdminScreen rol="ENTRENADOR" />;
+    return <ClienteApp />;
+  }
+
+  const navigation = {
+    navigate: (name, params = {}) => setPila((prev) => {
+      const existente = prev.findIndex((p) => p.name === name);
+      if (existente >= 0) return [...prev.slice(0, existente), { name, params }];
+      return [...prev, { name, params }];
+    }),
+    goBack: () => setPila((prev) => (prev.length > 1 ? prev.slice(0, -1) : prev)),
+  };
+  const actual = pila[pila.length - 1];
+  const Pantalla = PANTALLAS_ACCESO[actual.name] || BienvenidaScreen;
+  return <Pantalla navigation={navigation} route={{ params: actual.params }} />;
+};
