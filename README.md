@@ -188,3 +188,4 @@ Subir la carpeta `public_landing/` a cualquier hosting estático (Vercel, Netlif
 
 ## Licencia
 Proyecto académico. © 2026 Constanza Castillo.
+# FitTime
