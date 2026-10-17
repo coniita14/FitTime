@@ -3,6 +3,8 @@ import { View } from 'react-native';
 import { useTheme } from '../../context/ThemeContext';
 import { TabBar, BellButton } from '../../components/cliente/ui';
 import { NotificacionesModal } from '../../components/cliente/NotificacionesModal';
+import { AsistenteBoton, AsistenteModal } from '../../components/AsistenteChat';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { clienteService } from '../../api/cliente.service';
 import { HorariosScreen } from './HorariosScreen';
 import { BloquesScreen } from './BloquesScreen';
@@ -43,6 +45,8 @@ export const ClienteApp = () => {
   const [pilas, setPilas] = useState(pilasIniciales);
   const [noLeidas, setNoLeidas] = useState(0);
   const [verNotif, setVerNotif] = useState(false);
+  const [verAsistente, setVerAsistente] = useState(false);
+  const insets = useSafeAreaInsets();
   const [version, setVersion] = useState(0); // fuerza recarga al volver a una pestaña
 
   const actualizarNoLeidas = useCallback(async () => {
@@ -88,6 +92,9 @@ export const ClienteApp = () => {
         />
       </View>
       <TabBar tabs={TABS} value={tab} onChange={cambiarTab} />
+      {/* Asistente con IA: sólo en las pantallas principales para no tapar botones de abajo */}
+      {pilas[tab].length === 1 && <AsistenteBoton onPress={() => setVerAsistente(true)} bottom={78 + insets.bottom} />}
+      <AsistenteModal visible={verAsistente} onClose={() => setVerAsistente(false)} onCambio={() => setVersion((v) => v + 1)} />
       <NotificacionesModal visible={verNotif} onClose={() => setVerNotif(false)} onLeidas={() => setNoLeidas(0)} />
     </View>
   );

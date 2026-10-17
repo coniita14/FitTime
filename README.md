@@ -29,6 +29,12 @@ FitTime es una aplicación multiplataforma para gimnasios locales. Los **cliente
 - **Alumnos**: asignar rutinas con indicaciones (el cliente recibe una notificación).
 - **Rutinas y ejercicios**: crear y editar rutinas, músculos involucrados y "consejos del entrenador".
 
+### Asistente con IA "Fiti" (cliente y entrenador)
+- Botón ✨ flotante que abre un chat con IA (Google Gemini) que conoce los datos de quien pregunta.
+- **Cliente**: consulta sus turnos y su rutina asignada, pregunta por horarios y cupos, pide explicaciones de ejercicios y **reserva o cancela turnos** desde el chat. La IA sólo *propone* la acción: la app muestra una tarjeta con **Confirmar** y recién ahí se hace la reserva, con las mismas reglas que en la pantalla de Horarios.
+- **Entrenador**: consulta sus clases y quiénes se anotaron, y pide ideas de entrenamiento.
+- Límite de 40 consultas por persona por día para no superar el plan gratuito.
+
 ### Administrador (dashboard web)
 - **Inicio**: estadísticas (clientes activos, turnos de hoy y de la semana, cancelaciones, horarios más concurridos) y accesos rápidos.
 - **ABM** de horarios, rutinas y ejercicios.
@@ -93,10 +99,13 @@ La arquitectura completa está en [docs/ARQUITECTURA.md](./docs/ARQUITECTURA.md)
    3. `database/05a_roles_y_categorias.sql` (solo, en una ejecución aparte)
    4. `database/05b_entrenadores_y_diseno.sql`
    5. `database/06_reportes.sql`
+   6. `database/07_entrenadores_admin.sql`
+   7. `database/08_asistente.sql`
 3. En **Authentication → Users → Add user**, crear las cuentas de prueba (ver la guía) y ejecutar `database/03_cuentas_prueba.sql`.
 4. En **Authentication → Email Templates → Reset Password**, incluir `{{ .Token }}` para que llegue el código de 6 dígitos.
    En **Authentication → Sign In / Providers → Email**, desactivar **Confirm email**: el servicio de correo gratuito de Supabase sólo envía a miembros del equipo y rechaza el registro de otros correos (`email_address_invalid`). Para que la recuperación de contraseña llegue a cualquier correo, configurar un SMTP propio en **Authentication → SMTP Settings**.
-5. **Google**: activar el proveedor en **Authentication → Providers → Google** con un Client ID de Google Cloud y agregar `fittime://auth/callback` y la URL web en **URL Configuration → Redirect URLs**.
+5. **Asistente con IA**: crear una clave gratis en [Google AI Studio](https://aistudio.google.com/apikey), desplegar `supabase functions deploy asistente --no-verify-jwt` y cargar la clave en **Edge Functions → Secrets** con el nombre `GEMINI_API_KEY` (opcional: `GEMINI_MODEL` para cambiar el modelo). La clave nunca va en la app.
+6. **Google**: activar el proveedor en **Authentication → Providers → Google** con un Client ID de Google Cloud y agregar `fittime://auth/callback` y la URL web en **URL Configuration → Redirect URLs**.
 
 ### 2. Variables de entorno
 ```bash

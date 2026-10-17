@@ -103,6 +103,14 @@ Marcar cada casilla al verificarla.
 - [ ] **Sin conexión:** activar modo avión y tirar hacia abajo para recargar → *"Sin conexión. Revisá tu internet e intentá de nuevo"*.
 - [ ] Mientras carga cualquier lista se ve un indicador de carga.
 
+### Extra · Asistente con IA "Fiti"
+- [ ] Como **cliente**, tocar el botón ✨ (abajo a la derecha) y preguntar *"¿Qué turnos tengo esta semana?"*: responde con los turnos reales de la cuenta.
+- [ ] Pedir *"Reservame mañana a la tarde"*: muestra los horarios con lugares y, al elegir uno, aparece una tarjeta **Reservar turno** con **Confirmar**. Sin confirmar no se reserva nada; al confirmar, el turno aparece en *Turnos*.
+- [ ] Pedir *"Cancelá mi próximo turno"*: aparece la tarjeta **Cancelar turno**; al confirmar queda cancelado.
+- [ ] Preguntar *"¿Cómo hago peso muerto?"*: explica la técnica usando el catálogo de ejercicios.
+- [ ] Preguntar algo que no tiene que ver con el gimnasio: responde que sólo ayuda con temas del gimnasio.
+- [ ] Como **entrenador**, preguntar *"¿Quiénes vienen a mi clase del lunes?"*: lista sólo los alumnos de sus clases.
+
 ### R11 · Distribución externa
 - [ ] La app se instala desde el APK (o se abre en Expo Go) y funciona con datos móviles, sin estar en la misma red que la computadora de desarrollo.
 

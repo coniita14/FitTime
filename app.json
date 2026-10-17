@@ -6,16 +6,14 @@
     "orientation": "portrait",
     "userInterfaceStyle": "automatic",
     "scheme": "fittime",
-    "splash": {
-      "resizeMode": "contain",
-      "backgroundColor": "#0b1120"
-    },
     "ios": {
       "supportsTablet": true
     },
     "android": {
       "adaptiveIcon": {
-        "backgroundColor": "#0b1120"
+        "foregroundImage": "./assets/adaptive-icon.png",
+        "backgroundImage": "./assets/adaptive-background.png",
+        "backgroundColor": "#3F37DE"
       },
       "package": "com.constanza.fittime",
       "permissions": [
@@ -23,7 +21,8 @@
       ]
     },
     "web": {
-      "bundler": "metro"
+      "bundler": "metro",
+      "favicon": "./assets/favicon.png"
     },
     "plugins": [
       "expo-web-browser",
@@ -35,12 +34,26 @@
           "photosPermission": "FitTime usa tus fotos para tu imagen de perfil.",
           "cameraPermission": false
         }
+      ],
+      [
+        "expo-splash-screen",
+        {
+          "image": "./assets/splash-icon.png",
+          "imageWidth": 180,
+          "resizeMode": "contain",
+          "backgroundColor": "#6861EC",
+          "dark": {
+            "image": "./assets/splash-icon.png",
+            "backgroundColor": "#2A2490"
+          }
+        }
       ]
     ],
     "extra": {
       "eas": {
         "projectId": "b98a7ed5-ecfe-4989-b693-60600abc5361"
       }
-    }
+    },
+    "icon": "./assets/icon.png"
   }
 }

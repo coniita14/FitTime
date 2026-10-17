@@ -39,5 +39,7 @@ export const supabase = createClient(supabaseUrl, supabaseAnonKey, {
     autoRefreshToken: true,
     persistSession: true,
     detectSessionInUrl: false,
+    // PKCE: Google devuelve un "code" que la app canjea por la sesión (web, Expo Go y APK).
+    flowType: 'pkce',
   },
 });

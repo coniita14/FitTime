@@ -17,6 +17,7 @@ import { EntrenadoresAdmin } from './EntrenadoresAdmin';
 import { ReportesAdmin } from './ReportesAdmin';
 import { PerfilAdmin } from './PerfilAdmin';
 import { DashboardEntrenador } from './DashboardEntrenador';
+import { AsistenteBoton, AsistenteModal } from '../../components/AsistenteChat';
 
 // Menú lateral (wireframes 3A–3E)
 const SECCIONES = {
@@ -61,6 +62,7 @@ export const AdminScreen = ({ rol = 'ADMIN' }) => {
   const [menuAbierto, setMenuAbierto] = useState(false);
   const [noLeidas, setNoLeidas] = useState(0);
   const [avisos, setAvisos] = useState(null);
+  const [verAsistente, setVerAsistente] = useState(false);
 
   const setSeccion = useCallback((k) => { setSeccionState(k); setBusqueda(''); setMenuAbierto(false); }, []);
 
@@ -174,6 +176,9 @@ export const AdminScreen = ({ rol = 'ADMIN' }) => {
           </View>
         </Modal>
       )}
+
+      <AsistenteBoton onPress={() => setVerAsistente(true)} bottom={24 + insets.bottom} />
+      <AsistenteModal visible={verAsistente} onClose={() => setVerAsistente(false)} />
 
       <Modal visible={!!avisos} transparent animationType="fade" onRequestClose={() => setAvisos(null)}>
         <Pressable style={s.overlay} onPress={() => setAvisos(null)}>

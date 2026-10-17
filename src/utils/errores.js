@@ -5,6 +5,8 @@ const MENSAJES = {
   'Email not confirmed': 'Confirmá tu correo antes de iniciar sesión.',
   'User already registered': 'Ya existe una cuenta con ese correo.',
   'JWT expired': 'Tu sesión expiró. Volvé a iniciar sesión.',
+  'provider is not enabled': 'El inicio con Google todavía no está habilitado en el gimnasio. Ingresá con tu correo y contraseña.',
+  'Unsupported provider': 'El inicio con Google todavía no está habilitado en el gimnasio. Ingresá con tu correo y contraseña.',
   // Funciones SQL de FitTime
   CUPO_COMPLETO: 'Ese horario ya no tiene lugares disponibles.',
   YA_RESERVADO: 'Ya hay un turno confirmado para esa persona en ese horario y fecha.',

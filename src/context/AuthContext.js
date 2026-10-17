@@ -1,6 +1,7 @@
 import React, { createContext, useState, useEffect, useContext } from 'react';
 import { Platform } from 'react-native';
 import * as WebBrowser from 'expo-web-browser';
+import * as Linking from 'expo-linking';
 import { supabase, supabaseConfigError } from '../config/supabase';
 
 const AuthContext = createContext();
@@ -41,6 +42,12 @@ export const AuthProvider = ({ children }) => {
       if (Platform.OS === 'web') {
         const callback = new URL(window.location.href);
         const code = callback.searchParams.get('code');
+        const errorGoogle = callback.searchParams.get('error_description');
+        if (errorGoogle) {
+          window.history.replaceState({}, document.title, callback.pathname);
+          window.alert(`No se pudo iniciar con Google\n\n${decodeURIComponent(errorGoogle.replace(/\+/g, ' '))}`);
+          throw new Error('Inicio con Google cancelado o rechazado.');
+        }
         if (code) {
           const { error: exchangeError } = await supabase.auth.exchangeCodeForSession(code);
           if (exchangeError) throw exchangeError;
@@ -116,12 +123,14 @@ export const AuthProvider = ({ children }) => {
 
   const loginWithGoogle = async () => {
     if (supabaseConfigError) throw new Error(supabaseConfigError);
+    // Web: vuelve a la misma página. Móvil: fittime://auth/callback en el APK y
+    // exp://<ip>:8081/--/auth/callback en Expo Go (Linking.createURL arma la correcta).
     const redirectTo = Platform.OS === 'web'
       ? window.location.origin
-      : 'fittime://auth/callback';
+      : Linking.createURL('auth/callback');
     const { data, error } = await supabase.auth.signInWithOAuth({
       provider: 'google',
-      options: { redirectTo, skipBrowserRedirect: true },
+      options: { redirectTo, skipBrowserRedirect: true, queryParams: { prompt: 'select_account' } },
     });
     if (error) throw error;
     if (!data.url) throw new Error('Supabase no devolvió la dirección de inicio con Google.');
