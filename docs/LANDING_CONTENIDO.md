@@ -54,7 +54,7 @@ FitTime muestra los cupos de cada horario en tiempo real. Reservás tu lugar, te
 ## Cómo empezar en 5 pasos
 
 1. **Descargá la app.** Escaneá el código QR con la cámara del celular o tocá "Descargar para Android". Si tenés iPhone, usá la versión web.
-2. **Creá tu cuenta.** Tocá *Crear cuenta* e ingresá tu nombre, correo y una contraseña de al menos 8 caracteres, o tocá *Continuar con Google*.
+2. **Creá tu cuenta.** Tocá *Crear cuenta* e ingresá tu nombre, correo y una contraseña de al menos 8 caracteres con una mayúscula, un número y un carácter especial, o tocá *Continuar con Google*.
 3. **Reservá tu primer turno.** Andá a *Turnos*, elegí el día y tocá *Reservar* en un horario con lugares libres. Aceptá las notificaciones para recibir la confirmación y el recordatorio.
 4. **Elegí tu rutina.** En *Rutinas* filtrá por categoría, abrí una para ver los ejercicios y guardala con la ⭐. Si tu entrenador te asigna una, aparece en *Inicio*.
 5. **Personalizá tu perfil.** En *Perfil* podés cambiar tus datos, tu foto, tu contraseña y el tema claro u oscuro.

@@ -97,7 +97,7 @@ Marcar cada casilla al verificarla.
 
 ### R10 · Validaciones y errores
 - [ ] Registro con correo mal escrito (`ana@`) → *"Ingresá un correo válido"*.
-- [ ] Registro con contraseña de 5 caracteres → *"La contraseña debe tener al menos 8 caracteres"*.
+- [ ] Registro con la contraseña `abc` → la lista de requisitos queda sin tildar y aparece *"A la contraseña le falta: al menos 8 caracteres, una mayúscula, un número y un carácter especial."*. Con `Gimnasio2026!` se tildan los cuatro requisitos y deja crear la cuenta.
 - [ ] **Cupo agotado:** el horario **Sábado 11:00** tiene cupo de 1 persona. Reservarlo con `cliente@fittime.com` y luego intentarlo con la cuenta propia → *"Ese horario ya no tiene lugares disponibles"*.
 - [ ] Intentar reservar dos veces el mismo horario → *"Ya tenés un turno reservado en ese horario"*.
 - [ ] **Sin conexión:** activar modo avión y tirar hacia abajo para recargar → *"Sin conexión. Revisá tu internet e intentá de nuevo"*.

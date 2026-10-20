@@ -5,13 +5,8 @@ import { Screen, Field, Button, useBrand } from '../../components/cliente/ui';
 import { useAuth } from '../../context/AuthContext';
 import { mensajeDeError } from '../../utils/errores';
 import { avisar } from '../../utils/dialogos';
+import { reglasClave, errorDeClave } from '../../utils/clave';
 
-export const reglasClave = (clave) => [
-  { ok: clave.length >= 8, texto: 'Al menos 8 caracteres' },
-  { ok: /[a-z]/.test(clave) && /[A-Z]/.test(clave), texto: 'Mayúsculas y minúsculas' },
-  { ok: /\d/.test(clave), texto: 'Al menos un número' },
-  { ok: /[^A-Za-z0-9]/.test(clave), texto: 'Carácter especial (!@#$...)' },
-];
 const NIVELES = ['Muy débil', 'Débil', 'Media', 'Buena', 'Fuerte'];
 
 // 3D · Cambiar contraseña: actual, nueva, confirmación y medidor de fortaleza.
@@ -32,8 +27,8 @@ export const CambiarClaveScreen = ({ navigation }) => {
   const actualizar = async () => {
     const e = {};
     if (!actual) e.actual = 'Ingresá tu contraseña actual';
-    if (!reglas[0].ok) e.nueva = 'La nueva contraseña debe tener al menos 8 caracteres';
-    else if (puntaje < 3) e.nueva = 'Elegí una contraseña más segura (cumplí al menos 3 requisitos)';
+    const errClave = errorDeClave(nueva);
+    if (errClave) e.nueva = errClave;
     else if (nueva === actual) e.nueva = 'La nueva contraseña debe ser distinta de la actual';
     if (confirmar !== nueva) e.confirmar = 'Las contraseñas no coinciden';
     setErrores(e);

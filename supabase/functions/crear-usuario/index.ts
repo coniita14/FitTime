@@ -43,7 +43,9 @@ Deno.serve(async (req) => {
   const rol = (body.rol ?? 'CLIENTE').toUpperCase();
   if (!nombre || !apellido) return json(400, { error: 'Nombre y apellido son obligatorios' });
   if (!EMAIL_RE.test(email)) return json(400, { error: 'Correo inválido' });
-  if (password.length < 8) return json(400, { error: 'La contraseña debe tener al menos 8 caracteres' });
+  if (password.length < 8 || !/[A-Z]/.test(password) || !/\d/.test(password) || !/[^A-Za-z0-9\s]/.test(password)) {
+    return json(400, { error: 'La contraseña debe tener al menos 8 caracteres, una mayúscula, un número y un carácter especial' });
+  }
   if (!ROLES.includes(rol)) return json(400, { error: 'Rol inválido' });
 
   // 3) Crear la cuenta confirmada (el trigger on_auth_user_created crea el perfil como CLIENTE)

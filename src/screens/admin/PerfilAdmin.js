@@ -4,6 +4,8 @@ import { useTheme } from '../../context/ThemeContext';
 import { useAuth } from '../../context/AuthContext';
 import { mensajeDeError } from '../../utils/errores';
 import { avisar, confirmar } from '../../utils/dialogos';
+import { errorDeClave } from '../../utils/clave';
+import { ReglasClave } from '../../components/ReglasClave';
 import { CustomInput } from '../../components/CustomInput';
 import { CustomButton } from '../../components/CustomButton';
 import { ScreenHeader, Card } from '../../components/admin/AdminUI';
@@ -34,7 +36,8 @@ export const PerfilAdmin = () => {
   };
 
   const guardarClave = async () => {
-    if (clave.length < 8) { avisar('Contraseña inválida', 'Debe tener al menos 8 caracteres.'); return; }
+    const errClave = errorDeClave(clave);
+    if (errClave) { avisar('Contraseña inválida', errClave); return; }
     if (clave !== clave2) { avisar('No coinciden', 'Las dos contraseñas deben ser iguales.'); return; }
     setCambiandoClave(true);
     try {
@@ -72,7 +75,8 @@ export const PerfilAdmin = () => {
 
       <Card>
         <Text style={s.title}>Cambiar contraseña</Text>
-        <CustomInput label="Nueva contraseña" value={clave} onChangeText={setClave} secureTextEntry helperText="Mínimo 8 caracteres" />
+        <CustomInput label="Nueva contraseña" value={clave} onChangeText={setClave} secureTextEntry />
+        <ReglasClave clave={clave} color={theme.colors.success} colorPendiente={theme.colors.textMuted} />
         <CustomInput label="Repetir contraseña" value={clave2} onChangeText={setClave2} secureTextEntry />
         <CustomButton title="Cambiar contraseña" variant="outline" onPress={guardarClave} isLoading={cambiandoClave} />
       </Card>

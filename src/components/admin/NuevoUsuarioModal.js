@@ -4,17 +4,22 @@ import { useTheme } from '../../context/ThemeContext';
 import { adminService } from '../../api/admin.service';
 import { mensajeDeError } from '../../utils/errores';
 import { avisar } from '../../utils/dialogos';
+import { errorDeClave } from '../../utils/clave';
+import { ReglasClave } from '../ReglasClave';
 import { FormModal, FormField, FormRow, FieldLabel, SegmentToggle } from './AdminUI';
 
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 const VACIO = { nombre: '', apellido: '', email: '', telefono: '', password: '', rol: 'CLIENTE' };
 
-// Contraseña temporal legible (el usuario la cambia desde Perfil → Cambiar contraseña)
+// Contraseña temporal legible que cumple las reglas (mayúscula, número y carácter especial).
+// El usuario la cambia desde Perfil → Cambiar contraseña.
 const generarClave = () => {
-  const letras = 'ABCDEFGHJKMNPQRSTUVWXYZabcdefghijkmnpqrstuvwxyz';
-  let c = '';
-  for (let i = 0; i < 6; i += 1) c += letras[Math.floor(Math.random() * letras.length)];
-  return `${c}${Math.floor(10 + Math.random() * 89)}!`;
+  const may = 'ABCDEFGHJKMNPQRSTUVWXYZ';
+  const min = 'abcdefghijkmnpqrstuvwxyz';
+  const al = (t) => t[Math.floor(Math.random() * t.length)];
+  let c = al(may);
+  for (let i = 0; i < 5; i += 1) c += al(min);
+  return `${c}${Math.floor(10 + Math.random() * 89)}${al('!#$%*?')}`;
 };
 
 // "+ Nuevo Usuario": crea la cuenta desde el panel sin entrar a Supabase.
@@ -36,7 +41,8 @@ export const NuevoUsuarioModal = ({ visible, onClose, onCreado, rolInicial = 'CL
     if (form.apellido.trim().length < 2) e.apellido = 'Ingresá el apellido';
     if (!EMAIL_RE.test(form.email.trim())) e.email = 'Correo inválido';
     if (form.telefono && !/^[\d\s+()-]{6,20}$/.test(form.telefono.trim())) e.telefono = 'Teléfono inválido';
-    if (form.password.length < 8) e.password = 'Mínimo 8 caracteres';
+    const errClave = errorDeClave(form.password);
+    if (errClave) e.password = errClave;
     setErrores(e);
     if (Object.keys(e).length) return;
     setSaving(true);
@@ -66,6 +72,7 @@ export const NuevoUsuarioModal = ({ visible, onClose, onCreado, rolInicial = 'CL
           placeholder="11 5555-5555" keyboardType="phone-pad" />
         <FormField label="Contraseña temporal" value={form.password} onChangeText={set('password')} error={errores.password} autoCapitalize="none" />
       </FormRow>
+      <ReglasClave clave={form.password} color={theme.colors.success} colorPendiente={theme.colors.textMuted} />
       {!bloquearRol && (
         <>
           <FieldLabel>Tipo de cuenta</FieldLabel>

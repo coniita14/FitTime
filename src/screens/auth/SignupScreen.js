@@ -7,6 +7,8 @@ import { AuthLayout } from './AuthLayout';
 import { Field, Button } from '../../components/cliente/ui';
 import { mensajeDeError } from '../../utils/errores';
 import { avisar } from '../../utils/dialogos';
+import { claveValida, errorDeClave } from '../../utils/clave';
+import { ReglasClave } from '../../components/ReglasClave';
 
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 const TEL_RE = /^\+?[\d\s-]{8,20}$/;
@@ -25,7 +27,7 @@ export const SignupScreen = ({ navigation }) => {
   const set = (k) => (v) => setF((prev) => ({ ...prev, [k]: v }));
 
   const paso1 = f.nombre.trim() && f.apellido.trim();
-  const paso2 = paso1 && EMAIL_RE.test(f.email.trim()) && f.password.length >= 8;
+  const paso2 = paso1 && EMAIL_RE.test(f.email.trim()) && claveValida(f.password);
   const paso = !paso1 ? 1 : !paso2 ? 2 : 3;
   const pasoLabel = ['1. Datos personales', '2. Datos de la cuenta', '3. Términos y condiciones'][paso - 1];
 
@@ -35,7 +37,8 @@ export const SignupScreen = ({ navigation }) => {
     if (!f.apellido.trim()) e.apellido = 'Ingresá tu apellido';
     if (!EMAIL_RE.test(f.email.trim())) e.email = 'Ingresá un correo válido (ej. nombre@gmail.com)';
     if (f.telefono.trim() && !TEL_RE.test(f.telefono.trim())) e.telefono = 'Teléfono inválido (ej. +54 9 2944 123456)';
-    if (f.password.length < 8) e.password = 'La contraseña debe tener al menos 8 caracteres';
+    const errClave = errorDeClave(f.password);
+    if (errClave) e.password = errClave;
     if (!acepta) e.terminos = 'Tenés que aceptar los Términos y Condiciones';
     setErrores(e);
     if (Object.keys(e).length) return;
@@ -70,6 +73,7 @@ export const SignupScreen = ({ navigation }) => {
       <Field label="Email" placeholder="email@ejemplo.com" value={f.email} onChangeText={set('email')} keyboardType="email-address" maxLength={150} error={errores.email} />
       <Field label="Teléfono" placeholder="+54 9 ..." value={f.telefono} onChangeText={set('telefono')} keyboardType="phone-pad" maxLength={20} error={errores.telefono} />
       <Field label="Contraseña" placeholder="••••••••" value={f.password} onChangeText={set('password')} secure error={errores.password} />
+      <ReglasClave clave={f.password} color={b.onBg} colorPendiente={b.onBgSoft} />
 
       <View style={s.terms}>
         <TouchableOpacity onPress={() => setAcepta(!acepta)} style={[s.check, { backgroundColor: b.card }]}

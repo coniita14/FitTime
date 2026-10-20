@@ -6,6 +6,8 @@ import { AuthLayout } from './AuthLayout';
 import { Field, Button } from '../../components/cliente/ui';
 import { mensajeDeError } from '../../utils/errores';
 import { avisar } from '../../utils/dialogos';
+import { errorDeClave } from '../../utils/clave';
+import { ReglasClave } from '../../components/ReglasClave';
 
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
@@ -39,7 +41,8 @@ export const RecuperarScreen = ({ navigation, route }) => {
   const cambiar = async () => {
     const e = {};
     if (!/^\d{6}$/.test(codigo.trim())) e.codigo = 'El código tiene 6 números';
-    if (clave.length < 8) e.clave = 'Mínimo 8 caracteres';
+    const errClave = errorDeClave(clave);
+    if (errClave) e.clave = errClave;
     if (clave !== clave2) e.clave2 = 'Las contraseñas no coinciden';
     setErrores(e);
     if (Object.keys(e).length) return;
@@ -70,6 +73,7 @@ export const RecuperarScreen = ({ navigation, route }) => {
         <>
           <Field label="Código" placeholder="123456" value={codigo} onChangeText={(v) => setCodigo(v.replace(/\D/g, ''))} keyboardType="number-pad" maxLength={6} error={errores.codigo} />
           <Field label="Nueva contraseña" placeholder="••••••••" value={clave} onChangeText={setClave} secure error={errores.clave} />
+          <ReglasClave clave={clave} color={theme.brand.onBg} colorPendiente={theme.brand.onBgSoft} />
           <Field label="Repetir contraseña" placeholder="••••••••" value={clave2} onChangeText={setClave2} secure error={errores.clave2} />
           <Button title="Cambiar contraseña" onPress={cambiar} loading={loading} />
           <Text onPress={enviar} style={{ color: b.onBg, textAlign: 'center', marginTop: 18, textDecorationLine: 'underline' }}>
