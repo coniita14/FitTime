@@ -1,12 +1,11 @@
 import React from 'react';
 import {
-  View, Text, ScrollView, TouchableOpacity, KeyboardAvoidingView, Platform, StyleSheet, ImageBackground,
+  View, Text, ScrollView, TouchableOpacity, KeyboardAvoidingView, Platform, StyleSheet,
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useTheme } from '../../context/ThemeContext';
-
-const FONDO = require('../../../assets/fondo-gimnasio.jpg');
+import { FondoGimnasio } from '../../components/FondoGimnasio';
 
 // Estructura común de Login / Registro / Recuperar:
 // foto del gimnasio difuminada de fondo, tarjeta translúcida centrada con un
@@ -16,8 +15,7 @@ export const AuthLayout = ({ title, subtitle, onBack, icon = 'person', children 
   const b = theme.brand;
   const insets = useSafeAreaInsets();
   return (
-    <ImageBackground source={FONDO} style={s.fondo} resizeMode="cover">
-      <View style={[StyleSheet.absoluteFill, { backgroundColor: isDark ? 'rgba(8, 15, 30, 0.62)' : 'rgba(23, 64, 150, 0.15)' }]} />
+    <FondoGimnasio>
       <KeyboardAvoidingView style={{ flex: 1 }} behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
         <ScrollView
           contentContainerStyle={[s.content, { paddingTop: insets.top + 12, paddingBottom: insets.bottom + 32 }]}
@@ -44,12 +42,11 @@ export const AuthLayout = ({ title, subtitle, onBack, icon = 'person', children 
           </View>
         </ScrollView>
       </KeyboardAvoidingView>
-    </ImageBackground>
+    </FondoGimnasio>
   );
 };
 
 const s = StyleSheet.create({
-  fondo: { flex: 1, backgroundColor: '#1E3A6B' },
   content: { flexGrow: 1, justifyContent: 'center', paddingHorizontal: 20, width: '100%', maxWidth: 480, alignSelf: 'center' },
   back: { flexDirection: 'row', alignItems: 'center', gap: 6, marginBottom: 44, alignSelf: 'flex-start', paddingVertical: 4 },
   backText: { fontSize: 14, color: '#FFFFFF', fontWeight: '600' },
