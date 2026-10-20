@@ -199,7 +199,7 @@ export const Loading = ({ text }) => {
   const s = useS();
   return (
     <View style={s.center}>
-      <ActivityIndicator size="large" color="#FFFFFF" />
+      <ActivityIndicator size="large" color={useBrand().primary} />
       {text ? <Text style={s.centerText}>{text}</Text> : null}
     </View>
   );
@@ -293,7 +293,7 @@ const createStyles = (b) => StyleSheet.create({
   pill: { paddingHorizontal: 12, paddingVertical: 5, borderRadius: 999, alignSelf: 'flex-start' },
   pillSmall: { paddingHorizontal: 9, paddingVertical: 3 },
   pillText: { fontSize: 12, fontWeight: '700' },
-  btn: { minHeight: 50, borderRadius: 10, alignItems: 'center', justifyContent: 'center', paddingHorizontal: 18 },
+  btn: { minHeight: 50, borderRadius: 12, alignItems: 'center', justifyContent: 'center', paddingHorizontal: 18 },
   btnSmall: { minHeight: 36, borderRadius: 999, paddingHorizontal: 14 },
   btnWhite: { backgroundColor: b.card, borderWidth: 1.5, borderColor: b.border },
   btnRow: { flexDirection: 'row', alignItems: 'center', gap: 8 },
@@ -311,13 +311,13 @@ const createStyles = (b) => StyleSheet.create({
   utabTextActive: { color: b.text, fontWeight: '800' },
   fieldLabel: { color: b.onBg, fontWeight: '700', fontSize: 13, marginBottom: 6 },
   field: {
-    flexDirection: 'row', alignItems: 'center', backgroundColor: b.card, borderRadius: 10, minHeight: 50,
+    flexDirection: 'row', alignItems: 'center', backgroundColor: b.card, borderRadius: 12, minHeight: 50,
     paddingHorizontal: 14, borderWidth: 1, borderColor: b.border,
   },
   fieldInput: { flex: 1, color: b.text, fontSize: 15, paddingVertical: 10, ...Platform.select({ web: { outlineStyle: 'none' }, default: {} }) },
   fieldError: { color: '#FFFFFF', backgroundColor: b.danger, alignSelf: 'flex-start', fontSize: 12, fontWeight: '600', marginTop: 6, paddingHorizontal: 8, paddingVertical: 2, borderRadius: 6, overflow: 'hidden' },
   center: { alignItems: 'center', justifyContent: 'center', padding: 40, gap: 10 },
-  centerText: { color: '#FFFFFF', fontWeight: '600' },
+  centerText: { color: b.onBgSoft, fontWeight: '600' },
   sheetOverlay: { flex: 1, backgroundColor: 'rgba(15, 23, 42, 0.45)', justifyContent: 'flex-end' },
   sheet: {
     backgroundColor: b.card, borderTopLeftRadius: 22, borderTopRightRadius: 22, padding: 20, paddingBottom: 34,

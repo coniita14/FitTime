@@ -56,7 +56,7 @@ export const CambiarClaveScreen = ({ navigation }) => {
       <Text style={s.label}>Fortaleza de la contraseña</Text>
       <View style={s.bars}>
         {[0, 1, 2, 3].map((i) => (
-          <View key={i} style={[s.bar, { backgroundColor: i < puntaje ? colores[puntaje] : 'rgba(255,255,255,0.45)' }]} />
+          <View key={i} style={[s.bar, { backgroundColor: i < puntaje ? colores[puntaje] : b.track }]} />
         ))}
       </View>
       <Text style={s.level}>{nueva ? NIVELES[puntaje] : '—'}</Text>

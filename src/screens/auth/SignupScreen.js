@@ -60,10 +60,10 @@ export const SignupScreen = ({ navigation }) => {
   };
 
   return (
-    <AuthLayout title="Crear cuenta" subtitle="Completá tus datos personales" onBack={() => navigation.goBack()}>
+    <AuthLayout title="Crear cuenta" subtitle="Completá tus datos personales" icon="person-add" onBack={() => navigation.goBack()}>
       <View style={s.steps}>
         {[1, 2, 3].map((n) => (
-          <View key={n} style={[s.step, { backgroundColor: n <= paso ? b.check : 'rgba(255,255,255,0.55)' }]} />
+          <View key={n} style={[s.step, { backgroundColor: n <= paso ? b.primary : b.track }]} />
         ))}
       </View>
       <Text style={[s.stepLabel, { color: b.onBgSoft }]}>{pasoLabel}</Text>
@@ -76,7 +76,7 @@ export const SignupScreen = ({ navigation }) => {
       <ReglasClave clave={f.password} color={b.onBg} colorPendiente={b.onBgSoft} />
 
       <View style={s.terms}>
-        <TouchableOpacity onPress={() => setAcepta(!acepta)} style={[s.check, { backgroundColor: b.card }]}
+        <TouchableOpacity onPress={() => setAcepta(!acepta)} style={[s.check, { backgroundColor: b.card, borderWidth: 1.5, borderColor: acepta ? b.primary : b.border }]}
           accessibilityRole="checkbox" accessibilityState={{ checked: acepta }} accessibilityLabel="Acepto los Términos y Condiciones">
           {acepta && <Ionicons name="checkmark" size={16} color={b.primary} />}
         </TouchableOpacity>
@@ -92,7 +92,7 @@ export const SignupScreen = ({ navigation }) => {
       <View style={s.footer}>
         <Text style={{ color: b.onBgSoft }}>¿Ya tenés cuenta?</Text>
         <TouchableOpacity onPress={() => navigation.navigate('Login')}>
-          <Text style={{ color: b.onBg, fontWeight: '800' }}>Iniciar sesión</Text>
+          <Text style={{ color: b.primary, fontWeight: '800' }}>Iniciar sesión</Text>
         </TouchableOpacity>
       </View>
 

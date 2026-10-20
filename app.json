@@ -13,7 +13,7 @@
       "adaptiveIcon": {
         "foregroundImage": "./assets/adaptive-icon.png",
         "backgroundImage": "./assets/adaptive-background.png",
-        "backgroundColor": "#3F37DE"
+        "backgroundColor": "#2563EB"
       },
       "package": "com.constanza.fittime",
       "permissions": [
@@ -41,10 +41,10 @@
           "image": "./assets/splash-icon.png",
           "imageWidth": 180,
           "resizeMode": "contain",
-          "backgroundColor": "#6861EC",
+          "backgroundColor": "#2563EB",
           "dark": {
             "image": "./assets/splash-icon.png",
-            "backgroundColor": "#2A2490"
+            "backgroundColor": "#0F1D3A"
           }
         }
       ]

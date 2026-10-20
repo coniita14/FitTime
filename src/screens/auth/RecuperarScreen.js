@@ -59,7 +59,7 @@ export const RecuperarScreen = ({ navigation, route }) => {
   };
 
   return (
-    <AuthLayout
+    <AuthLayout icon="key"
       title="Recuperar contraseña"
       subtitle={enviado ? `Ingresá el código de 6 números que enviamos a ${email}` : 'Te enviaremos un código a tu correo'}
       onBack={() => (enviado ? setEnviado(false) : navigation.goBack())}

@@ -201,12 +201,12 @@ export const AdminScreen = ({ rol = 'ADMIN' }) => {
 };
 
 const createStyles = (theme, isDark) => StyleSheet.create({
-  root: { flex: 1, backgroundColor: isDark ? theme.colors.background : '#EEF1F6' },
-  sidebar: { width: 230, backgroundColor: isDark ? '#111B36' : '#4F86E0', paddingVertical: 18, paddingHorizontal: 12 },
+  root: { flex: 1, backgroundColor: theme.colors.background },
+  sidebar: { width: 230, backgroundColor: isDark ? '#0A1222' : '#0F1E3D', paddingVertical: 18, paddingHorizontal: 12 },
   brandRow: { flexDirection: 'row', alignItems: 'center', gap: 8, paddingHorizontal: 8, marginBottom: 22 },
   brand: { color: '#FFF', fontSize: 18, fontWeight: '900' },
   sideItem: { flexDirection: 'row', alignItems: 'center', gap: 10, paddingVertical: 10, paddingHorizontal: 12, borderRadius: 6 },
-  sideItemActive: { backgroundColor: isDark ? '#5B54F0' : '#1F2937' },
+  sideItemActive: { backgroundColor: theme.colors.primary },
   sideText: { color: '#FFF', fontSize: 14, fontWeight: '600' },
   sideUser: {
     flexDirection: 'row', alignItems: 'center', gap: 10, paddingTop: 14, marginTop: 10,

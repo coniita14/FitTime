@@ -90,7 +90,7 @@ export const LoginScreen = ({ navigation, route }) => {
   };
 
   return (
-    <AuthLayout title="Iniciar Sesión" subtitle="Elegí cómo querés ingresar" onBack={() => navigation.goBack()}>
+    <AuthLayout title="Iniciar Sesión" subtitle="Elegí cómo querés ingresar" icon={TIPOS[tipo].icono} onBack={() => navigation.goBack()}>
       <Text style={[s.label, { color: b.onBg }]}>Ingresar como</Text>
       {tipo === 'ADMIN' ? (
         <View style={[s.adminBox, { backgroundColor: b.card }]}>
@@ -106,9 +106,9 @@ export const LoginScreen = ({ navigation, route }) => {
           <Opcion clave="ENTRENADOR" />
         </View>
       )}
-      <View style={[s.hint, { backgroundColor: 'rgba(255,255,255,0.22)' }]}>
-        <Ionicons name="information-circle-outline" size={16} color={b.onBg} />
-        <Text style={[s.hintText, { color: b.onBg }]}>{TIPOS[tipo].descripcion}</Text>
+      <View style={[s.hint, { backgroundColor: b.cardSoft }]}>
+        <Ionicons name="information-circle-outline" size={16} color={b.primary} />
+        <Text style={[s.hintText, { color: b.textSoft }]}>{TIPOS[tipo].descripcion}</Text>
       </View>
 
       <Field label="Email" placeholder={esCliente ? 'usuario@email.com' : tipo === 'ENTRENADOR' ? 'entrenador@email.com' : 'admin@email.com'}
@@ -129,7 +129,7 @@ export const LoginScreen = ({ navigation, route }) => {
             <View style={[s.line, { backgroundColor: b.onBgSoft }]} />
           </View>
 
-          <TouchableOpacity onPress={google} disabled={googleLoading} style={[s.google, { backgroundColor: b.card }]} accessibilityRole="button">
+          <TouchableOpacity onPress={google} disabled={googleLoading} style={[s.google, { backgroundColor: b.card, borderColor: b.border }]} accessibilityRole="button">
             <View style={s.gCircle}><Text style={s.gText}>G</Text></View>
             <Text style={[s.googleText, { color: b.text }]}>{googleLoading ? 'Conectando…' : 'Continuar con Google'}</Text>
           </TouchableOpacity>
@@ -137,7 +137,7 @@ export const LoginScreen = ({ navigation, route }) => {
           <View style={s.footer}>
             <Text style={{ color: b.onBgSoft }}>¿No tenés cuenta?</Text>
             <TouchableOpacity onPress={() => navigation.navigate('Signup')}>
-              <Text style={[s.footerLink, { color: b.onBg }]}>Registrarse</Text>
+              <Text style={[s.footerLink, { color: b.primary }]}>Registrarse</Text>
             </TouchableOpacity>
           </View>
         </>
@@ -160,7 +160,7 @@ export const LoginScreen = ({ navigation, route }) => {
 };
 
 const s = StyleSheet.create({
-  label: { fontSize: 13, fontWeight: '700', marginTop: -8, marginBottom: 8 },
+  label: { fontSize: 13, fontWeight: '700', marginBottom: 8 },
   options: { flexDirection: 'row', gap: 10 },
   option: {
     flex: 1, borderRadius: 12, borderWidth: 1.5, paddingVertical: 14, paddingHorizontal: 12,
@@ -176,7 +176,7 @@ const s = StyleSheet.create({
   link: { fontSize: 12 },
   divider: { flexDirection: 'row', alignItems: 'center', gap: 10, marginVertical: 18 },
   line: { flex: 1, height: 1, opacity: 0.5 },
-  google: { flexDirection: 'row', alignItems: 'center', gap: 14, minHeight: 50, borderRadius: 10, paddingHorizontal: 18 },
+  google: { flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 12, minHeight: 50, borderRadius: 12, paddingHorizontal: 18, borderWidth: 1 },
   gCircle: { width: 24, height: 24, borderRadius: 12, backgroundColor: '#F1F5F9', alignItems: 'center', justifyContent: 'center' },
   gText: { fontWeight: '900', color: '#4285F4' },
   googleText: { fontSize: 15, fontWeight: '600' },
