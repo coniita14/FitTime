@@ -47,6 +47,12 @@
             "backgroundColor": "#0F1D3A"
           }
         }
+      ],
+      [
+        "expo-local-authentication",
+        {
+          "faceIDPermission": "FitTime usa Face ID para proteger el acceso a tu cuenta."
+        }
       ]
     ],
     "extra": {

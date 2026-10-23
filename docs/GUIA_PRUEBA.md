@@ -41,7 +41,7 @@ Marcar cada casilla al verificarla.
 - [ ] **Registro:** "Crear cuenta" con nombre, apellido, teléfono, cualquier correo y contraseña de 8 o más caracteres, aceptando los términos → la cuenta se crea con rol Cliente y entra directo (sin confirmación por mail).
 - [ ] **Login inválido:** `cliente@fittime.com` con contraseña `123` → *"Correo o contraseña incorrectos"*, sin entrar.
 - [ ] **Login válido:** `cliente@fittime.com` / `FitTime2026!` → entra al Inicio del cliente.
-- [ ] **Sesión persistente:** cerrar la app por completo y volver a abrirla → sigue logueado.
+- [ ] **Sesión persistente con Face ID:** cerrar la app por completo y volver a abrirla → sigue logueado, pero antes de ver nada pide **Face ID / huella / código del celular** ("Hola, …"). Sin verificar no entra; "Ingresar con otra cuenta" cierra la sesión. También lo pide al volver a la app después de más de 1 minuto. (En la web no aplica.)
 - [ ] **Logout:** Perfil → Cerrar sesión → vuelve al login.
 - [ ] **Recuperar contraseña:** "¿Olvidaste tu contraseña?" con el correo propio → llega un código de 6 dígitos → ingresar código y clave nueva → iniciar sesión con la clave nueva.
 - [ ] **Google:** "Continuar con Google" → elegir cuenta → entra como Cliente.
@@ -65,6 +65,7 @@ Marcar cada casilla al verificarla.
 - [ ] (técnico) Con la sesión de cliente, ejecutar `admin_estadisticas()` desde la API → error `SOLO_ADMIN`. Las reglas están en PostgreSQL (RLS), no sólo en la interfaz.
 
 ### R4b · Entrenador
+- [ ] Como **admin**, ir a *Entrenadores* → **+ Nuevo Entrenador** y completar nombre, apellido y correo (la contraseña temporal se genera sola). Aparecen los datos de acceso para pasarle al entrenador y se abre la ventana para **asignarle sus clases**. Cerrar sesión y entrar con esa cuenta eligiendo *Entrenador*: ve las clases asignadas.
 - [ ] Entrar como `entrenador@fittime.com`: se abre el **panel del entrenador** (sin Horarios ni Usuarios).
 - [ ] *Inicio* muestra sus clases de hoy y la ocupación.
 - [ ] *Alumnos* → asignar "Fuerza Base 5x5" a un cliente con una indicación → el cliente la ve en *Rutinas → Tu rutina* con "Asignada por …" y la indicación.

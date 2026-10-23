@@ -7,6 +7,7 @@ import { SignupScreen } from '../screens/auth/SignupScreen';
 import { RecuperarScreen } from '../screens/auth/RecuperarScreen';
 import { ClienteApp } from '../screens/cliente/ClienteApp';
 import { AdminScreen } from '../screens/admin/AdminScreen';
+import { BloqueoBiometrico } from '../components/BloqueoBiometrico';
 
 const PANTALLAS_ACCESO = {
   Bienvenida: BienvenidaScreen,
@@ -38,7 +39,8 @@ export const AppNavigator = () => {
   if (isAuthenticated) {
     if (user?.rol === 'ADMIN') return <AdminScreen rol="ADMIN" />;
     if (user?.rol === 'ENTRENADOR') return <AdminScreen rol="ENTRENADOR" />;
-    return <ClienteApp />;
+    // El cliente tiene que pasar por Face ID / huella cada vez que entra a la cuenta
+    return <BloqueoBiometrico key={user?.id}><ClienteApp /></BloqueoBiometrico>;
   }
 
   const navigation = {

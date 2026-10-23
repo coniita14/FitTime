@@ -168,7 +168,12 @@ export const EntrenadoresAdmin = ({ busqueda = '', setBusqueda = () => {} }) => 
       <DataTable columns={columnas} rows={filas} loading={loading} error={error} onRetry={cargar}
         emptyIcon="medal-outline" emptyText={items.length ? 'No hay entrenadores que coincidan.' : 'Todavía no hay entrenadores. Creá uno con "+ Nuevo Entrenador".'} />
 
-      <NuevoUsuarioModal visible={nuevo} onClose={() => setNuevo(false)} onCreado={cargar} rolInicial="ENTRENADOR" bloquearRol />
+      {/* Al crear la cuenta se abre directamente la asignación de clases del nuevo entrenador */}
+      <NuevoUsuarioModal visible={nuevo} onClose={() => setNuevo(false)} rolInicial="ENTRENADOR" bloquearRol
+        onCreado={(u) => {
+          cargar();
+          if (u?.id) setClases({ entrenador: { ...u, clases: [] }, ids: new Set() });
+        }} />
 
       <FormModal visible={!!promover} title="Convertir un usuario en entrenador" onClose={() => setPromover(null)}
         onSubmit={guardarPromocion} submitLabel="Hacer entrenador" saving={saving}>

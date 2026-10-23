@@ -17,6 +17,7 @@ FitTime es una aplicación multiplataforma para gimnasios locales. Los **cliente
 
 ### Cliente (app móvil)
 - Registro, inicio de sesión con correo o **Google**, recuperación de contraseña por código y sesión persistente.
+- **Face ID / huella**: cada vez que el cliente entra a su cuenta (al abrir la app o al volver después de un rato) tiene que verificarse con la biometría o el código del celular.
 - **Inicio**: próximos turnos y rutina asignada.
 - **Turnos**: horarios por día con cupos libres en tiempo real, reserva y cancelación.
 - **Rutinas**: catálogo por categoría (Fuerza, Cardio, Tren superior, Tren inferior, Cuerpo completo, Movilidad), detalle de ejercicios y rutinas guardadas.

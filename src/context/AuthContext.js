@@ -29,13 +29,16 @@ export const AuthProvider = ({ children }) => {
   const [token, setToken] = useState(null);
   const [user, setUser] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
+  // true si en esta apertura de la app la persona ya se identificó con contraseña o Google
+  // (en ese caso no se le pide Face ID enseguida; ver BloqueoBiometrico).
+  const [ingresoConClave, setIngresoConClave] = useState(false);
 
   useEffect(() => {
     let mounted = true;
     const { data: listener } = supabase.auth.onAuthStateChange((event, session) => {
       if (!mounted) return;
       setToken(session?.access_token || null);
-      if (event === 'SIGNED_OUT') setUser(null);
+      if (event === 'SIGNED_OUT') { setUser(null); setIngresoConClave(false); }
     });
 
     const restoreSession = async () => {
@@ -100,6 +103,7 @@ export const AuthProvider = ({ children }) => {
       await supabase.auth.signOut();
       throw new Error('Tu cuenta está dada de baja. Consultá en el gimnasio.');
     }
+    setIngresoConClave(true);
     setToken(data.session.access_token);
     setUser(profile);
     return profile;
@@ -115,6 +119,7 @@ export const AuthProvider = ({ children }) => {
     if (error) throw error;
     if (data.session && data.user) {
       const profile = await getProfile(data.user);
+      setIngresoConClave(true);
       setToken(data.session.access_token);
       setUser(profile);
     }
@@ -148,6 +153,7 @@ export const AuthProvider = ({ children }) => {
       const { data: sessionData, error: sessionError } = await supabase.auth.exchangeCodeForSession(code);
       if (sessionError) throw sessionError;
       if (!sessionData.user || !sessionData.session) throw new Error('Google no devolvió una sesión válida.');
+      setIngresoConClave(true);
       setToken(sessionData.session.access_token);
       setUser(await getProfile(sessionData.user));
       return;
@@ -165,6 +171,7 @@ export const AuthProvider = ({ children }) => {
     });
     if (sessionError) throw sessionError;
     if (!sessionData.user || !sessionData.session) throw new Error('Google no devolvió una sesión válida.');
+    setIngresoConClave(true);
     setToken(sessionData.session.access_token);
     setUser(await getProfile(sessionData.user));
   };
@@ -228,6 +235,7 @@ export const AuthProvider = ({ children }) => {
         user,
         isLoading,
         isAuthenticated: !!token && !!user,
+        ingresoConClave,
         login,
         signup,
         loginWithGoogle,
