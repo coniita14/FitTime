@@ -43,5 +43,5 @@ export const NIVELES = ['PRINCIPIANTE', 'INTERMEDIO', 'AVANZADO'];
 export const NIVEL_LABEL = { PRINCIPIANTE: 'Principiante', INTERMEDIO: 'Intermedio', AVANZADO: 'Avanzado' };
 export const ROL_LABEL = { CLIENTE: 'Cliente', ENTRENADOR: 'Entrenador', ADMIN: 'Administrador' };
 export const ESTADO_LABEL = {
-  CONFIRMADO: 'Confirmado', CANCELADO: 'Cancelado', COMPLETADO: 'Asistió', AUSENTE: 'Ausente',
+  CONFIRMADO: 'Confirmado', CANCELADO: 'Cancelado', COMPLETADO: 'Confirmado', AUSENTE: 'Confirmado',
 };

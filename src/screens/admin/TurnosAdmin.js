@@ -7,12 +7,13 @@ import { mensajeDeError } from '../../utils/errores';
 import { avisar, fechaLocal, ESTADO_LABEL } from '../../utils/dialogos';
 import {
   ScreenHeader, Toolbar, SearchBox, Select, DataTable, CellText, Actions, Badge, IconButton, FieldLabel, FormModal, FormField,
-  SegmentToggle,
 } from '../../components/admin/AdminUI';
 import { nombrePersona } from './HorariosAdmin';
 
 const TONO = { CONFIRMADO: 'primary', COMPLETADO: 'success', AUSENTE: 'warning', CANCELADO: 'danger' };
-const ACCIONES = ['COMPLETADO', 'AUSENTE', 'CANCELADO', 'CONFIRMADO'];
+const ACCIONES = ['CANCELADO', 'CONFIRMADO'];
+// Sin control de asistencia: los turnos viejos marcados como asistió/ausente se muestran como reservados
+const estadoVisible = (e) => (e === 'CANCELADO' ? 'CANCELADO' : 'CONFIRMADO');
 
 const formatearFecha = (iso) => {
   const d = new Date(`${iso}T12:00:00`);
@@ -20,7 +21,7 @@ const formatearFecha = (iso) => {
   return texto.charAt(0).toUpperCase() + texto.slice(1);
 };
 
-// Turnos (admin) / Mis clases (entrenador): reservas del día, asistencia y cancelaciones.
+// Turnos (admin) / Mis clases (entrenador): reservas del día y cancelaciones.
 export const TurnosAdmin = ({ modo = 'ADMIN', busqueda = '', setBusqueda = () => {} }) => {
   const esEntrenador = modo === 'ENTRENADOR';
   const { theme } = useTheme();
@@ -58,15 +59,6 @@ export const TurnosAdmin = ({ modo = 'ADMIN', busqueda = '', setBusqueda = () =>
     await cargar();
   };
 
-  // Marcado rápido de asistencia (un toque)
-  const marcar = async (t, nuevoEstado) => {
-    try {
-      await aplicar(t, nuevoEstado, nuevoEstado === 'COMPLETADO' ? 'Asistencia registrada' : 'No asistió a la clase');
-    } catch (err) {
-      avisar('No se pudo actualizar el turno', mensajeDeError(err));
-    }
-  };
-
   const guardar = async () => {
     if ((gestion.motivo || '').trim().length < 3) { avisar('Falta el motivo', 'Escribí un motivo de al menos 3 caracteres.'); return; }
     setSaving(true);
@@ -90,7 +82,7 @@ export const TurnosAdmin = ({ modo = 'ADMIN', busqueda = '', setBusqueda = () =>
   const q = busqueda.trim().toLowerCase();
   const filas = turnos
     .filter((t) => clase === 'TODAS' || String(t.horario_id) === clase)
-    .filter((t) => estado === 'TODOS' || t.estado === estado)
+    .filter((t) => estado === 'TODOS' || estadoVisible(t.estado) === estado)
     .filter((t) => !q || `${t.usuarios?.nombre} ${t.usuarios?.apellido} ${t.usuarios?.email}`.toLowerCase().includes(q))
     .sort((a, b) => a.horarios.hora_inicio.localeCompare(b.horarios.hora_inicio));
 
@@ -100,17 +92,17 @@ export const TurnosAdmin = ({ modo = 'ADMIN', busqueda = '', setBusqueda = () =>
       key: 'cli', title: esEntrenador ? 'Alumno' : 'Cliente', flex: 2, render: (t) => (
         <View>
           <CellText bold>{nombrePersona(t.usuarios)}</CellText>
-          <CellText muted small>{t.usuarios?.email}</CellText>
+          <CellText muted small>{t.usuarios?.email}{t.profesor ? ` · con ${nombrePersona(t.profesor)}` : ''}</CellText>
         </View>
       ),
     },
-    { key: 'est', title: 'Estado', flex: 1, render: (t) => <Badge text={ESTADO_LABEL[t.estado]} tone={TONO[t.estado]} /> },
+    { key: 'est', title: 'Estado', flex: 1, render: (t) => <Badge text={ESTADO_LABEL[estadoVisible(t.estado)]} tone={TONO[estadoVisible(t.estado)]} /> },
     {
-      key: 'acc', title: 'Asistencia', flex: 1.8, render: (t) => (
+      key: 'acc', title: 'Acciones', flex: 1.4, render: (t) => (
         <Actions>
-          {t.estado === 'CONFIRMADO' && <IconButton icon="checkmark-circle-outline" label="Asistió" tone="primary" onPress={() => marcar(t, 'COMPLETADO')} />}
-          {t.estado === 'CONFIRMADO' && <IconButton icon="close-circle-outline" label="Ausente" onPress={() => marcar(t, 'AUSENTE')} />}
-          <IconButton icon="ellipsis-horizontal" onPress={() => setGestion({ turno: t, estado: ACCIONES.find((a) => a !== t.estado), motivo: '' })} />
+          {estadoVisible(t.estado) === 'CONFIRMADO'
+            ? <IconButton icon="close-circle-outline" label="Cancelar" onPress={() => setGestion({ turno: t, estado: 'CANCELADO', motivo: '' })} />
+            : <IconButton icon="refresh-outline" label="Reactivar" tone="primary" onPress={() => setGestion({ turno: t, estado: 'CONFIRMADO', motivo: '' })} />}
         </Actions>
       ),
     },
@@ -120,7 +112,7 @@ export const TurnosAdmin = ({ modo = 'ADMIN', busqueda = '', setBusqueda = () =>
     <View>
       <ScreenHeader
         title={esEntrenador ? 'Mis Clases' : 'Gestión de Turnos'}
-        subtitle={esEntrenador ? 'Alumnos anotados en tus clases; marcá la asistencia' : 'Reservas por día; marcá asistencia o cancelá con motivo'}
+        subtitle={esEntrenador ? 'Alumnos anotados en tus clases' : 'Reservas por día; podés cancelar con motivo'}
         actionLabel="Actualizar" actionIcon="refresh" onAction={cargar} />
 
       <View style={s.dateBar}>
@@ -165,12 +157,10 @@ export const TurnosAdmin = ({ modo = 'ADMIN', busqueda = '', setBusqueda = () =>
         {gestion && (
           <>
             <Text style={[s.name, { marginBottom: 12 }]}>
-              {nombrePersona(gestion.turno.usuarios)} · {gestion.turno.horarios.hora_inicio.slice(0, 5)} hs · estado actual: {ESTADO_LABEL[gestion.turno.estado]}
+              {nombrePersona(gestion.turno.usuarios)} · {gestion.turno.horarios.hora_inicio.slice(0, 5)} hs · estado actual: {ESTADO_LABEL[estadoVisible(gestion.turno.estado)]}
             </Text>
-            <FieldLabel>Nuevo estado</FieldLabel>
-            <SegmentToggle value={gestion.estado} onChange={(e) => setGestion({ ...gestion, estado: e })}
-              options={ACCIONES.filter((a) => a !== gestion.turno.estado).map((a) => [a, a === 'CONFIRMADO' ? 'Reactivar' : ESTADO_LABEL[a]])} />
-            <FormField label="Motivo (queda registrado)" placeholder="Ej. Asistió a la clase / Clase suspendida" multiline
+            <FieldLabel>{gestion.estado === 'CANCELADO' ? 'Cancelar el turno' : 'Reactivar el turno'}</FieldLabel>
+            <FormField label="Motivo (queda registrado)" placeholder="Ej. Clase suspendida por feriado" multiline
               value={gestion.motivo} onChangeText={(motivo) => setGestion({ ...gestion, motivo })} />
             {gestion.estado === 'CANCELADO' && <Text style={s.meta}>El cupo se libera y el cliente recibe una notificación de cancelación.</Text>}
           </>

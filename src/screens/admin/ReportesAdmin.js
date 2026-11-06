@@ -4,7 +4,7 @@ import { useTheme } from '../../context/ThemeContext';
 import { adminService } from '../../api/admin.service';
 import { mensajeDeError } from '../../utils/errores';
 import { DIA_LABEL, CATEGORIA_LABEL, ESTADO_LABEL, ROL_LABEL, avisar, fechaLocal } from '../../utils/dialogos';
-import { exportarCSV } from '../../utils/exportar';
+import { exportarExcel } from '../../utils/exportar';
 import {
   ScreenHeader, Toolbar, Select, DataTable, CellText, Badge, Card, PrimaryButton, EmptyState,
 } from '../../components/admin/AdminUI';
@@ -16,10 +16,12 @@ const PERIODOS = {
   MES_ANTERIOR: { label: 'Mes anterior', rango: () => { const h = new Date(); return [fechaLocal(new Date(h.getFullYear(), h.getMonth() - 1, 1)), fechaLocal(new Date(h.getFullYear(), h.getMonth(), 0))]; } },
   PROXIMOS: { label: 'Próximos 30 días', rango: () => { const h = new Date(); const d = new Date(); d.setDate(h.getDate() + 30); return [fechaLocal(h), fechaLocal(d)]; } },
 };
-const TONO_ESTADO = { CONFIRMADO: 'primary', COMPLETADO: 'success', CANCELADO: 'danger', AUSENTE: 'warning' };
+const TONO_ESTADO = { CONFIRMADO: 'primary', COMPLETADO: 'primary', CANCELADO: 'danger', AUSENTE: 'primary' };
+// Sin control de asistencia: un turno está reservado (vigente) o cancelado
+const ESTADO_REPORTE = (e) => (e === 'CANCELADO' ? 'CANCELADO' : 'CONFIRMADO');
 
 // Reportes: turnos por período (con resumen por estado y por instructor), ranking de
-// rutinas y exportación a CSV (se abre en Excel).
+// rutinas y exportación a Excel (.xlsx).
 export const ReportesAdmin = () => {
   const { theme } = useTheme();
   const s = useMemo(() => createStyles(theme), [theme]);
@@ -48,31 +50,43 @@ export const ReportesAdmin = () => {
   }, [desde, hasta]);
   useEffect(() => { cargar(); }, [cargar]);
 
-  const filas = turnos.filter((t) => estado === 'TODOS' || t.estado === estado);
-  const porEstado = turnos.reduce((acc, t) => ({ ...acc, [t.estado]: (acc[t.estado] || 0) + 1 }), {});
+  const filas = turnos.filter((t) => estado === 'TODOS' || ESTADO_REPORTE(t.estado) === estado);
+  const porEstado = turnos.reduce((acc, t) => ({ ...acc, [ESTADO_REPORTE(t.estado)]: (acc[ESTADO_REPORTE(t.estado)] || 0) + 1 }), {});
   const porInstructor = Object.entries(turnos.reduce((acc, t) => {
-    const k = nombrePersona(t.horarios?.usuarios) || 'Sin asignar';
+    const k = nombrePersona(t.profesor || t.horarios?.usuarios) || 'Sin asignar';
     acc[k] = (acc[k] || 0) + 1;
     return acc;
   }, {})).sort((a, b) => b[1] - a[1]);
-  const asistidos = porEstado.COMPLETADO || 0;
-  const cerrados = asistidos + (porEstado.AUSENTE || 0);
 
   const exportarTurnos = async () => {
     if (!filas.length) { avisar('Sin datos', 'No hay turnos para exportar con esos filtros.'); return; }
     setExportando('turnos');
     try {
-      await exportarCSV(`fittime_turnos_${desde}_a_${hasta}.csv`, [
-        { titulo: 'Turno', valor: (t) => t.id },
-        { titulo: 'Fecha', valor: (t) => t.fecha_turno },
-        { titulo: 'Día', valor: (t) => DIA_LABEL[t.horarios?.dia] },
-        { titulo: 'Horario', valor: (t) => `${t.horarios?.hora_inicio?.slice(0, 5)}-${t.horarios?.hora_fin?.slice(0, 5)}` },
-        { titulo: 'Cliente', valor: (t) => nombrePersona(t.usuarios) },
-        { titulo: 'Email', valor: (t) => t.usuarios?.email },
-        { titulo: 'Instructor', valor: (t) => nombrePersona(t.horarios?.usuarios) || 'Sin asignar' },
-        { titulo: 'Estado', valor: (t) => ESTADO_LABEL[t.estado] },
-        { titulo: 'Reservado el', valor: (t) => t.creado_en?.slice(0, 16).replace('T', ' ') },
-      ], filas);
+      const resumenHoja = [
+        ['Período', `${desde.split('-').reverse().join('/')} al ${hasta.split('-').reverse().join('/')}`],
+        ['Turnos reservados', porEstado.CONFIRMADO || 0],
+        ['Cancelaciones', porEstado.CANCELADO || 0],
+        ['Total', turnos.length],
+        ...porInstructor.map(([n, c]) => [`Instructor: ${n}`, c]),
+      ];
+      await exportarExcel(`fittime_turnos_${desde}_a_${hasta}.xlsx`, [
+        {
+          nombre: 'Turnos',
+          filas,
+          columnas: [
+            { titulo: 'Turno', valor: (t) => t.id },
+            { titulo: 'Fecha', valor: (t) => t.fecha_turno.split('-').reverse().join('/') },
+            { titulo: 'Día', valor: (t) => DIA_LABEL[t.horarios?.dia] },
+            { titulo: 'Horario', valor: (t) => `${t.horarios?.hora_inicio?.slice(0, 5)}-${t.horarios?.hora_fin?.slice(0, 5)}` },
+            { titulo: 'Cliente', valor: (t) => nombrePersona(t.usuarios) },
+            { titulo: 'Email', valor: (t) => t.usuarios?.email },
+            { titulo: 'Profesor/a', valor: (t) => nombrePersona(t.profesor || t.horarios?.usuarios) || 'Sin asignar' },
+            { titulo: 'Estado', valor: (t) => ESTADO_LABEL[ESTADO_REPORTE(t.estado)] },
+            { titulo: 'Reservado el', valor: (t) => t.creado_en?.slice(0, 16).replace('T', ' ') },
+          ],
+        },
+        { nombre: 'Resumen', filas: resumenHoja, columnas: [{ titulo: 'Dato', valor: (r) => r[0] }, { titulo: 'Valor', valor: (r) => r[1] }] },
+      ]);
     } catch (e) {
       avisar('No se pudo exportar', mensajeDeError(e));
     } finally {
@@ -84,7 +98,10 @@ export const ReportesAdmin = () => {
     setExportando('usuarios');
     try {
       const u = await adminService.reporteUsuarios();
-      await exportarCSV(`fittime_usuarios_${fechaLocal()}.csv`, [
+      await exportarExcel(`fittime_usuarios_${fechaLocal()}.xlsx`, [{
+        nombre: 'Usuarios',
+        filas: u,
+        columnas: [
         { titulo: 'Nombre', valor: nombrePersona },
         { titulo: 'Email', valor: (x) => x.email },
         { titulo: 'Teléfono', valor: (x) => x.telefono },
@@ -92,7 +109,7 @@ export const ReportesAdmin = () => {
         { titulo: 'Activo', valor: (x) => (x.activo ? 'Sí' : 'No') },
         { titulo: 'Rutina activa', valor: (x) => (x.rutina_asignada || []).find((r) => r.activa)?.rutinas?.nombre || '' },
         { titulo: 'Alta', valor: (x) => x.creado_en?.slice(0, 10) },
-      ], u);
+      ] }]);
     } catch (e) {
       avisar('No se pudo exportar', mensajeDeError(e));
     } finally {
@@ -104,29 +121,28 @@ export const ReportesAdmin = () => {
     { key: 'fecha', title: 'Fecha', flex: 1, render: (t) => <CellText bold>{t.fecha_turno.split('-').reverse().join('/')}</CellText> },
     { key: 'hora', title: 'Clase', flex: 1.2, render: (t) => <CellText>{DIA_LABEL[t.horarios?.dia]} {t.horarios?.hora_inicio?.slice(0, 5)}</CellText> },
     { key: 'cli', title: 'Cliente', flex: 1.6, render: (t) => <CellText>{nombrePersona(t.usuarios)}</CellText> },
-    { key: 'inst', title: 'Instructor', flex: 1.4, render: (t) => <CellText muted>{nombrePersona(t.horarios?.usuarios) || 'Sin asignar'}</CellText> },
-    { key: 'est', title: 'Estado', flex: 1, render: (t) => <Badge text={ESTADO_LABEL[t.estado]} tone={TONO_ESTADO[t.estado]} /> },
+    { key: 'inst', title: 'Instructor', flex: 1.4, render: (t) => <CellText muted>{nombrePersona(t.profesor || t.horarios?.usuarios) || 'Sin asignar'}</CellText> },
+    { key: 'est', title: 'Estado', flex: 1, render: (t) => <Badge text={ESTADO_LABEL[ESTADO_REPORTE(t.estado)]} tone={TONO_ESTADO[ESTADO_REPORTE(t.estado)]} /> },
   ];
 
   const resumen = [
     ['Turnos en el período', turnos.length],
-    ['Asistencias', asistidos],
+    ['Reservados', porEstado.CONFIRMADO || 0],
     ['Cancelaciones', porEstado.CANCELADO || 0],
-    ['Ausencias', porEstado.AUSENTE || 0],
-    ['Tasa de asistencia', cerrados ? `${Math.round((asistidos / cerrados) * 100)}%` : '—'],
+    ['Cancelación', turnos.length ? `${Math.round(((porEstado.CANCELADO || 0) / turnos.length) * 100)}%` : '—'],
   ];
 
   return (
     <View>
       <ScreenHeader title="Reportes" subtitle={`Del ${desde.split('-').reverse().join('/')} al ${hasta.split('-').reverse().join('/')}`}
-        actionLabel="Exportar turnos (CSV)" actionIcon="download-outline" onAction={exportarTurnos}>
-        <PrimaryButton title="Exportar usuarios" icon="people-outline" variant="outline" onPress={exportarUsuarios} loading={exportando === 'usuarios'} />
+        actionLabel="Exportar turnos (Excel)" actionIcon="download-outline" onAction={exportarTurnos}>
+        <PrimaryButton title="Exportar usuarios (Excel)" icon="people-outline" variant="outline" onPress={exportarUsuarios} loading={exportando === 'usuarios'} />
       </ScreenHeader>
       <Toolbar>
         <Select label="Período" value={periodo} onChange={setPeriodo}
           options={Object.entries(PERIODOS).map(([value, p]) => ({ value, label: p.label }))} />
         <Select label="Estado" value={estado} onChange={setEstado}
-          options={[{ value: 'TODOS', label: 'Todos' }, ...Object.keys(ESTADO_LABEL).map((k) => ({ value: k, label: ESTADO_LABEL[k] }))]} />
+          options={[{ value: 'TODOS', label: 'Todos' }, { value: 'CONFIRMADO', label: ESTADO_LABEL.CONFIRMADO }, { value: 'CANCELADO', label: ESTADO_LABEL.CANCELADO }]} />
       </Toolbar>
 
       {!loading && !error && (

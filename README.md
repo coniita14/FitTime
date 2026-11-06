@@ -19,7 +19,7 @@ FitTime es una aplicación multiplataforma para gimnasios locales. Los **cliente
 - Registro, inicio de sesión con correo o **Google**, recuperación de contraseña por código y sesión persistente.
 - **Face ID / huella**: cada vez que el cliente entra a su cuenta (al abrir la app o al volver después de un rato) tiene que verificarse con la biometría o el código del celular.
 - **Inicio**: próximos turnos y rutina asignada.
-- **Turnos**: horarios por día con cupos libres en tiempo real, reserva y cancelación.
+- **Turnos**: horarios por día con cupos libres en tiempo real, reserva y cancelación. Al reservar se abre una pantalla para **elegir con qué profesor/a entrenar en ese turno** (su profesor/a principal aparece primero); eso no cambia su profesor/a principal.
 - **Elegir profesor/a**: el cliente elige su profesor/a (desde Rutinas o Perfil) viendo sus clases y cuántos alumnos tiene. El cliente aparece en la lista de *Alumnos* del profesor, que es quien le asigna la rutina; las cuentas nuevas empiezan sin rutina.
 - **Rutinas**: sólo las rutinas de su profesor/a, por categoría (Fuerza, Cardio, Tren superior, Tren inferior, Cuerpo completo, Movilidad), detalle de ejercicios y rutinas guardadas.
 - **Video de cada ejercicio**: en el detalle del ejercicio se reproduce solo (sin sonido y en bucle) un video de técnica de YouTube; tocándolo se activa el sonido o la pantalla completa, y hay un botón *Ver en YouTube*.
@@ -28,7 +28,7 @@ FitTime es una aplicación multiplataforma para gimnasios locales. Los **cliente
 
 ### Entrenador (panel web / móvil)
 - **Inicio**: sus clases de hoy con ocupación, reservas de la semana y alumnos con su rutina.
-- **Mis clases**: alumnos anotados en sus horarios; marcar asistencia o ausencia.
+- **Mis clases**: alumnos anotados en sus horarios.
 - **Alumnos**: sólo los clientes que lo eligieron como profesor/a (los nuevos aparecen con *Nuevo · asignar rutina*); les asigna rutinas con indicaciones y el cliente recibe una notificación. La base de datos impide asignar rutinas a alumnos de otro profesor.
 - **Mis rutinas**: cada entrenador ve, edita y asigna **sólo las rutinas que cargó él**; otros entrenadores no las ven y sus alumnos sólo ven las de su profesor/a (lo controla la base de datos con RLS).
 - **Ejercicios**: músculos involucrados, "consejos del entrenador" y link al video de YouTube.
@@ -45,8 +45,9 @@ FitTime es una aplicación multiplataforma para gimnasios locales. Los **cliente
 - **ABM** de horarios, rutinas y ejercicios.
 - **Usuarios**: listado, rol (Cliente / Entrenador / Administrador), alta/baja y asignación de rutinas.
 - **Horarios**: además de día, hora y cupo, se asigna el **instructor** de cada clase.
-- **Turnos**: control por fecha, marcar asistencia/ausencia o cancelar con motivo (queda auditado).
-- **Reportes**: turnos por día, horarios más concurridos, rutinas más usadas y **exportación a CSV** (turnos de un período y usuarios activos), que abre directo en Excel.
+- **Horarios**: el gimnasio abre de **08:00 a 23:00** (lunes a sábado) y hay turnos de una hora en todo ese rango; la base de datos no deja crear clases fuera de ese horario.
+- **Turnos**: control por fecha y cancelación con motivo (queda auditado).
+- **Reportes**: turnos por día, horarios más concurridos, rutinas más usadas y **exportación a Excel (.xlsx)**: turnos de un período (con hoja de resumen) y usuarios.
 
 ---
 
@@ -84,7 +85,7 @@ La arquitectura completa está en [docs/ARQUITECTURA.md](./docs/ARQUITECTURA.md)
     │   ├── cliente/       # 2A–2F y 3A–3D: Horarios, Bloques, Mis Turnos, Detalle, Rutinas, Ejercicio, Perfil, Contraseña
     │   └── admin/         # Panel del administrador y del entrenador
     ├── styles/            # theme.js: colores de los wireframes (claro) y versión oscura
-    └── utils/             # errores, diálogos, fechas y exportar CSV
+    └── utils/             # errores, diálogos, fechas y exportar a Excel
 ```
 
 ---
@@ -109,6 +110,8 @@ La arquitectura completa está en [docs/ARQUITECTURA.md](./docs/ARQUITECTURA.md)
    8. `database/09_profesor_elegido.sql`
    9. `database/10_notificaciones_solo_clientes.sql`
    10. `database/11_rutinas_por_entrenador.sql`
+   11. `database/12_sin_asistencias_y_horario_8_a_23.sql`
+   12. `database/13_profesor_por_turno.sql`
 3. En **Authentication → Users → Add user**, crear las cuentas de prueba (ver la guía) y ejecutar `database/03_cuentas_prueba.sql`.
 4. En **Authentication → Email Templates → Reset Password**, incluir `{{ .Token }}` para que llegue el código de 6 dígitos.
    En **Authentication → Sign In / Providers → Email**, desactivar **Confirm email**: el servicio de correo gratuito de Supabase sólo envía a miembros del equipo y rechaza el registro de otros correos (`email_address_invalid`). Para que la recuperación de contraseña llegue a cualquier correo, configurar un SMTP propio en **Authentication → SMTP Settings**.

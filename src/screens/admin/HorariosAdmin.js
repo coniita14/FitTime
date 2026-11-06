@@ -9,6 +9,10 @@ import {
 } from '../../components/admin/AdminUI';
 
 const HORA_RE = /^([01]\d|2[0-3]):[0-5]\d$/;
+// Horario de apertura del gimnasio (también lo controla la base de datos)
+export const APERTURA = '08:00';
+export const CIERRE = '23:00';
+
 const VACIO = { id: null, dia: 'LUNES', hora_inicio: '', hora_fin: '', cupo_maximo: '15', entrenador_id: null, activo: true, observaciones: '' };
 export const nombrePersona = (u) => (u ? `${u.nombre} ${u.apellido && u.apellido !== '-' ? u.apellido : ''}`.trim() : null);
 
@@ -51,6 +55,8 @@ export const HorariosAdmin = ({ busqueda = '', setBusqueda = () => {} }) => {
     const e = {};
     if (!HORA_RE.test(form.hora_inicio)) e.hora_inicio = 'Formato HH:MM (ej. 08:00)';
     if (!HORA_RE.test(form.hora_fin)) e.hora_fin = 'Formato HH:MM (ej. 09:00)';
+    if (!e.hora_inicio && form.hora_inicio < APERTURA) e.hora_inicio = `El gimnasio abre a las ${APERTURA}`;
+    if (!e.hora_fin && form.hora_fin > CIERRE) e.hora_fin = `El gimnasio cierra a las ${CIERRE}`;
     if (!e.hora_inicio && !e.hora_fin && form.hora_fin <= form.hora_inicio) e.hora_fin = 'Debe ser posterior al inicio';
     const cupo = Number(form.cupo_maximo);
     if (!Number.isInteger(cupo) || cupo < 1 || cupo > 200) e.cupo_maximo = 'Número entre 1 y 200';
@@ -123,7 +129,7 @@ export const HorariosAdmin = ({ busqueda = '', setBusqueda = () => {} }) => {
 
   return (
     <View>
-      <ScreenHeader title="Gestión de Horarios" subtitle="Administrá los horarios disponibles del gimnasio"
+      <ScreenHeader title="Gestión de Horarios" subtitle="El gimnasio abre de 08:00 a 23:00; los turnos se pueden reservar dentro de ese horario"
         actionLabel="Nuevo Horario" onAction={() => abrir(null)} />
       <Toolbar>
         <SearchBox value={busqueda} onChangeText={setBusqueda} placeholder="Buscar horario o instructor..." />

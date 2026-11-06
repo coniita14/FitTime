@@ -161,7 +161,7 @@ export const adminService = {
   reporteTurnos: (desde, hasta) => {
     listo();
     return run(supabase.from('turnos')
-      .select('id, fecha_turno, estado, creado_en, cancelado_en, usuarios(nombre, apellido, email), horarios(dia, hora_inicio, hora_fin, usuarios(nombre, apellido))')
+      .select('id, fecha_turno, estado, creado_en, cancelado_en, usuarios:usuarios!turnos_usuario_id_fkey(nombre, apellido, email), profesor:usuarios!turnos_profesor_id_fkey(nombre, apellido), horarios(dia, hora_inicio, hora_fin, usuarios(nombre, apellido))')
       .gte('fecha_turno', desde)
       .lte('fecha_turno', hasta)
       .order('fecha_turno')
@@ -178,7 +178,7 @@ export const adminService = {
   listarTurnosDelDia: (fecha) => {
     listo();
     return run(supabase.from('turnos')
-      .select('id, fecha_turno, estado, horario_id, horarios(dia, hora_inicio, hora_fin, cupo_maximo), usuarios(nombre, apellido, email)')
+      .select('id, fecha_turno, estado, horario_id, profesor_id, horarios(dia, hora_inicio, hora_fin, cupo_maximo), usuarios:usuarios!turnos_usuario_id_fkey(nombre, apellido, email), profesor:usuarios!turnos_profesor_id_fkey(nombre, apellido)')
       .eq('fecha_turno', fecha)
       .order('horario_id'));
   },

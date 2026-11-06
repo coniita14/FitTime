@@ -137,7 +137,6 @@ export const DashboardAdmin = ({ onNavigate }) => {
         <Card style={s.col}>
           <Text style={s.cardTitle}>Este mes</Text>
           {[
-            ['checkmark-circle-outline', `${stats.asistencias_mes} asistencias registradas`],
             ['close-circle-outline', `${stats.cancelaciones_mes} cancelaciones`],
             ['medal-outline', `${stats.entrenadores} entrenadores en el equipo`],
             ['person-add-outline', `${stats.clientes_nuevos_mes} clientes nuevos`],

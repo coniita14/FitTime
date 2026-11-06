@@ -140,3 +140,6 @@ BEGIN
     );
 END;
 $$;
+
+-- La app lee profesor_id del perfil (la tabla usuarios usa permisos por columna)
+GRANT SELECT (profesor_id) ON public.usuarios TO authenticated;

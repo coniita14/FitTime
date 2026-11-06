@@ -8,7 +8,9 @@ import { useAuth } from '../../context/AuthContext';
 import { mensajeDeError } from '../../utils/errores';
 import { fechaCorta, fechaLarga, hora } from '../../utils/fechas';
 
-// 2B · Lista de bloques del día con ocupación + 2C · hoja "Confirmar Reserva".
+// 2B · Lista de bloques del día con ocupación + 2C · reserva en dos pasos:
+// 1) elegir con qué profesor/a entrenar en ese turno, 2) confirmar.
+// Elegir profesor/a acá NO cambia el profesor/a principal (el que asigna rutinas).
 export const BloquesScreen = ({ navigation, route }) => {
   const b = useBrand();
   const s = useMemo(() => createStyles(b), [b]);
@@ -18,7 +20,9 @@ export const BloquesScreen = ({ navigation, route }) => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [elegido, setElegido] = useState(null);
-  const [estado, setEstado] = useState('confirmar'); // confirmar | enviando | ok | error
+  const [estado, setEstado] = useState('profesor'); // profesor | confirmar | enviando | ok | error
+  const [profesores, setProfesores] = useState(null);
+  const [profesor, setProfesor] = useState(null);
   const [mensaje, setMensaje] = useState('');
   const scrollRef = useRef(null);
   const posiciones = useRef({});
@@ -37,12 +41,22 @@ export const BloquesScreen = ({ navigation, route }) => {
   }, [fecha]);
   useEffect(() => { cargar(); }, [cargar]);
 
-  const abrir = (h) => { setElegido(h); setEstado('confirmar'); setMensaje(''); };
+  const abrir = (h) => {
+    setElegido(h); setProfesor(null); setEstado('profesor'); setMensaje('');
+    if (!profesores) {
+      clienteService.listarProfesores()
+        // Su profesor/a principal aparece primero
+        .then((lista) => setProfesores([...lista].sort((a, b) => (b.id === user?.profesor_id) - (a.id === user?.profesor_id))))
+        .catch(() => setProfesores([]));
+    }
+  };
+  const elegirProfesor = (p) => { setProfesor(p); setEstado('confirmar'); };
+  const nombreProfe = (p) => (p ? `${p.nombre} ${p.apellido && p.apellido !== '-' ? p.apellido : ''}`.trim() : '');
 
   const confirmar = async () => {
     setEstado('enviando');
     try {
-      const turno = await clienteService.reservar(elegido.id, fecha);
+      const turno = await clienteService.reservar(elegido.id, fecha, profesor?.id ?? null);
       const t = Array.isArray(turno) ? turno[0] : turno;
       if (user?.notificaciones_activas !== false) {
         try {
@@ -86,7 +100,7 @@ export const BloquesScreen = ({ navigation, route }) => {
                   <Text style={s.time}>{hora(h.hora_inicio)} – {hora(h.hora_fin)}</Text>
                   <ProgressBar value={ocupacion} color={lleno ? b.textMuted : b.check} />
                   <Text style={s.meta}>
-                    {h.cupo_actual}/{h.cupo_maximo} cupos{lleno ? ' — COMPLETO' : ''}{h.entrenador ? ` · ${h.entrenador}` : ''}
+                    {h.cupo_actual}/{h.cupo_maximo} cupos{lleno ? ' — COMPLETO' : ''}
                   </Text>
                 </View>
                 {h.ya_reservado ? (
@@ -105,17 +119,43 @@ export const BloquesScreen = ({ navigation, route }) => {
       </ScrollView>
 
       <BottomSheet visible={!!elegido} onClose={() => estado !== 'enviando' && setElegido(null)}>
-        {elegido && estado !== 'ok' && (
+        {elegido && estado === 'profesor' && (
+          <>
+            <Text style={s.sheetTitle}>¿Con qué profesor/a querés entrenar?</Text>
+            <Text style={[s.meta, { marginBottom: 10 }]}>
+              {fechaLarga(fecha)} · {hora(elegido.hora_inicio)} - {hora(elegido.hora_fin)} hs
+            </Text>
+            {!profesores && <Loading />}
+            {profesores && profesores.length === 0 && <Text style={s.meta}>No hay profesores disponibles por ahora.</Text>}
+            <ScrollView style={{ maxHeight: 340 }}>
+              {(profesores || []).map((p) => (
+                <TouchableOpacity key={p.id} style={s.profe} onPress={() => elegirProfesor(p)} accessibilityRole="button"
+                  accessibilityLabel={`Entrenar con ${nombreProfe(p)}`}>
+                  <View style={[s.avatar, { backgroundColor: b.primary }]}>
+                    <Text style={s.avatarText}>{(p.nombre || '?').charAt(0).toUpperCase()}</Text>
+                  </View>
+                  <View style={{ flex: 1 }}>
+                    <Text style={s.time}>{nombreProfe(p)}</Text>
+                    <Text style={s.meta}>{p.id === user?.profesor_id ? 'Tu profesor/a' : `${p.alumnos} alumno${p.alumnos === 1 ? '' : 's'}`}</Text>
+                  </View>
+                  <Ionicons name="chevron-forward" size={18} color={b.textMuted} />
+                </TouchableOpacity>
+              ))}
+            </ScrollView>
+            <Button title="Volver" variant="white" onPress={() => setElegido(null)} style={{ marginTop: 12 }} />
+          </>
+        )}
+        {elegido && estado !== 'ok' && estado !== 'profesor' && (
           <>
             <Text style={s.sheetTitle}>Confirmar Reserva</Text>
             <Row label="📅  Fecha" value={fechaLarga(fecha)} />
             <Row label="🕒  Horario" value={`${hora(elegido.hora_inicio)} - ${hora(elegido.hora_fin)} hs`} />
             <Row label="👥  Cupos" value={`${libres}/${elegido.cupo_maximo} disponibles`} />
-            <Row label="🏋️  Instructor" value={elegido.entrenador || 'Pendiente de asignación'} />
+            <Row label="🏋️  Profesor/a" value={nombreProfe(profesor)} />
             <Row label="📍  Estado" value="Pendiente de confirmación" last />
             {estado === 'error' && <Text style={[s.err, { backgroundColor: b.danger }]}>{mensaje}</Text>}
             <Button title="Confirmar Reserva" onPress={confirmar} loading={estado === 'enviando'} style={{ marginTop: 18 }} />
-            <Button title="Volver" variant="white" onPress={() => setElegido(null)} disabled={estado === 'enviando'} style={{ marginTop: 10 }} />
+            <Button title="Cambiar profesor/a" variant="white" onPress={() => setEstado('profesor')} disabled={estado === 'enviando'} style={{ marginTop: 10 }} />
           </>
         )}
         {elegido && estado === 'ok' && (
@@ -123,7 +163,7 @@ export const BloquesScreen = ({ navigation, route }) => {
             <Ionicons name="checkmark-circle" size={56} color={b.success} />
             <Text style={s.sheetTitle}>¡Turno confirmado!</Text>
             <Text style={[s.meta, { textAlign: 'center' }]}>
-              {fechaLarga(fecha)} · {hora(elegido.hora_inicio)} hs.{'\n'}
+              {fechaLarga(fecha)} · {hora(elegido.hora_inicio)} hs{profesor ? ` con ${nombreProfe(profesor)}` : ''}.{'\n'}
               {user?.notificaciones_activas !== false ? 'Te vamos a avisar antes de la clase.' : 'Tenés los recordatorios desactivados.'}
             </Text>
             <Button title="Ver mis turnos" onPress={() => { setElegido(null); navigation.resetTo('turnos'); }} style={{ alignSelf: 'stretch', marginTop: 10 }} />
@@ -147,5 +187,8 @@ const createStyles = (b) => StyleSheet.create({
   reserved: { flexDirection: 'row', alignItems: 'center', gap: 4 },
   reservedText: { fontWeight: '700', fontSize: 12 },
   sheetTitle: { color: b.text, fontSize: 18, fontWeight: '800', marginBottom: 8 },
+  profe: { flexDirection: 'row', alignItems: 'center', gap: 12, paddingVertical: 10, borderBottomWidth: 1, borderBottomColor: b.track },
+  avatar: { width: 40, height: 40, borderRadius: 20, alignItems: 'center', justifyContent: 'center' },
+  avatarText: { color: '#FFF', fontWeight: '800', fontSize: 16 },
   err: { color: '#FFF', fontWeight: '600', padding: 10, borderRadius: 8, marginTop: 12, overflow: 'hidden' },
 });

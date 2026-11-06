@@ -48,16 +48,17 @@ export const clienteService = {
     return [...new Set(data.map((h) => h.dia))];
   },
   horariosPorFecha: (fecha) => { listo(); return run(supabase.rpc('horarios_por_fecha', { p_fecha: fecha })); },
-  reservar: (horarioId, fecha) => {
+  // profesorId: el profesor/a con quien entrena en ESE turno (no cambia su profesor/a principal)
+  reservar: (horarioId, fecha, profesorId = null) => {
     listo();
-    return run(supabase.rpc('reservar_turno', { p_horario_id: horarioId, p_fecha_turno: fecha }));
+    return run(supabase.rpc('reservar_turno', { p_horario_id: horarioId, p_fecha_turno: fecha, p_profesor_id: profesorId }));
   },
 
   // ---------- Mis turnos (2D–2E) ----------
   misTurnos: () => {
     listo();
     return run(supabase.from('turnos')
-      .select('id, fecha_turno, estado, creado_en, cancelado_en, horario_id, horarios(dia, hora_inicio, hora_fin, cupo_maximo, usuarios(nombre, apellido))')
+      .select('id, fecha_turno, estado, creado_en, cancelado_en, horario_id, profesor:usuarios!turnos_profesor_id_fkey(nombre, apellido), horarios(dia, hora_inicio, hora_fin, cupo_maximo, usuarios(nombre, apellido))')
       .order('fecha_turno', { ascending: false })
       .order('id', { ascending: false }));
   },

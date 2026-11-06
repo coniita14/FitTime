@@ -132,7 +132,6 @@ export const EntrenadoresAdmin = ({ busqueda = '', setBusqueda = () => {} }) => 
     },
     { key: 'alumnos', title: 'Alumnos', flex: 0.8, render: (e) => <CellText>{e.alumnos}</CellText> },
     { key: 'rutinas', title: 'Rutinas', flex: 0.8, render: (e) => <CellText>{e.rutinas_creadas}</CellText> },
-    { key: 'asist', title: 'Asist. mes', flex: 0.9, render: (e) => <CellText>{e.asistencias_mes}</CellText> },
     { key: 'estado', title: 'Estado', flex: 0.9, render: (e) => <Badge text={e.activo ? 'Activo' : 'De baja'} tone={e.activo ? 'success' : 'danger'} /> },
     {
       key: 'acc', title: 'Acciones', flex: 1.6, render: (e) => (

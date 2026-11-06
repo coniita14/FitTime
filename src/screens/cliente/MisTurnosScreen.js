@@ -8,8 +8,8 @@ import { fechaMini, hora, yaPaso } from '../../utils/fechas';
 export const ESTADO_PILL = {
   CONFIRMADO: { text: 'Confirmado', tone: 'primary' },
   CANCELADO: { text: 'Cancelado', tone: 'danger' },
-  COMPLETADO: { text: 'Asistió', tone: 'success' },
-  AUSENTE: { text: 'Ausente', tone: 'warning' },
+  COMPLETADO: { text: 'Confirmado', tone: 'primary' },
+  AUSENTE: { text: 'Confirmado', tone: 'primary' },
 };
 
 // 2D · Mis Turnos: pestañas Próximos / Historial.

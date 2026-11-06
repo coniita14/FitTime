@@ -8,6 +8,7 @@ const MENSAJES = {
   'provider is not enabled': 'El inicio con Google todavía no está habilitado en el gimnasio. Ingresá con tu correo y contraseña.',
   'Unsupported provider': 'El inicio con Google todavía no está habilitado en el gimnasio. Ingresá con tu correo y contraseña.',
   // Funciones SQL de FitTime
+  horarios_dentro_de_apertura: 'El gimnasio abre de 08:00 a 23:00: el horario tiene que estar dentro de ese rango.',
   CUPO_COMPLETO: 'Ese horario ya no tiene lugares disponibles.',
   YA_RESERVADO: 'Ya hay un turno confirmado para esa persona en ese horario y fecha.',
   HORARIO_YA_INICIADO: 'Ese turno ya empezó; elegí otro horario.',

@@ -58,7 +58,9 @@ Marcar cada casilla al verificarla.
 - [ ] **Horarios:** crear "Domingo 09:00–10:00, cupo 8" → editarlo a cupo 10 → darlo de baja. El cliente ya no lo ve.
 - [ ] **Ejercicios:** crear "Remo en máquina" → editar la descripción → eliminar.
 - [ ] **Rutinas:** crear una rutina de categoría *Cardio* con dos ejercicios → editarla → desactivarla.
-- [ ] **Turnos:** en la lista de turnos, marcar uno como *Asistió* o *Ausente* indicando un motivo.
+- [ ] **Turnos:** en la lista de turnos, cancelar uno indicando un motivo (y *Reactivar* lo vuelve a confirmar).
+- [ ] **Horarios:** intentar crear una clase a las 07:00 o que termine 23:30 → *"El gimnasio abre a las 08:00"* / *"cierra a las 23:00"*. Como cliente, en *Horarios* hay turnos de 08:00 a 23:00 de lunes a sábado.
+- [ ] **Reportes:** *Exportar turnos (Excel)* descarga un `.xlsx` con las hojas *Turnos* y *Resumen*; *Exportar usuarios (Excel)* descarga la lista de usuarios.
 
 ### R4 · Multiusuario y roles
 - [ ] Logueado como cliente no aparece ningún menú de administración.
@@ -73,10 +75,11 @@ Marcar cada casilla al verificarla.
 - [ ] **Rutinas propias:** como `entrenador@fittime.com`, *Mis rutinas* muestra sus rutinas. Crear una rutina nueva → entrar con otro entrenador (creado desde *Entrenadores*): **no la ve**. Un cliente que eligió a otro profesor tampoco la ve.
 - [ ] En el celular, deslizar el dedo desde el borde izquierdo → se abre el menú (las 3 rayitas); deslizar hacia la izquierda → se cierra. El ícono de tema oscuro aparece **una sola vez** (en *Mi perfil*).
 - [ ] *Ejercicios* → editar los consejos de "Sentadilla Libre" → el cliente los ve en el detalle del ejercicio ("Consejos del entrenador").
-- [ ] *Mis clases* → marcar a un alumno como "Asistió".
+- [ ] *Mis clases* → ve los alumnos anotados en sus clases del día.
 - [ ] Como cliente, el detalle del turno muestra el **Instructor** de la clase.
 
 ### R5 · Interacción entre usuarios
+- [ ] **Reservar con profesor/a:** como cliente, *Horarios* → elegir un día → *Reservar* → se abre *"¿Con qué profesor/a querés entrenar?"*. Elegir uno → *Confirmar Reserva*. El detalle del turno muestra ese profesor/a, y en *Perfil* el profesor/a principal **no cambió**. Ese entrenador ve al alumno en *Mis clases*.
 - [ ] **Elegir profesor/a:** registrar un cliente nuevo → en *Rutinas* aparece *"Elegí tu profesor/a"* (no tiene rutina). Tocar el botón, elegir a **Lucas Díaz** → la tarjeta pasa a *"Esperando tu rutina"*. Entrar como `entrenador@fittime.com` → el cliente aparece en *Alumnos* como *Nuevo · asignar rutina*. Asignarle una rutina → el cliente la ve en *Rutinas*.
 - [ ] Como **cliente**, reservar un turno → como **admin**, verlo en la lista de turnos de esa fecha con el nombre del cliente.
 - [ ] Como **admin**, asignar la rutina "Fuerza Base 5x5" al cliente → como **cliente**, aparece en Inicio y llega la notificación "Nueva rutina asignada".
@@ -112,7 +115,7 @@ Marcar cada casilla al verificarla.
 
 ### Extra · Asistente con IA "Fiti"
 - [ ] Como **cliente**, tocar el botón ✨ (abajo a la derecha) y preguntar *"¿Qué turnos tengo esta semana?"*: responde con los turnos reales de la cuenta.
-- [ ] Pedir *"Quiero que me reserves un turno mañana"*: muestra las clases con lugares; al responder con una (ej. *"la de las 18"*) **la reserva directamente** y aparece la tarjeta ✔ **Turno reservado**. El turno ya está en *Turnos*.
+- [ ] Pedir *"Quiero que me reserves un turno mañana"*: muestra los horarios con lugares y pregunta **con qué profesor/a** querés entrenar; al responder (ej. *"a las 18 con Lucas"*) **lo reserva directamente** y aparece la tarjeta ✔ **Turno reservado**. El turno ya está en *Turnos*.
 - [ ] Pedir *"Cancelá mi próximo turno"*: Fiti pregunta *"¿Seguro que querés cancelar el turno del …?"*. Responder *"sí"* → aparece ✔ **Turno cancelado** y el cupo se libera. Si se responde *"no"*, no cancela nada.
 - [ ] Pedir *"Ayudame a elegir profesor/a"*: lista los profesores con sus clases; al elegir uno aparece ✔ **Profesor/a elegido** y el cliente pasa a la lista de *Alumnos* de ese entrenador.
 - [ ] Preguntar *"¿Cómo hago peso muerto?"*: explica la técnica usando el catálogo de ejercicios.

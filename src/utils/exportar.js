@@ -1,24 +1,16 @@
 import { Platform, Share } from 'react-native';
+import { crearExcel } from './excel';
 
-// Exporta filas a CSV (separador ";" para que Excel en español lo abra en columnas).
-// Web: descarga el archivo. Android/iOS: abre el menú "Compartir" (mail, WhatsApp, Drive…).
+// Exporta reportes a Excel (.xlsx).
+// Web: descarga el archivo. Android/iOS: lo guarda y abre el menú "Compartir" (mail, WhatsApp, Drive…).
 
-const celda = (v) => {
-  const texto = v === null || v === undefined ? '' : String(v);
-  return /[";\n\r]/.test(texto) ? `"${texto.replace(/"/g, '""')}"` : texto;
-};
+const MIME_XLSX = 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet';
 
-export const aCSV = (columnas, filas) => {
-  const encabezado = columnas.map((c) => celda(c.titulo)).join(';');
-  const cuerpo = filas.map((f) => columnas.map((c) => celda(c.valor(f))).join(';'));
-  return [encabezado, ...cuerpo].join('\r\n');
-};
-
-export const exportarCSV = async (nombreArchivo, columnas, filas) => {
-  const csv = aCSV(columnas, filas);
+// hojas: [{ nombre, columnas: [{ titulo, valor }], filas }]
+export const exportarExcel = async (nombreArchivo, hojas) => {
+  const bytes = crearExcel(hojas);
   if (Platform.OS === 'web') {
-    const blob = new Blob([`﻿${csv}`], { type: 'text/csv;charset=utf-8' }); // BOM: Excel respeta acentos
-    const url = URL.createObjectURL(blob);
+    const url = URL.createObjectURL(new Blob([bytes], { type: MIME_XLSX }));
     const a = document.createElement('a');
     a.href = url;
     a.download = nombreArchivo;
@@ -28,5 +20,15 @@ export const exportarCSV = async (nombreArchivo, columnas, filas) => {
     setTimeout(() => URL.revokeObjectURL(url), 1000);
     return;
   }
-  await Share.share({ title: nombreArchivo, message: csv });
+  const { File, Paths } = require('expo-file-system');
+  const Sharing = require('expo-sharing');
+  const archivo = new File(Paths.cache, nombreArchivo);
+  if (archivo.exists) archivo.delete();
+  archivo.create();
+  archivo.write(bytes);
+  if (await Sharing.isAvailableAsync()) {
+    await Sharing.shareAsync(archivo.uri, { mimeType: MIME_XLSX, UTI: 'org.openxmlformats.spreadsheetml.sheet', dialogTitle: nombreArchivo });
+  } else {
+    await Share.share({ title: nombreArchivo, url: archivo.uri });
+  }
 };

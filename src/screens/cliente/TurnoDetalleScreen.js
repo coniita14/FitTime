@@ -16,7 +16,9 @@ export const TurnoDetalleScreen = ({ navigation, route }) => {
   const s = useMemo(() => createStyles(b), [b]);
   const { turno } = route.params;
   const h = turno.horarios || {};
-  const instructor = h.usuarios ? `${h.usuarios.nombre} ${h.usuarios.apellido !== '-' ? h.usuarios.apellido : ''}`.trim() : null;
+  // El profesor/a elegido al reservar; si es un turno viejo, el de la clase
+  const p = turno.profesor || h.usuarios;
+  const instructor = p ? `${p.nombre} ${p.apellido && p.apellido !== '-' ? p.apellido : ''}`.trim() : null;
   const [cancelando, setCancelando] = useState(false);
   const futuro = turno.estado === 'CONFIRMADO' && !yaPaso(turno.fecha_turno, h.hora_inicio);
   const pill = ESTADO_PILL[turno.estado] || ESTADO_PILL.CONFIRMADO;
@@ -59,7 +61,7 @@ export const TurnoDetalleScreen = ({ navigation, route }) => {
         <Row label="Estado:" value={pill.text} />
         <Row label="Fecha:" value={fechaLarga(turno.fecha_turno)} />
         <Row label="Hora:" value={`${hora(h.hora_inicio)} - ${hora(h.hora_fin)} hs`} />
-        <Row label="Instructor:" value={instructor || '[ Pendiente de asignación ]'} last />
+        <Row label="Profesor/a:" value={instructor || 'Sin elegir'} last />
       </Card>
 
       <SectionTitle>Información del Horario</SectionTitle>
