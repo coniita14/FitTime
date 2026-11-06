@@ -70,6 +70,8 @@ Marcar cada casilla al verificarla.
 - [ ] *Inicio* muestra sus clases de hoy y la ocupación.
 - [ ] *Alumnos* muestra **sólo los clientes que eligieron a ese entrenador** (Carlos ya eligió a Lucas Díaz).
 - [ ] *Alumnos* → asignar "Fuerza Base 5x5" a Carlos con una indicación → el cliente la ve en *Rutinas → Tu rutina* con "Asignada por …" y la indicación.
+- [ ] **Rutinas propias:** como `entrenador@fittime.com`, *Mis rutinas* muestra sus rutinas. Crear una rutina nueva → entrar con otro entrenador (creado desde *Entrenadores*): **no la ve**. Un cliente que eligió a otro profesor tampoco la ve.
+- [ ] En el celular, deslizar el dedo desde el borde izquierdo → se abre el menú (las 3 rayitas); deslizar hacia la izquierda → se cierra. El ícono de tema oscuro aparece **una sola vez** (en *Mi perfil*).
 - [ ] *Ejercicios* → editar los consejos de "Sentadilla Libre" → el cliente los ve en el detalle del ejercicio ("Consejos del entrenador").
 - [ ] *Mis clases* → marcar a un alumno como "Asistió".
 - [ ] Como cliente, el detalle del turno muestra el **Instructor** de la clase.
@@ -83,6 +85,7 @@ Marcar cada casilla al verificarla.
 ### R6 · Configuración de cuenta
 - [ ] Perfil → editar nombre y teléfono → guardar → cerrar y abrir la app → los datos se mantienen.
 - [ ] Cambiar la foto de perfil desde la galería.
+- [ ] Rutinas → abrir una rutina → tocar un ejercicio (ej. *Sentadilla Libre*): el video de técnica arranca solo y sin sonido; tocándolo se escucha o se pone en pantalla completa. *Ver en YouTube* lo abre en la app de YouTube.
 - [ ] Cambiar contraseña estando logueado.
 - [ ] Preferencias: activar/desactivar notificaciones y elegir cuánto antes llega el recordatorio.
 

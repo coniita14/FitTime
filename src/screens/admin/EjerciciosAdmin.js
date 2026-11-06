@@ -133,7 +133,7 @@ export const EjerciciosAdmin = ({ busqueda = '', setBusqueda = () => {} }) => {
               onChangeText={(v) => setForm({ ...form, descripcion: v })} />
             <FormField label="Consejos del entrenador" placeholder="Ej. Evitá que las rodillas sobrepasen la punta de los pies" multiline
               value={form.consejos} onChangeText={(v) => setForm({ ...form, consejos: v })} />
-            <FormField label="Video (opcional)" placeholder="https://…" value={form.video_url} error={errores.video_url}
+            <FormField label="Video de YouTube (opcional)" placeholder="https://www.youtube.com/watch?v=…" value={form.video_url} error={errores.video_url}
               onChangeText={(v) => setForm({ ...form, video_url: v })} keyboardType="url" autoCapitalize="none" />
           </>
         )}

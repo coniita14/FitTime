@@ -1,6 +1,7 @@
-import React, { useCallback, useEffect, useMemo, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import {
-  View, Text, TouchableOpacity, ScrollView, StyleSheet, useWindowDimensions, Modal, Pressable, Image, TextInput, Platform,
+  View, Text, TouchableOpacity, ScrollView, StyleSheet, useWindowDimensions, Pressable, Image, TextInput, Platform,
+  Animated, PanResponder, BackHandler,
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
@@ -50,7 +51,7 @@ const nombreCompleto = (u) => `${u?.nombre || ''} ${u?.apellido && u.apellido !=
 export const AdminScreen = ({ rol = 'ADMIN' }) => {
   const esEntrenador = rol === 'ENTRENADOR';
   const secciones = SECCIONES[rol] || SECCIONES.ADMIN;
-  const { theme, isDark, toggleTheme } = useTheme();
+  const { theme, isDark } = useTheme();
   const { user } = useAuth();
   const { width } = useWindowDimensions();
   const insets = useSafeAreaInsets();
@@ -61,7 +62,42 @@ export const AdminScreen = ({ rol = 'ADMIN' }) => {
   const [menuAbierto, setMenuAbierto] = useState(false);
   const [verAsistente, setVerAsistente] = useState(false);
 
-  const setSeccion = useCallback((k) => { setSeccionState(k); setBusqueda(''); setMenuAbierto(false); }, []);
+  // ----- Menú lateral (las 3 rayitas): se abre tocando o deslizando desde el borde izquierdo -----
+  const ANCHO_MENU = 260;
+  const abierto = useRef(new Animated.Value(0)).current; // 0 = cerrado, 1 = abierto
+  const animarMenu = useCallback((valor) => {
+    if (valor) setMenuAbierto(true);
+    Animated.timing(abierto, { toValue: valor, duration: 180, useNativeDriver: Platform.OS !== 'web' })
+      .start(() => { if (!valor) setMenuAbierto(false); });
+  }, [abierto]);
+  const abrirMenu = useCallback(() => animarMenu(1), [animarMenu]);
+  const cerrarMenu = useCallback(() => animarMenu(0), [animarMenu]);
+
+  const deslizarParaAbrir = useMemo(() => PanResponder.create({
+    onMoveShouldSetPanResponderCapture: (_e, g) => !esAncho && g.x0 < 32 && g.dx > 8 && Math.abs(g.dx) > Math.abs(g.dy),
+    onPanResponderGrant: () => setMenuAbierto(true),
+    onPanResponderMove: (_e, g) => abierto.setValue(Math.max(0, Math.min(1, g.dx / ANCHO_MENU))),
+    onPanResponderRelease: (_e, g) => animarMenu(g.dx > ANCHO_MENU / 3 || g.vx > 0.5 ? 1 : 0),
+    onPanResponderTerminate: () => animarMenu(0),
+  }), [esAncho, abierto, animarMenu]);
+
+  const deslizarParaCerrar = useMemo(() => PanResponder.create({
+    onMoveShouldSetPanResponder: (_e, g) => g.dx < -8 && Math.abs(g.dx) > Math.abs(g.dy),
+    onPanResponderMove: (_e, g) => abierto.setValue(Math.max(0, Math.min(1, 1 + g.dx / ANCHO_MENU))),
+    onPanResponderRelease: (_e, g) => animarMenu(g.dx < -ANCHO_MENU / 3 || g.vx < -0.5 ? 0 : 1),
+    onPanResponderTerminate: () => animarMenu(1),
+  }), [abierto, animarMenu]);
+
+  useEffect(() => {
+    if (!menuAbierto) return undefined;
+    const sub = BackHandler.addEventListener('hardwareBackPress', () => { cerrarMenu(); return true; });
+    return () => sub.remove();
+  }, [menuAbierto, cerrarMenu]);
+
+  const setSeccion = useCallback((k) => {
+    setSeccionState(k); setBusqueda('');
+    abierto.setValue(0); setMenuAbierto(false);
+  }, [abierto]);
 
   // Entrenadores y administradores no reciben notificaciones (sólo los clientes)
 
@@ -120,13 +156,13 @@ export const AdminScreen = ({ rol = 'ADMIN' }) => {
   );
 
   return (
-    <View style={[s.root, { flexDirection: esAncho ? 'row' : 'column' }]}>
+    <View style={[s.root, { flexDirection: esAncho ? 'row' : 'column' }]} {...(!esAncho ? deslizarParaAbrir.panHandlers : {})}>
       {esAncho && <Sidebar />}
 
       <View style={{ flex: 1 }}>
         <View style={[s.topbar, { paddingTop: esAncho ? 12 : insets.top + 8 }]}>
           {!esAncho && (
-            <TouchableOpacity onPress={() => setMenuAbierto(true)} accessibilityLabel="Abrir menú" style={s.topIcon}>
+            <TouchableOpacity onPress={abrirMenu} accessibilityLabel="Abrir menú" style={s.topIcon}>
               <Ionicons name="menu" size={24} color={theme.colors.textPrimary} />
             </TouchableOpacity>
           )}
@@ -138,9 +174,7 @@ export const AdminScreen = ({ rol = 'ADMIN' }) => {
                 style={[s.topSearchInput, Platform.OS === 'web' && { outlineStyle: 'none' }]} accessibilityLabel="Buscar en la sección" />
             </View>
           )}
-          <TouchableOpacity onPress={toggleTheme} style={s.topIcon} accessibilityLabel={isDark ? 'Tema claro' : 'Tema oscuro'}>
-            <Ionicons name={isDark ? 'sunny-outline' : 'moon-outline'} size={20} color={theme.colors.textPrimary} />
-          </TouchableOpacity>
+          {/* El tema claro/oscuro se cambia una sola vez, desde Mi perfil */}
           <TouchableOpacity onPress={() => setSeccion('perfil')} accessibilityLabel="Mi perfil">
             <Avatar size={32} />
           </TouchableOpacity>
@@ -151,17 +185,22 @@ export const AdminScreen = ({ rol = 'ADMIN' }) => {
         </ScrollView>
       </View>
 
-      {!esAncho && (
-        <Modal visible={menuAbierto} transparent animationType="fade" onRequestClose={() => setMenuAbierto(false)}>
-          <View style={{ flex: 1, flexDirection: 'row' }}>
-            <Sidebar />
-            <Pressable style={{ flex: 1, backgroundColor: 'rgba(15,23,42,0.45)' }} onPress={() => setMenuAbierto(false)} accessibilityLabel="Cerrar menú" />
-          </View>
-        </Modal>
-      )}
-
       <AsistenteBoton onPress={() => setVerAsistente(true)} bottom={24 + insets.bottom} />
       <AsistenteModal visible={verAsistente} onClose={() => setVerAsistente(false)} />
+
+      {!esAncho && menuAbierto && (
+        <View style={StyleSheet.absoluteFill} {...deslizarParaCerrar.panHandlers}>
+          <Animated.View style={[StyleSheet.absoluteFill, { backgroundColor: 'rgba(15,23,42,0.45)', opacity: abierto }]}>
+            <Pressable style={{ flex: 1 }} onPress={cerrarMenu} accessibilityLabel="Cerrar menú" />
+          </Animated.View>
+          <Animated.View style={{
+            position: 'absolute', top: 0, bottom: 0, left: 0, width: ANCHO_MENU,
+            transform: [{ translateX: abierto.interpolate({ inputRange: [0, 1], outputRange: [-ANCHO_MENU, 0] }) }],
+          }}>
+            <Sidebar />
+          </Animated.View>
+        </View>
+      )}
 
     </View>
   );

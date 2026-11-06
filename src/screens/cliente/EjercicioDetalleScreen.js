@@ -5,6 +5,8 @@ import { Screen, Card, Button, SectionTitle, useBrand } from '../../components/c
 import { clienteService } from '../../api/cliente.service';
 import { mensajeDeError } from '../../utils/errores';
 import { avisar } from '../../utils/dialogos';
+import { VideoEjercicio } from '../../components/video/VideoEjercicio';
+import { idDeYoutube } from '../../components/video/youtube';
 
 // 3B · Detalle del ejercicio: video, series/reps/descanso, descripción,
 // músculos involucrados, consejos del entrenador y "Marcar como completado".
@@ -42,11 +44,21 @@ export const EjercicioDetalleScreen = ({ navigation, route }) => {
 
   return (
     <Screen title={ej.nombre || 'Ejercicio'} onBack={navigation.goBack} contentStyle={{ paddingTop: 0 }}>
-      <TouchableOpacity onPress={verVideo} style={s.video} accessibilityRole="button"
-        accessibilityLabel={ej.video_url ? 'Ver video del ejercicio' : 'Buscar video del ejercicio'}>
-        <View style={s.play}><Ionicons name="play" size={30} color={b.card} /></View>
-        <Text style={s.videoText}>{ej.video_url ? 'Ver video del ejercicio' : '[ Video / Animación ] · Buscar ejemplo'}</Text>
-      </TouchableOpacity>
+      {idDeYoutube(ej.video_url) ? (
+        <View style={s.videoCaja}>
+          {/* Se reproduce solo y sin sonido; tocándolo se activa el audio o la pantalla completa */}
+          <VideoEjercicio url={ej.video_url} titulo={`Técnica: ${ej.nombre}`} />
+          <TouchableOpacity onPress={verVideo} style={s.verYoutube} accessibilityRole="link" accessibilityLabel="Ver el video en YouTube">
+            <Ionicons name="logo-youtube" size={16} color={b.primary} />
+            <Text style={s.verYoutubeText}>Ver en YouTube</Text>
+          </TouchableOpacity>
+        </View>
+      ) : (
+        <TouchableOpacity onPress={verVideo} style={s.video} accessibilityRole="button" accessibilityLabel="Buscar video del ejercicio">
+          <View style={s.play}><Ionicons name="play" size={30} color={b.card} /></View>
+          <Text style={s.videoText}>Buscar un video de ejemplo</Text>
+        </TouchableOpacity>
+      )}
 
       <View style={s.tiles}>
         {[[detalle.series, 'Series'], [detalle.repeticiones, 'Reps'], [`${descanso}s`, 'Descanso']].map(([v, l]) => (
@@ -88,6 +100,9 @@ const createStyles = (b) => StyleSheet.create({
   video: {
     backgroundColor: b.cardSoft, marginHorizontal: -16, height: 200, alignItems: 'center', justifyContent: 'center', gap: 10, marginBottom: 16,
   },
+  videoCaja: { marginHorizontal: -16, marginBottom: 16 },
+  verYoutube: { flexDirection: 'row', alignItems: 'center', gap: 6, alignSelf: 'flex-end', paddingHorizontal: 16, paddingVertical: 8 },
+  verYoutubeText: { color: b.primary, fontWeight: '700', fontSize: 13 },
   play: { width: 64, height: 64, borderRadius: 32, backgroundColor: b.textMuted, alignItems: 'center', justifyContent: 'center' },
   videoText: { color: b.textSoft, fontSize: 12 },
   tiles: { flexDirection: 'row', gap: 10, marginBottom: 6 },

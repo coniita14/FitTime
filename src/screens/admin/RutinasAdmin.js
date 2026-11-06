@@ -168,7 +168,8 @@ export const RutinasAdmin = ({ busqueda = '', setBusqueda = () => {} }) => {
 
   return (
     <View>
-      <ScreenHeader title="Gestión de Rutinas" subtitle="Plantillas de entrenamiento con sus ejercicios, series y descansos"
+      <ScreenHeader title={user?.rol === 'ENTRENADOR' ? 'Mis rutinas' : 'Gestión de Rutinas'}
+        subtitle={user?.rol === 'ENTRENADOR' ? 'Sólo vos y tus alumnos ven las rutinas que cargás' : 'Rutinas de todos los entrenadores, con sus ejercicios, series y descansos'}
         actionLabel="Nueva Rutina" onAction={() => abrirForm(null)} />
       <Toolbar>
         <SearchBox value={busqueda} onChangeText={setBusqueda} placeholder="Buscar rutina..." />

@@ -21,7 +21,8 @@ FitTime es una aplicación multiplataforma para gimnasios locales. Los **cliente
 - **Inicio**: próximos turnos y rutina asignada.
 - **Turnos**: horarios por día con cupos libres en tiempo real, reserva y cancelación.
 - **Elegir profesor/a**: el cliente elige su profesor/a (desde Rutinas o Perfil) viendo sus clases y cuántos alumnos tiene. El cliente aparece en la lista de *Alumnos* del profesor, que es quien le asigna la rutina; las cuentas nuevas empiezan sin rutina.
-- **Rutinas**: catálogo por categoría (Fuerza, Cardio, Tren superior, Tren inferior, Cuerpo completo, Movilidad), detalle de ejercicios y rutinas guardadas.
+- **Rutinas**: sólo las rutinas de su profesor/a, por categoría (Fuerza, Cardio, Tren superior, Tren inferior, Cuerpo completo, Movilidad), detalle de ejercicios y rutinas guardadas.
+- **Video de cada ejercicio**: en el detalle del ejercicio se reproduce solo (sin sonido y en bucle) un video de técnica de YouTube; tocándolo se activa el sonido o la pantalla completa, y hay un botón *Ver en YouTube*.
 - **Notificaciones** (sólo para clientes): confirmación de turno, recordatorio antes de entrenar, avisos de cancelación y de rutina asignada. Entrenadores y administradores no reciben notificaciones.
 - **Perfil**: datos personales, foto, cambio de contraseña, tema claro/oscuro, preferencias de notificación y cerrar sesión.
 
@@ -29,7 +30,9 @@ FitTime es una aplicación multiplataforma para gimnasios locales. Los **cliente
 - **Inicio**: sus clases de hoy con ocupación, reservas de la semana y alumnos con su rutina.
 - **Mis clases**: alumnos anotados en sus horarios; marcar asistencia o ausencia.
 - **Alumnos**: sólo los clientes que lo eligieron como profesor/a (los nuevos aparecen con *Nuevo · asignar rutina*); les asigna rutinas con indicaciones y el cliente recibe una notificación. La base de datos impide asignar rutinas a alumnos de otro profesor.
-- **Rutinas y ejercicios**: crear y editar rutinas, músculos involucrados y "consejos del entrenador".
+- **Mis rutinas**: cada entrenador ve, edita y asigna **sólo las rutinas que cargó él**; otros entrenadores no las ven y sus alumnos sólo ven las de su profesor/a (lo controla la base de datos con RLS).
+- **Ejercicios**: músculos involucrados, "consejos del entrenador" y link al video de YouTube.
+- **Menú lateral**: en el celular se abre con las 3 rayitas o deslizando el dedo desde el borde izquierdo, y se cierra deslizando hacia la izquierda.
 
 ### Asistente con IA "Fiti" (cliente y entrenador)
 - Botón ✨ flotante que abre un chat con IA (Google Gemini) que conoce los datos de quien pregunta.
@@ -105,6 +108,7 @@ La arquitectura completa está en [docs/ARQUITECTURA.md](./docs/ARQUITECTURA.md)
    7. `database/08_asistente.sql`
    8. `database/09_profesor_elegido.sql`
    9. `database/10_notificaciones_solo_clientes.sql`
+   10. `database/11_rutinas_por_entrenador.sql`
 3. En **Authentication → Users → Add user**, crear las cuentas de prueba (ver la guía) y ejecutar `database/03_cuentas_prueba.sql`.
 4. En **Authentication → Email Templates → Reset Password**, incluir `{{ .Token }}` para que llegue el código de 6 dígitos.
    En **Authentication → Sign In / Providers → Email**, desactivar **Confirm email**: el servicio de correo gratuito de Supabase sólo envía a miembros del equipo y rechaza el registro de otros correos (`email_address_invalid`). Para que la recuperación de contraseña llegue a cualquier correo, configurar un SMTP propio en **Authentication → SMTP Settings**.

@@ -24,6 +24,7 @@ const MENSAJES = {
   RUTINA_NO_ENCONTRADA: 'La rutina no existe o está desactivada.',
   PROFESOR_NO_ENCONTRADO: 'Ese profesor/a ya no está disponible. Elegí otro.',
   SOLO_CLIENTES: 'Solo los clientes pueden elegir profesor/a.',
+  NO_ES_TU_RUTINA: 'Sólo podés asignar rutinas que cargaste vos.',
   NO_ES_TU_ALUMNO: 'Solo podés asignar rutinas a los clientes que te eligieron como profesor/a.',
   NO_PUEDE_MODIFICARSE_A_SI_MISMO: 'No podés cambiar tu propio rol ni darte de baja.',
 };

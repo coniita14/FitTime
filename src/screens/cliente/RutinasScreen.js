@@ -131,10 +131,10 @@ export const RutinasScreen = ({ navigation, campana }) => {
 
       {!loading && !error && (
         <>
-          <SectionTitle>Catálogo</SectionTitle>
+          <SectionTitle>{user?.profesor_id ? 'Rutinas de tu profesor/a' : 'Catálogo'}</SectionTitle>
           {visibles.length === 0 && (
             <Empty icon={objetivo === 'GUARDADAS' ? 'star-outline' : 'search'}
-              text={objetivo === 'GUARDADAS' ? 'Todavía no guardaste rutinas. Abrí una y tocá la ⭐.' : 'No encontramos rutinas con esos filtros.'} />
+              text={objetivo === 'GUARDADAS' ? 'Todavía no guardaste rutinas. Abrí una y tocá la ⭐.' : !user?.profesor_id ? 'Cuando elijas tu profesor/a vas a ver acá sus rutinas.' : 'No encontramos rutinas con esos filtros.'} />
           )}
           {visibles.map((r) => (
             <Card key={r.id} onPress={() => navigation.navigate('RutinaDetalle', { rutinaId: r.id })} style={s.item}>
