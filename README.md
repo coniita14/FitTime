@@ -20,9 +20,9 @@ FitTime es una aplicación multiplataforma para gimnasios locales. Los **cliente
 - **Face ID / huella**: cada vez que el cliente entra a su cuenta (al abrir la app o al volver después de un rato) tiene que verificarse con la biometría o el código del celular.
 - **Inicio**: próximos turnos y rutina asignada.
 - **Turnos**: horarios por día con cupos libres en tiempo real, reserva y cancelación.
-- **Elegir profesor/a**: el cliente elige su profesor/a (desde Rutinas o Perfil) viendo sus clases y cuántos alumnos tiene. El profesor recibe un aviso y es quien le asigna la rutina; las cuentas nuevas empiezan sin rutina.
+- **Elegir profesor/a**: el cliente elige su profesor/a (desde Rutinas o Perfil) viendo sus clases y cuántos alumnos tiene. El cliente aparece en la lista de *Alumnos* del profesor, que es quien le asigna la rutina; las cuentas nuevas empiezan sin rutina.
 - **Rutinas**: catálogo por categoría (Fuerza, Cardio, Tren superior, Tren inferior, Cuerpo completo, Movilidad), detalle de ejercicios y rutinas guardadas.
-- **Notificaciones**: confirmación de turno, recordatorio antes de entrenar, avisos de cancelación y de rutina asignada.
+- **Notificaciones** (sólo para clientes): confirmación de turno, recordatorio antes de entrenar, avisos de cancelación y de rutina asignada. Entrenadores y administradores no reciben notificaciones.
 - **Perfil**: datos personales, foto, cambio de contraseña, tema claro/oscuro, preferencias de notificación y cerrar sesión.
 
 ### Entrenador (panel web / móvil)
@@ -104,6 +104,7 @@ La arquitectura completa está en [docs/ARQUITECTURA.md](./docs/ARQUITECTURA.md)
    6. `database/07_entrenadores_admin.sql`
    7. `database/08_asistente.sql`
    8. `database/09_profesor_elegido.sql`
+   9. `database/10_notificaciones_solo_clientes.sql`
 3. En **Authentication → Users → Add user**, crear las cuentas de prueba (ver la guía) y ejecutar `database/03_cuentas_prueba.sql`.
 4. En **Authentication → Email Templates → Reset Password**, incluir `{{ .Token }}` para que llegue el código de 6 dígitos.
    En **Authentication → Sign In / Providers → Email**, desactivar **Confirm email**: el servicio de correo gratuito de Supabase sólo envía a miembros del equipo y rechaza el registro de otros correos (`email_address_invalid`). Para que la recuperación de contraseña llegue a cualquier correo, configurar un SMTP propio en **Authentication → SMTP Settings**.

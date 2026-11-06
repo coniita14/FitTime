@@ -6,7 +6,6 @@ import { Ionicons } from '@expo/vector-icons';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useTheme } from '../../context/ThemeContext';
 import { useAuth } from '../../context/AuthContext';
-import { clienteService } from '../../api/cliente.service';
 import { DashboardAdmin } from './DashboardAdmin';
 import { TurnosAdmin } from './TurnosAdmin';
 import { HorariosAdmin } from './HorariosAdmin';
@@ -60,25 +59,11 @@ export const AdminScreen = ({ rol = 'ADMIN' }) => {
   const [seccion, setSeccionState] = useState('inicio');
   const [busqueda, setBusqueda] = useState('');
   const [menuAbierto, setMenuAbierto] = useState(false);
-  const [noLeidas, setNoLeidas] = useState(0);
-  const [avisos, setAvisos] = useState(null);
   const [verAsistente, setVerAsistente] = useState(false);
 
   const setSeccion = useCallback((k) => { setSeccionState(k); setBusqueda(''); setMenuAbierto(false); }, []);
 
-  useEffect(() => {
-    clienteService.contarNoLeidas().then(setNoLeidas).catch(() => {});
-  }, [seccion]);
-
-  const abrirAvisos = async () => {
-    try {
-      const lista = await clienteService.listarNotificaciones();
-      setAvisos(lista || []);
-      if (noLeidas) { await clienteService.marcarTodasLeidas(); setNoLeidas(0); }
-    } catch {
-      setAvisos([]);
-    }
-  };
+  // Entrenadores y administradores no reciben notificaciones (sólo los clientes)
 
   const props = { busqueda, setBusqueda, onNavigate: setSeccion };
   const contenido = {
@@ -156,10 +141,6 @@ export const AdminScreen = ({ rol = 'ADMIN' }) => {
           <TouchableOpacity onPress={toggleTheme} style={s.topIcon} accessibilityLabel={isDark ? 'Tema claro' : 'Tema oscuro'}>
             <Ionicons name={isDark ? 'sunny-outline' : 'moon-outline'} size={20} color={theme.colors.textPrimary} />
           </TouchableOpacity>
-          <TouchableOpacity onPress={abrirAvisos} style={s.topIcon} accessibilityLabel={`Notificaciones${noLeidas ? `, ${noLeidas} sin leer` : ''}`}>
-            <Ionicons name="notifications-outline" size={21} color={theme.colors.textPrimary} />
-            {noLeidas > 0 && <View style={s.dot}><Text style={s.dotText}>{noLeidas > 9 ? '9+' : noLeidas}</Text></View>}
-          </TouchableOpacity>
           <TouchableOpacity onPress={() => setSeccion('perfil')} accessibilityLabel="Mi perfil">
             <Avatar size={32} />
           </TouchableOpacity>
@@ -182,22 +163,6 @@ export const AdminScreen = ({ rol = 'ADMIN' }) => {
       <AsistenteBoton onPress={() => setVerAsistente(true)} bottom={24 + insets.bottom} />
       <AsistenteModal visible={verAsistente} onClose={() => setVerAsistente(false)} />
 
-      <Modal visible={!!avisos} transparent animationType="fade" onRequestClose={() => setAvisos(null)}>
-        <Pressable style={s.overlay} onPress={() => setAvisos(null)}>
-          <View style={s.avisosBox}>
-            <Text style={s.avisosTitle}>Notificaciones</Text>
-            <ScrollView style={{ maxHeight: 380 }}>
-              {(avisos || []).length === 0 && <Text style={s.avisoMuted}>No tenés notificaciones.</Text>}
-              {(avisos || []).map((n) => (
-                <View key={n.id} style={s.aviso}>
-                  <Text style={s.avisoTitulo}>{n.titulo}</Text>
-                  <Text style={s.avisoMuted}>{n.mensaje}</Text>
-                </View>
-              ))}
-            </ScrollView>
-          </View>
-        </Pressable>
-      </Modal>
     </View>
   );
 };

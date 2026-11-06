@@ -11,7 +11,7 @@ const DIA_CORTO = { LUNES: 'Lun', MARTES: 'Mar', MIERCOLES: 'Mié', JUEVES: 'Jue
 const nombre = (p) => `${p.nombre}${p.apellido && p.apellido !== '-' ? ` ${p.apellido}` : ''}`;
 
 // El cliente elige a su profesor/a. Recién entonces el profesor puede asignarle rutinas
-// (el servidor lo controla en admin_asignar_rutina) y le llega un aviso de "Nuevo alumno".
+// (el servidor lo controla en admin_asignar_rutina) y lo ve en su lista de Alumnos como "Nuevo".
 export const ElegirProfesorScreen = ({ navigation }) => {
   const b = useBrand();
   const s = useMemo(() => createStyles(b), [b]);

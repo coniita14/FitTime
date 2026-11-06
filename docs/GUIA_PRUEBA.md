@@ -75,7 +75,7 @@ Marcar cada casilla al verificarla.
 - [ ] Como cliente, el detalle del turno muestra el **Instructor** de la clase.
 
 ### R5 · Interacción entre usuarios
-- [ ] **Elegir profesor/a:** registrar un cliente nuevo → en *Rutinas* aparece *"Elegí tu profesor/a"* (no tiene rutina). Tocar el botón, elegir a **Lucas Díaz** → la tarjeta pasa a *"Esperando tu rutina"*. Entrar como `entrenador@fittime.com` → llega el aviso *"Nuevo alumno"* y el cliente aparece en *Alumnos* como *Nuevo · asignar rutina*. Asignarle una rutina → el cliente la ve en *Rutinas*.
+- [ ] **Elegir profesor/a:** registrar un cliente nuevo → en *Rutinas* aparece *"Elegí tu profesor/a"* (no tiene rutina). Tocar el botón, elegir a **Lucas Díaz** → la tarjeta pasa a *"Esperando tu rutina"*. Entrar como `entrenador@fittime.com` → el cliente aparece en *Alumnos* como *Nuevo · asignar rutina*. Asignarle una rutina → el cliente la ve en *Rutinas*.
 - [ ] Como **cliente**, reservar un turno → como **admin**, verlo en la lista de turnos de esa fecha con el nombre del cliente.
 - [ ] Como **admin**, asignar la rutina "Fuerza Base 5x5" al cliente → como **cliente**, aparece en Inicio y llega la notificación "Nueva rutina asignada".
 - [ ] Como **admin**, cancelar un turno del cliente con motivo → el cliente recibe "Turno cancelado" y el cupo se libera.
@@ -92,7 +92,8 @@ Marcar cada casilla al verificarla.
 ### R8 · Notificaciones
 - [ ] Al reservar, aceptar el permiso → llega la notificación "Turno confirmado".
 - [ ] Reservar un turno con más de una hora de anticipación → se programa un recordatorio antes del turno.
-- [ ] La campana de Notificaciones muestra el historial (confirmaciones, cancelaciones y rutinas) y permite marcarlas como leídas.
+- [ ] El panel de entrenador y el de administrador **no tienen campana ni reciben notificaciones**: son sólo para clientes.
+- [ ] La campana de Notificaciones (cliente) muestra el historial (confirmaciones, cancelaciones y rutinas) y permite marcarlas como leídas.
 
 ### R9 · Almacenamiento persistente
 - [ ] Los turnos, rutinas y datos del perfil se mantienen al cambiar de dispositivo (iniciar sesión con la misma cuenta en la web).
@@ -110,7 +111,7 @@ Marcar cada casilla al verificarla.
 - [ ] Como **cliente**, tocar el botón ✨ (abajo a la derecha) y preguntar *"¿Qué turnos tengo esta semana?"*: responde con los turnos reales de la cuenta.
 - [ ] Pedir *"Quiero que me reserves un turno mañana"*: muestra las clases con lugares; al responder con una (ej. *"la de las 18"*) **la reserva directamente** y aparece la tarjeta ✔ **Turno reservado**. El turno ya está en *Turnos*.
 - [ ] Pedir *"Cancelá mi próximo turno"*: Fiti pregunta *"¿Seguro que querés cancelar el turno del …?"*. Responder *"sí"* → aparece ✔ **Turno cancelado** y el cupo se libera. Si se responde *"no"*, no cancela nada.
-- [ ] Pedir *"Ayudame a elegir profesor/a"*: lista los profesores con sus clases; al elegir uno aparece ✔ **Profesor/a elegido** y el entrenador recibe el aviso.
+- [ ] Pedir *"Ayudame a elegir profesor/a"*: lista los profesores con sus clases; al elegir uno aparece ✔ **Profesor/a elegido** y el cliente pasa a la lista de *Alumnos* de ese entrenador.
 - [ ] Preguntar *"¿Cómo hago peso muerto?"*: explica la técnica usando el catálogo de ejercicios.
 - [ ] Preguntar algo que no tiene que ver con el gimnasio: responde que sólo ayuda con temas del gimnasio.
 - [ ] Como **entrenador**, preguntar *"¿Quiénes vienen a mi clase del lunes?"*: lista sólo los alumnos de sus clases.
