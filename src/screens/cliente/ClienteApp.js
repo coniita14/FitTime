@@ -15,6 +15,7 @@ import { RutinaDetalleScreen } from './RutinaDetalleScreen';
 import { EjercicioDetalleScreen } from './EjercicioDetalleScreen';
 import { PerfilScreen } from './PerfilScreen';
 import { CambiarClaveScreen } from './CambiarClaveScreen';
+import { ElegirProfesorScreen } from './ElegirProfesorScreen';
 
 const TABS = [
   { key: 'horarios', label: 'Horarios', icon: 'calendar', root: 'Horarios' },
@@ -26,6 +27,7 @@ const TABS = [
 const PANTALLAS = {
   Horarios: HorariosScreen,
   Bloques: BloquesScreen,
+  ElegirProfesor: ElegirProfesorScreen,
   MisTurnos: MisTurnosScreen,
   TurnoDetalle: TurnoDetalleScreen,
   Rutinas: RutinasScreen,

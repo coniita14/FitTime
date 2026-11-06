@@ -41,7 +41,7 @@ export const UsuariosAdmin = ({ modo = 'ADMIN', busqueda = '', setBusqueda = () 
     setLoading(true);
     setError(null);
     try {
-      const [u, r] = await Promise.all([adminService.listarUsuarios(esEntrenador), adminService.listarRutinas()]);
+      const [u, r] = await Promise.all([adminService.listarUsuarios(esEntrenador, esEntrenador ? user?.id : null), adminService.listarRutinas()]);
       setUsuarios(u);
       setRutinas(r.filter((x) => x.activa));
     } catch (err) {
@@ -49,7 +49,7 @@ export const UsuariosAdmin = ({ modo = 'ADMIN', busqueda = '', setBusqueda = () 
     } finally {
       setLoading(false);
     }
-  }, [esEntrenador]);
+  }, [esEntrenador, user?.id]);
   useEffect(() => { cargar(); }, [cargar]);
 
   const guardarRol = async () => {
@@ -114,10 +114,15 @@ export const UsuariosAdmin = ({ modo = 'ADMIN', busqueda = '', setBusqueda = () 
       ),
     },
     { key: 'tel', title: 'Teléfono', flex: 1, render: (u) => <CellText muted={!u.telefono}>{u.telefono || '—'}</CellText> },
+    ...(esEntrenador ? [] : [{ key: 'profe', title: 'Profesor/a', flex: 1, render: (u) => {
+      const p = usuarios.find((x) => x.id === u.profesor_id);
+      return <CellText muted={!p}>{u.rol !== 'CLIENTE' ? '—' : p ? nombrePersona(p) : 'Sin elegir'}</CellText>;
+    } }]),
     ...(esEntrenador ? [] : [{ key: 'rol', title: 'Rol', flex: 0.9, render: (u) => <Badge text={ROL_LABEL[u.rol]} tone={TONO_ROL[u.rol]} /> }]),
     {
       key: 'rutina', title: 'Rutina', flex: 1.3, render: (u) => (u.rol !== 'CLIENTE' ? <CellText muted>—</CellText>
-        : <CellText muted={!rutinaDe(u)}>{rutinaDe(u)?.nombre || 'Sin rutina'}</CellText>),
+        : rutinaDe(u) ? <CellText>{rutinaDe(u).nombre}</CellText>
+          : <Badge text={esEntrenador ? 'Nuevo · asignar rutina' : 'Sin rutina'} tone={esEntrenador ? 'warning' : 'neutral'} />),
     },
     { key: 'estado', title: 'Estado', flex: 0.8, render: (u) => <Badge text={u.activo ? 'Activo' : 'De baja'} tone={u.activo ? 'success' : 'danger'} /> },
     {
@@ -145,7 +150,7 @@ export const UsuariosAdmin = ({ modo = 'ADMIN', busqueda = '', setBusqueda = () 
     <View>
       <ScreenHeader
         title={esEntrenador ? 'Mis Alumnos' : 'Gestión de Usuarios'}
-        subtitle={esEntrenador ? 'Asigná y actualizá las rutinas de los clientes del gimnasio'
+        subtitle={esEntrenador ? 'Clientes que te eligieron como profesor/a. Asignales y actualizales la rutina.'
           : `${clientesActivos} clientes activos · ${usuarios.filter((u) => u.rol === 'ENTRENADOR').length} entrenadores · ${usuarios.filter((u) => u.rol === 'ADMIN').length} administradores`}
         actionLabel={esEntrenador ? null : 'Nuevo Usuario'}
         onAction={() => setNuevo(true)}
@@ -162,7 +167,7 @@ export const UsuariosAdmin = ({ modo = 'ADMIN', busqueda = '', setBusqueda = () 
           options={[{ value: 'TODOS', label: 'Todas' }, { value: 'CON', label: 'Con rutina' }, { value: 'SIN', label: 'Sin rutina' }]} />
       </Toolbar>
       <DataTable columns={columnas} rows={filas} loading={loading} error={error} onRetry={cargar} pageSize={10}
-        emptyIcon="people-outline" emptyText="No hay usuarios que coincidan." />
+        emptyIcon="people-outline" emptyText={esEntrenador && !usuarios.length ? 'Todavía ningún cliente te eligió como profesor/a. Te va a llegar un aviso cuando pase.' : 'No hay usuarios que coincidan.'} />
 
       <NuevoUsuarioModal visible={nuevo} onClose={() => setNuevo(false)} onCreado={cargar} />
 

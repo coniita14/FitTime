@@ -1,7 +1,7 @@
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { View, Text, TextInput, ScrollView, StyleSheet, Platform } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
-import { Screen, Card, Chip, Pill, Loading, ErrorBox, Empty, SectionTitle, useBrand } from '../../components/cliente/ui';
+import { Screen, Card, Chip, Pill, Loading, ErrorBox, Empty, SectionTitle, Button, useBrand } from '../../components/cliente/ui';
 import { clienteService } from '../../api/cliente.service';
 import { useAuth } from '../../context/AuthContext';
 import { mensajeDeError } from '../../utils/errores';
@@ -21,6 +21,7 @@ export const RutinasScreen = ({ navigation, campana }) => {
   const [rutinas, setRutinas] = useState([]);
   const [favoritas, setFavoritas] = useState([]);
   const [asignada, setAsignada] = useState(null);
+  const [profesor, setProfesor] = useState(null);
   const [busqueda, setBusqueda] = useState('');
   const [nivel, setNivel] = useState('TODOS');
   const [objetivo, setObjetivo] = useState('TODOS');
@@ -31,9 +32,11 @@ export const RutinasScreen = ({ navigation, campana }) => {
     setLoading(true);
     setError(null);
     try {
-      const [r, f, a] = await Promise.all([
+      const [r, f, a, p] = await Promise.all([
         clienteService.catalogo(), clienteService.listarFavoritas(), clienteService.miRutinaAsignada(user.id),
+        user.profesor_id ? clienteService.miProfesor(user.profesor_id) : Promise.resolve(null),
       ]);
+      setProfesor(p);
       setRutinas(r);
       setFavoritas(f);
       setAsignada(a);
@@ -42,7 +45,7 @@ export const RutinasScreen = ({ navigation, campana }) => {
     } finally {
       setLoading(false);
     }
-  }, [user.id]);
+  }, [user.id, user.profesor_id]);
   useEffect(() => { cargar(); }, [cargar]);
 
   const q = busqueda.trim().toLowerCase();
@@ -81,6 +84,27 @@ export const RutinasScreen = ({ navigation, campana }) => {
       {loading && <Loading />}
       {!loading && error && <ErrorBox message={error} onRetry={cargar} />}
 
+      {!loading && !error && !user.profesor_id && (
+        <Card style={s.cta}>
+          <Ionicons name="person-add" size={26} color={b.primary} />
+          <View style={{ flex: 1 }}>
+            <Text style={s.name}>Elegí tu profesor/a</Text>
+            <Text style={s.sub}>Tu profesor/a es quien te asigna las rutinas. Elegilo para empezar.</Text>
+          </View>
+          <Button title="Elegir" small onPress={() => navigation.navigate('ElegirProfesor')} />
+        </Card>
+      )}
+
+      {!loading && !error && user.profesor_id && !asignada?.rutinas && (
+        <Card style={s.cta}>
+          <Ionicons name="hourglass-outline" size={24} color={b.warning} />
+          <View style={{ flex: 1 }}>
+            <Text style={s.name}>Esperando tu rutina</Text>
+            <Text style={s.sub}>{profesor ? `${profesor.nombre} ya sabe que lo elegiste` : 'Tu profesor/a ya sabe que lo elegiste'} y te va a asignar una rutina. Te avisamos con una notificación.</Text>
+          </View>
+        </Card>
+      )}
+
       {!loading && !error && asignada?.rutinas && (
         <>
           <SectionTitle>Tu rutina</SectionTitle>
@@ -90,13 +114,19 @@ export const RutinasScreen = ({ navigation, campana }) => {
             </View>
             <View style={{ flex: 1 }}>
               <Text style={[s.name, { color: '#FFF' }]}>{asignada.rutinas.nombre}</Text>
-              <Text style={[s.sub, { color: '#E0E7FF' }]}>
+              <Text style={[s.sub, { color: '#FFFFFF' }]}>
                 {asignador ? `Asignada por ${asignador}` : 'Asignada por tu entrenador'} · {NIVEL_LABEL[asignada.rutinas.nivel]}
               </Text>
             </View>
             <Ionicons name="chevron-forward" size={20} color="#FFF" />
           </Card>
         </>
+      )}
+
+      {!loading && !error && user.profesor_id && (
+        <Text style={s.profe} onPress={() => navigation.navigate('ElegirProfesor')} accessibilityRole="link">
+          Tu profesor/a: {profesor ? `${profesor.nombre}${profesor.apellido && profesor.apellido !== '-' ? ` ${profesor.apellido}` : ''}` : '…'} · Cambiar
+        </Text>
       )}
 
       {!loading && !error && (
@@ -140,6 +170,8 @@ const createStyles = (b) => StyleSheet.create({
   filterLabel: { color: b.onBgSoft, fontSize: 12, fontWeight: '700', marginTop: 8, marginBottom: 6 },
   assigned: { flexDirection: 'row', alignItems: 'center', gap: 12, backgroundColor: b.primary },
   item: { flexDirection: 'row', alignItems: 'center', gap: 12 },
+  cta: { flexDirection: 'row', alignItems: 'center', gap: 12, marginTop: 6 },
+  profe: { color: b.primary, fontSize: 13, fontWeight: '700', marginTop: -4, marginBottom: 6, paddingVertical: 6 },
   thumb: { width: 56, height: 56, borderRadius: 10, backgroundColor: b.cardSoft, alignItems: 'center', justifyContent: 'center' },
   name: { color: b.text, fontWeight: '800', fontSize: 15 },
   sub: { color: b.textSoft, fontSize: 12 },

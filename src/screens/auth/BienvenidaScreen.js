@@ -45,7 +45,7 @@ export const BienvenidaScreen = ({ navigation }) => {
             <Button title="Iniciar Sesión" onPress={() => navigation.navigate('Login', { tipo: 'CLIENTE' })} />
             <Button title="Crear una cuenta" variant="white" onPress={() => navigation.navigate('Signup')} />
             <TouchableOpacity onPress={() => navigation.navigate('Login', { tipo: 'ENTRENADOR' })} style={s.trainer}
-              accessibilityRole="button" accessibilityLabel="Ingresar como entrenador">
+              accessibilityRole="button" accessibilityLabel="¿Sos entrenador? Ingresá acá">
               <Ionicons name="barbell-outline" size={16} color={b.primary} />
               <Text style={[s.trainerText, { color: b.primary }]}>¿Sos entrenador? Ingresá acá</Text>
             </TouchableOpacity>

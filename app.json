@@ -53,7 +53,9 @@
         {
           "faceIDPermission": "FitTime usa Face ID para proteger el acceso a tu cuenta."
         }
-      ]
+      ],
+      "expo-status-bar",
+      "expo-font"
     ],
     "extra": {
       "eas": {

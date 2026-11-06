@@ -20,6 +20,7 @@ FitTime es una aplicación multiplataforma para gimnasios locales. Los **cliente
 - **Face ID / huella**: cada vez que el cliente entra a su cuenta (al abrir la app o al volver después de un rato) tiene que verificarse con la biometría o el código del celular.
 - **Inicio**: próximos turnos y rutina asignada.
 - **Turnos**: horarios por día con cupos libres en tiempo real, reserva y cancelación.
+- **Elegir profesor/a**: el cliente elige su profesor/a (desde Rutinas o Perfil) viendo sus clases y cuántos alumnos tiene. El profesor recibe un aviso y es quien le asigna la rutina; las cuentas nuevas empiezan sin rutina.
 - **Rutinas**: catálogo por categoría (Fuerza, Cardio, Tren superior, Tren inferior, Cuerpo completo, Movilidad), detalle de ejercicios y rutinas guardadas.
 - **Notificaciones**: confirmación de turno, recordatorio antes de entrenar, avisos de cancelación y de rutina asignada.
 - **Perfil**: datos personales, foto, cambio de contraseña, tema claro/oscuro, preferencias de notificación y cerrar sesión.
@@ -27,12 +28,12 @@ FitTime es una aplicación multiplataforma para gimnasios locales. Los **cliente
 ### Entrenador (panel web / móvil)
 - **Inicio**: sus clases de hoy con ocupación, reservas de la semana y alumnos con su rutina.
 - **Mis clases**: alumnos anotados en sus horarios; marcar asistencia o ausencia.
-- **Alumnos**: asignar rutinas con indicaciones (el cliente recibe una notificación).
+- **Alumnos**: sólo los clientes que lo eligieron como profesor/a (los nuevos aparecen con *Nuevo · asignar rutina*); les asigna rutinas con indicaciones y el cliente recibe una notificación. La base de datos impide asignar rutinas a alumnos de otro profesor.
 - **Rutinas y ejercicios**: crear y editar rutinas, músculos involucrados y "consejos del entrenador".
 
 ### Asistente con IA "Fiti" (cliente y entrenador)
 - Botón ✨ flotante que abre un chat con IA (Google Gemini) que conoce los datos de quien pregunta.
-- **Cliente**: consulta sus turnos y su rutina asignada, pregunta por horarios y cupos, pide explicaciones de ejercicios y **reserva o cancela turnos** desde el chat. La IA sólo *propone* la acción: la app muestra una tarjeta con **Confirmar** y recién ahí se hace la reserva, con las mismas reglas que en la pantalla de Horarios.
+- **Cliente**: consulta sus turnos y su rutina asignada, pregunta por horarios y cupos, pide explicaciones de ejercicios y **Fiti hace lo que se le pide**: *"reservame un turno mañana a las 18"* reserva directamente; para **cancelar** primero pregunta *"¿Seguro…?"* en el chat y cancela cuando la persona confirma; también puede **elegir o cambiar el profesor/a**. Las acciones se hacen en el servidor con la sesión de la persona y las mismas funciones de la base (cupo, fechas y permisos), y en el chat aparece una tarjeta con lo que se hizo.
 - **Entrenador**: consulta sus clases y quiénes se anotaron, y pide ideas de entrenamiento.
 - Límite de 40 consultas por persona por día para no superar el plan gratuito.
 
@@ -102,6 +103,7 @@ La arquitectura completa está en [docs/ARQUITECTURA.md](./docs/ARQUITECTURA.md)
    5. `database/06_reportes.sql`
    6. `database/07_entrenadores_admin.sql`
    7. `database/08_asistente.sql`
+   8. `database/09_profesor_elegido.sql`
 3. En **Authentication → Users → Add user**, crear las cuentas de prueba (ver la guía) y ejecutar `database/03_cuentas_prueba.sql`.
 4. En **Authentication → Email Templates → Reset Password**, incluir `{{ .Token }}` para que llegue el código de 6 dígitos.
    En **Authentication → Sign In / Providers → Email**, desactivar **Confirm email**: el servicio de correo gratuito de Supabase sólo envía a miembros del equipo y rechaza el registro de otros correos (`email_address_invalid`). Para que la recuperación de contraseña llegue a cualquier correo, configurar un SMTP propio en **Authentication → SMTP Settings**.

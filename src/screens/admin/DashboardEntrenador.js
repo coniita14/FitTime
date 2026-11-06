@@ -35,7 +35,7 @@ export const DashboardEntrenador = ({ onNavigate }) => {
   const kpis = [
     { label: 'Clases por semana', value: datos.clases_semana, icon: 'time' },
     { label: 'Reservas próximos 7 días', value: datos.reservas_7_dias, icon: 'calendar' },
-    { label: 'Alumnos con tu rutina', value: datos.alumnos_con_rutina, icon: 'people' },
+    { label: datos.alumnos_sin_rutina ? `Alumnos (${datos.alumnos_sin_rutina} sin rutina)` : 'Alumnos que te eligieron', value: datos.alumnos ?? datos.alumnos_con_rutina, icon: 'people' },
     { label: 'Rutinas que creaste', value: datos.rutinas_creadas, icon: 'barbell' },
   ];
   const accesos = [

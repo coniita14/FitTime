@@ -110,7 +110,8 @@ export const AdminScreen = ({ rol = 'ADMIN' }) => {
         <Ionicons name="barbell" size={22} color="#FFF" />
         <Text style={s.brand}>FitTime {esEntrenador ? 'Entrenador' : 'Admin'}</Text>
       </View>
-      <ScrollView style={{ flex: 1 }} contentContainerStyle={{ gap: 4 }}>
+      <ScrollView style={{ flex: 1 }}>
+        <View accessibilityRole="tablist" style={{ gap: 4 }}>
         {secciones.map((item) => {
           const activo = item.key === seccion;
           return (
@@ -121,6 +122,7 @@ export const AdminScreen = ({ rol = 'ADMIN' }) => {
             </TouchableOpacity>
           );
         })}
+        </View>
       </ScrollView>
       <TouchableOpacity style={s.sideUser} onPress={() => setSeccion('perfil')} accessibilityLabel="Mi perfil">
         <Avatar size={36} />

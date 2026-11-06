@@ -115,7 +115,7 @@ export const Button = ({ title, onPress, variant = 'primary', loading, disabled,
       accessibilityRole="button"
       style={[
         s.btn, small && s.btnSmall,
-        outline ? s.btnWhite : { backgroundColor: danger ? b.danger : b.primary },
+        outline ? s.btnWhite : { backgroundColor: danger ? '#DC2626' : b.primary },
         (disabled || loading) && { opacity: 0.5 }, style,
       ]}
     >
@@ -184,7 +184,7 @@ export const Field = ({ label, value, onChangeText, placeholder, secure, keyboar
           accessibilityLabel={label || placeholder}
         />
         {secure ? (
-          <TouchableOpacity onPress={() => setVisible(!visible)} accessibilityLabel={visible ? 'Ocultar contraseña' : 'Mostrar contraseña'}>
+          <TouchableOpacity onPress={() => setVisible(!visible)} accessibilityRole="button" hitSlop={10} accessibilityLabel={visible ? 'Ocultar contraseña' : 'Mostrar contraseña'}>
             <Ionicons name={visible ? 'eye-off-outline' : 'eye-outline'} size={20} color={b.textMuted} />
           </TouchableOpacity>
         ) : rightIcon ? <Ionicons name={rightIcon} size={18} color={b.textMuted} /> : null}
@@ -250,7 +250,7 @@ export const TabBar = ({ tabs, value, onChange }) => {
   const b = useBrand();
   const insets = useSafeAreaInsets();
   return (
-    <View style={[s.tabbar, { paddingBottom: Math.max(insets.bottom, 8) }]}>
+    <View style={[s.tabbar, { paddingBottom: Math.max(insets.bottom, 8) }]} accessibilityRole="tablist">
       {tabs.map((t) => {
         const active = t.key === value;
         return (
@@ -273,7 +273,7 @@ const createStyles = (b) => StyleSheet.create({
   },
   backBtn: { padding: 4, marginLeft: -4 },
   headerTitle: { fontSize: 18, fontWeight: '800', color: b.text, flexShrink: 1 },
-  content: { padding: 16, paddingBottom: 40, width: '100%', maxWidth: 720, alignSelf: 'center' },
+  content: { padding: 16, paddingBottom: 104, width: '100%', maxWidth: 720, alignSelf: 'center' },
   bell: { width: 38, height: 38, borderRadius: 19, alignItems: 'center', justifyContent: 'center', backgroundColor: b.cardSoft },
   bellBadge: {
     position: 'absolute', top: -3, right: -3, minWidth: 18, height: 18, borderRadius: 9, paddingHorizontal: 4,

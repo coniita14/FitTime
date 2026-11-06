@@ -104,12 +104,15 @@ export const adminService = {
   quitarEjercicioDeRutina: (detalleId) => { listo(); return run(supabase.from('rutina_detalle').delete().eq('id', detalleId)); },
 
   // ---------- Usuarios ----------
-  listarUsuarios: (soloClientes = false) => {
+  // profesorId: el entrenador ve solo a los clientes que lo eligieron como profesor/a
+  listarUsuarios: (soloClientes = false, profesorId = null) => {
     listo();
-    const q = supabase.from('usuarios')
-      .select('id, nombre, apellido, email, rol, telefono, activo, creado_en, rutina_asignada!rutina_asignada_usuario_id_fkey(activa, observaciones, rutinas(id, nombre))')
+    let q = supabase.from('usuarios')
+      .select('id, nombre, apellido, email, rol, telefono, activo, creado_en, profesor_id, rutina_asignada!rutina_asignada_usuario_id_fkey(activa, observaciones, rutinas(id, nombre))')
       .order('rol').order('apellido');
-    return run(soloClientes ? q.eq('rol', 'CLIENTE') : q);
+    if (soloClientes) q = q.eq('rol', 'CLIENTE');
+    if (profesorId) q = q.eq('profesor_id', profesorId);
+    return run(q);
   },
   actualizarUsuario: (usuarioId, { rol = null, activo = null }) => {
     listo();

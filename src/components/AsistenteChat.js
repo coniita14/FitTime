@@ -10,14 +10,15 @@ import { useAuth } from '../context/AuthContext';
 import { asistenteService } from '../api/asistente.service';
 import { clienteService } from '../api/cliente.service';
 import { gymService } from '../api/gym.service';
-import { mensajeDeError } from '../utils/errores';
 
 // Asistente "Fiti": botón flotante + chat a pantalla completa.
-// Las reservas y cancelaciones que propone la IA se confirman acá con un botón;
-// recién entonces se llama a las mismas funciones que usan las pantallas normales.
+// Fiti HACE lo que se le pide (reservar, cancelar después de preguntar "¿Seguro?" en
+// el chat, elegir profesor/a) desde el servidor, con las mismas funciones de la base.
+// Acá se muestran las acciones hechas como tarjetas y se actualiza lo local:
+// recordatorios del celular, perfil y pantallas.
 
 const SUGERENCIAS = {
-  CLIENTE: ['¿Qué turnos tengo esta semana?', 'Quiero reservar mañana a la tarde', '¿Cómo hago bien una sentadilla?', '¿Qué rutina me conviene para empezar?'],
+  CLIENTE: ['Quiero que me reserves un turno mañana', '¿Qué turnos tengo esta semana?', 'Quiero cancelar un turno', 'Ayudame a elegir profesor/a', '¿Cómo hago bien una sentadilla?'],
   ENTRENADOR: ['¿Qué clases tengo esta semana?', '¿Quiénes vienen a mi próxima clase?', 'Ideas de calentamiento para una clase de fuerza'],
   ADMIN: ['¿Qué clases hay mañana?', '¿Qué rutinas de cardio tenemos?'],
 };
@@ -50,7 +51,7 @@ export const AsistenteModal = ({ visible, onClose, onCambio }) => {
   const b = theme.brand;
   const s = useMemo(() => crearEstilos(b), [b]);
   const insets = useSafeAreaInsets();
-  const { user } = useAuth();
+  const { user, patchUser } = useAuth();
   const rol = user?.rol || 'CLIENTE';
   const [mensajes, setMensajes] = useState([]);
   const [texto, setTexto] = useState('');
@@ -63,7 +64,7 @@ export const AsistenteModal = ({ visible, onClose, onCambio }) => {
       setMensajes([{
         id: 'hola', rol: 'asistente',
         texto: `¡Hola, ${user?.nombre || ''}! Soy Fiti, el asistente de FitTime. ${rol === 'CLIENTE'
-          ? 'Puedo contarte tus turnos, ayudarte a reservar o cancelar y explicarte rutinas y ejercicios.'
+          ? 'Pedime lo que necesites: te reservo o cancelo turnos, te ayudo a elegir profesor/a y te explico rutinas y ejercicios.'
           : 'Puedo contarte tus clases, quiénes se anotaron y darte ideas para tus rutinas.'}`,
       }]);
     }
@@ -87,8 +88,12 @@ export const AsistenteModal = ({ visible, onClose, onCambio }) => {
       setRestantes(r.restantes);
       setMensajes((prev) => [...prev, {
         id: `a-${Date.now()}`, rol: 'asistente', texto: r.respuesta,
-        acciones: r.acciones.map((a, i) => ({ ...a, key: `${Date.now()}-${i}`, estado: 'pendiente' })),
+        acciones: r.acciones.map((a, i) => ({ ...a, key: `${Date.now()}-${i}` })),
       }]);
+      if (r.acciones.length) {
+        await aplicarAcciones(r.acciones);
+        onCambio?.();
+      }
     } catch (e) {
       setMensajes((prev) => [...prev, { id: `e-${Date.now()}`, rol: 'asistente', texto: e.message, error: true }]);
     } finally {
@@ -96,32 +101,24 @@ export const AsistenteModal = ({ visible, onClose, onCambio }) => {
     }
   };
 
-  const actualizarAccion = (msgId, key, cambios) => setMensajes((prev) => prev.map((m) => (m.id !== msgId ? m : {
-    ...m, acciones: m.acciones.map((a) => (a.key === key ? { ...a, ...cambios } : a)),
-  })));
-
-  const confirmarAccion = async (msg, accion) => {
-    actualizarAccion(msg.id, accion.key, { estado: 'enviando', error: null });
-    try {
-      if (accion.tipo === 'RESERVAR') {
-        const turno = await clienteService.reservar(accion.horario_id, accion.fecha);
-        const t = Array.isArray(turno) ? turno[0] : turno;
-        if (user?.notificaciones_activas !== false) {
-          const horario = { id: accion.horario_id, dia: accion.dia, hora_inicio: accion.hora_inicio };
-          try {
-            await clienteService.notificarConfirmacion(horario, accion.fecha);
-            await gymService.programarRecordatorio(t, horario, user?.recordatorio_minutos || 60);
-          } catch { /* la reserva ya quedó hecha aunque falle la notificación local */ }
+  // Lo que ya hizo el servidor se refleja en el celular (recordatorios y perfil)
+  const aplicarAcciones = async (acciones) => {
+    for (const a of acciones) {
+      try {
+        if (a.tipo === 'RESERVADO' && user?.notificaciones_activas !== false) {
+          const horario = { id: a.horario_id, dia: a.dia, hora_inicio: a.hora_inicio };
+          await clienteService.notificarConfirmacion(horario, a.fecha);
+          await gymService.programarRecordatorio({ id: a.turno_id, fecha_turno: a.fecha }, horario, user?.recordatorio_minutos || 60);
+        } else if (a.tipo === 'CANCELADO') {
+          await gymService.borrarRecordatorio(a.turno_id);
+        } else if (a.tipo === 'PROFESOR') {
+          patchUser?.({ profesor_id: a.profesor_id });
         }
-      } else if (accion.tipo === 'CANCELAR') {
-        await gymService.cancelarTurno(accion.turno_id);
-      }
-      actualizarAccion(msg.id, accion.key, { estado: 'hecho' });
-      onCambio?.();
-    } catch (e) {
-      actualizarAccion(msg.id, accion.key, { estado: 'pendiente', error: mensajeDeError(e, 'No se pudo completar.') });
+      } catch { /* la acción ya quedó hecha en el servidor aunque falle lo local */ }
     }
   };
+
+  const ICONO = { RESERVADO: 'calendar', CANCELADO: 'close-circle', PROFESOR: 'person' };
 
   const reiniciar = () => { setMensajes([]); setTimeout(() => setMensajes([{ id: 'hola', rol: 'asistente', texto: '¡Listo! Empecemos de nuevo. ¿En qué te ayudo?' }]), 0); };
 
@@ -153,39 +150,17 @@ export const AsistenteModal = ({ visible, onClose, onCambio }) => {
                 <Text style={[s.texto, m.rol === 'usuario' && { color: '#FFF' }]}>{m.texto}</Text>
               </View>
               {(m.acciones || []).map((a) => (
-                <View key={a.key} style={s.accion}>
+                <View key={a.key} style={[s.accion, a.tipo === 'CANCELADO' && { borderColor: b.danger }]}
+                  accessible accessibilityLabel={`${a.titulo}: ${a.detalle}`}>
                   <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}>
-                    <Ionicons name={a.tipo === 'RESERVAR' ? 'calendar' : 'close-circle'} size={20}
-                      color={a.tipo === 'RESERVAR' ? b.primary : b.danger} />
+                    <Ionicons name={ICONO[a.tipo] || 'checkmark-circle'} size={20}
+                      color={a.tipo === 'CANCELADO' ? b.danger : b.primary} />
                     <View style={{ flex: 1 }}>
                       <Text style={s.accionTitulo}>{a.titulo}</Text>
                       <Text style={s.accionDetalle}>{a.detalle}</Text>
                     </View>
+                    <Ionicons name="checkmark-circle" size={20} color={b.success} />
                   </View>
-                  {a.error ? <Text style={s.accionError}>{a.error}</Text> : null}
-                  {a.estado === 'hecho' ? (
-                    <View style={s.hecho}>
-                      <Ionicons name="checkmark-circle" size={18} color={b.success} />
-                      <Text style={[s.accionDetalle, { color: b.success, fontWeight: '700' }]}>
-                        {a.tipo === 'RESERVAR' ? 'Turno reservado' : 'Turno cancelado'}
-                      </Text>
-                    </View>
-                  ) : a.estado === 'descartado' ? (
-                    <Text style={[s.accionDetalle, { marginTop: 8 }]}>Descartado</Text>
-                  ) : (
-                    <View style={s.accionBotones}>
-                      <TouchableOpacity style={s.btnSecundario} disabled={a.estado === 'enviando'}
-                        onPress={() => actualizarAccion(m.id, a.key, { estado: 'descartado' })}>
-                        <Text style={s.btnSecundarioTexto}>Ahora no</Text>
-                      </TouchableOpacity>
-                      <TouchableOpacity style={[s.btnPrimario, a.tipo === 'CANCELAR' && { backgroundColor: b.danger }]}
-                        disabled={a.estado === 'enviando'} onPress={() => confirmarAccion(m, a)} accessibilityRole="button">
-                        {a.estado === 'enviando'
-                          ? <ActivityIndicator color="#FFF" size="small" />
-                          : <Text style={s.btnPrimarioTexto}>Confirmar</Text>}
-                      </TouchableOpacity>
-                    </View>
-                  )}
                 </View>
               ))}
             </View>
@@ -256,13 +231,6 @@ const crearEstilos = (b) => StyleSheet.create({
   },
   accionTitulo: { color: b.text, fontWeight: '800', fontSize: 14 },
   accionDetalle: { color: b.textSoft, fontSize: 13, textTransform: 'none' },
-  accionError: { color: b.danger, fontSize: 13, marginTop: 6 },
-  accionBotones: { flexDirection: 'row', gap: 8, marginTop: 10 },
-  btnPrimario: { flex: 1, backgroundColor: b.primary, borderRadius: 10, paddingVertical: 10, alignItems: 'center' },
-  btnPrimarioTexto: { color: '#FFF', fontWeight: '800' },
-  btnSecundario: { flex: 1, borderRadius: 10, paddingVertical: 10, alignItems: 'center', borderWidth: 1, borderColor: b.border },
-  btnSecundarioTexto: { color: b.textSoft, fontWeight: '700' },
-  hecho: { flexDirection: 'row', alignItems: 'center', gap: 6, marginTop: 8 },
   sugerencias: { flexDirection: 'row', flexWrap: 'wrap', gap: 8, marginTop: 4 },
   chip: { paddingHorizontal: 12, paddingVertical: 8, borderRadius: 999, backgroundColor: b.card, borderWidth: 1, borderColor: b.border },
   chipTexto: { color: b.primary, fontWeight: '600', fontSize: 13 },

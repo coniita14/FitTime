@@ -6,7 +6,7 @@ import { supabase, supabaseConfigError } from '../config/supabase';
 
 const AuthContext = createContext();
 
-const PERFIL_COLUMNAS = 'id, nombre, apellido, email, rol, telefono, activo, avatar_url, notificaciones_activas, recordatorio_minutos, creado_en';
+const PERFIL_COLUMNAS = 'id, nombre, apellido, email, rol, telefono, activo, avatar_url, notificaciones_activas, recordatorio_minutos, creado_en, profesor_id';
 
 WebBrowser.maybeCompleteAuthSession();
 

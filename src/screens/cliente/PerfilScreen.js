@@ -24,6 +24,12 @@ export const PerfilScreen = ({ navigation, campana }) => {
   const [guardando, setGuardando] = useState(false);
   const [subiendo, setSubiendo] = useState(false);
   const [stats, setStats] = useState(null);
+  const [profesor, setProfesor] = useState(null);
+
+  useEffect(() => {
+    if (!user?.profesor_id) { setProfesor(null); return; }
+    clienteService.miProfesor(user.profesor_id).then(setProfesor).catch(() => setProfesor(null));
+  }, [user?.profesor_id]);
 
   useEffect(() => {
     clienteService.estadisticasPerfil().then(setStats).catch(() => setStats({ turnos: '-', guardadas: '-' }));
@@ -108,17 +114,26 @@ export const PerfilScreen = ({ navigation, campana }) => {
       <Button title="Guardar cambios" onPress={guardar} loading={guardando} />
       <Button title="Cambiar contraseña" variant="white" onPress={() => navigation.navigate('CambiarClave')} style={{ marginTop: 10 }} />
 
-      <SectionTitle style={{ marginTop: 22 }}>Preferencias</SectionTitle>
+      <SectionTitle style={{ marginTop: 22 }}>Mi profesor/a</SectionTitle>
+      <Card style={s.profeCard} onPress={() => navigation.navigate('ElegirProfesor')}>
+        <Ionicons name="medal-outline" size={22} color={b.primary} />
+        <Text style={s.prefText}>
+          {user?.profesor_id ? (profesor ? `${profesor.nombre}${profesor.apellido && profesor.apellido !== '-' ? ` ${profesor.apellido}` : ''}` : '…') : 'Todavía no elegiste profesor/a'}
+        </Text>
+        <Text style={s.profeLink}>{user?.profesor_id ? 'Cambiar' : 'Elegir'}</Text>
+      </Card>
+
+      <SectionTitle style={{ marginTop: 10 }}>Preferencias</SectionTitle>
       <Card style={{ paddingVertical: 4 }}>
         <View style={s.pref}>
           <Ionicons name="moon-outline" size={20} color={b.primary} />
           <Text style={s.prefText}>Tema oscuro</Text>
-          <Switch value={isDark} onValueChange={() => toggleTheme().catch(() => {})} trackColor={{ true: b.primary }} />
+          <Switch accessibilityLabel="Tema oscuro" value={isDark} onValueChange={() => toggleTheme().catch(() => {})} trackColor={{ true: b.primary }} />
         </View>
         <View style={[s.pref, s.prefBorder]}>
           <Ionicons name="notifications-outline" size={20} color={b.primary} />
           <Text style={s.prefText}>Recordatorios de turnos</Text>
-          <Switch value={user?.notificaciones_activas !== false} trackColor={{ true: b.primary }}
+          <Switch accessibilityLabel="Recordatorios de turnos" value={user?.notificaciones_activas !== false} trackColor={{ true: b.primary }}
             onValueChange={(v) => preferencia({ notificaciones_activas: v }, { notificaciones_activas: !v })} />
         </View>
         {user?.notificaciones_activas !== false && (
@@ -164,6 +179,8 @@ const createStyles = (b) => StyleSheet.create({
   pref: { flexDirection: 'row', alignItems: 'center', gap: 12, paddingVertical: 10 },
   prefBorder: { borderTopWidth: 1, borderTopColor: b.border },
   prefText: { flex: 1, color: b.text, fontWeight: '600' },
+  profeCard: { flexDirection: 'row', alignItems: 'center', gap: 12 },
+  profeLink: { color: b.primary, fontWeight: '700' },
   reminders: { flexDirection: 'row', alignItems: 'center', gap: 8, paddingBottom: 10, flexWrap: 'wrap' },
   small: { color: b.textSoft, fontSize: 12 },
   remChip: { paddingHorizontal: 12, paddingVertical: 5, borderRadius: 999, backgroundColor: b.cardSoft },

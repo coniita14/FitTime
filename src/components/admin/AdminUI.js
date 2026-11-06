@@ -244,7 +244,7 @@ export const Badge = ({ text, tone = 'neutral' }) => {
   const s = useAdminStyles();
   const colors = {
     neutral: theme.colors.textSecondary, success: theme.colors.success, danger: theme.colors.danger,
-    warning: theme.colors.warning, primary: theme.colors.primary,
+    warning: theme.colors.warning, primary: theme.colors.primaryText || theme.colors.primary,
   };
   const c = colors[tone] || colors.neutral;
   return (

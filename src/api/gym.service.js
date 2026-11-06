@@ -70,17 +70,22 @@ export const gymService = {
     });
     if (error) throw error;
     try {
-      const storedIds = await AsyncStorage.getItem(REMINDER_IDS_KEY);
-      const reminderIds = storedIds ? JSON.parse(storedIds) : {};
-      if (reminderIds[turnoId]) {
-        await Notifications.cancelScheduledNotificationAsync(reminderIds[turnoId]);
-        delete reminderIds[turnoId];
-        await AsyncStorage.setItem(REMINDER_IDS_KEY, JSON.stringify(reminderIds));
-      }
+      await gymService.borrarRecordatorio(turnoId);
       return null;
     } catch (reminderError) {
       console.error('El turno se canceló, pero no se pudo borrar su recordatorio local:', reminderError);
       return 'El turno se canceló, pero no se pudo borrar el recordatorio local del dispositivo.';
+    }
+  },
+
+  // Borra el recordatorio local de un turno (por ejemplo, si lo canceló el asistente)
+  async borrarRecordatorio(turnoId) {
+    const storedIds = await AsyncStorage.getItem(REMINDER_IDS_KEY);
+    const reminderIds = storedIds ? JSON.parse(storedIds) : {};
+    if (reminderIds[turnoId]) {
+      await Notifications.cancelScheduledNotificationAsync(reminderIds[turnoId]);
+      delete reminderIds[turnoId];
+      await AsyncStorage.setItem(REMINDER_IDS_KEY, JSON.stringify(reminderIds));
     }
   },
 

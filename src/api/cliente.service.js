@@ -73,6 +73,28 @@ export const clienteService = {
       .limit(1)
       .maybeSingle());
   },
+  // ---------- Profesor/a elegido ----------
+  listarProfesores: async () => {
+    listo();
+    const [profes, clases, alumnos] = await Promise.all([
+      run(supabase.from('usuarios').select('id, nombre, apellido, avatar_url').eq('rol', 'ENTRENADOR').eq('activo', true).order('nombre')),
+      run(supabase.from('horarios').select('entrenador_id, dia, hora_inicio').eq('activo', true).not('entrenador_id', 'is', null)),
+      run(supabase.rpc('cantidad_alumnos_por_profesor')).catch(() => []),
+    ]);
+    const orden = ['LUNES', 'MARTES', 'MIERCOLES', 'JUEVES', 'VIERNES', 'SABADO', 'DOMINGO'];
+    return profes.map((p) => ({
+      ...p,
+      alumnos: (alumnos || []).find((a) => a.profesor_id === p.id)?.alumnos || 0,
+      clases: clases.filter((c) => c.entrenador_id === p.id)
+        .sort((a, b) => orden.indexOf(a.dia) - orden.indexOf(b.dia) || a.hora_inicio.localeCompare(b.hora_inicio)),
+    }));
+  },
+  miProfesor: (profesorId) => {
+    listo();
+    return run(supabase.from('usuarios').select('id, nombre, apellido, avatar_url').eq('id', profesorId).maybeSingle());
+  },
+  elegirProfesor: (profesorId) => { listo(); return run(supabase.rpc('elegir_profesor', { p_profesor_id: profesorId })); },
+
   catalogo: () => {
     listo();
     return run(supabase.from('rutinas')

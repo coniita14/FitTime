@@ -77,7 +77,8 @@ export const LoginScreen = ({ navigation, route }) => {
         onPress={() => setTipo(clave)}
         style={[s.option, { backgroundColor: activo ? b.primary : b.card, borderColor: activo ? b.primary : b.border }]}
         accessibilityRole="radio"
-        accessibilityState={{ selected: activo }}
+        accessibilityState={{ selected: activo, checked: activo }}
+        aria-checked={activo}
         accessibilityLabel={`Ingresar como ${t.titulo}`}
       >
         <View style={[s.optionIcon, { backgroundColor: activo ? 'rgba(255,255,255,0.18)' : b.cardSoft }]}>
@@ -115,7 +116,7 @@ export const LoginScreen = ({ navigation, route }) => {
         value={email} onChangeText={setEmail} keyboardType="email-address" error={errores.email} />
       <Field label="Contraseña" placeholder="••••••••" value={password} onChangeText={setPassword}
         secure error={errores.password} />
-      <TouchableOpacity onPress={() => navigation.navigate('ForgotPassword', { email })} style={s.forgot}>
+      <TouchableOpacity onPress={() => navigation.navigate('ForgotPassword', { email })} style={s.forgot} accessibilityRole="link">
         <Text style={[s.link, { color: b.onBgSoft }]}>¿Olvidaste tu contraseña?</Text>
       </TouchableOpacity>
 
@@ -136,7 +137,7 @@ export const LoginScreen = ({ navigation, route }) => {
 
           <View style={s.footer}>
             <Text style={{ color: b.onBgSoft }}>¿No tenés cuenta?</Text>
-            <TouchableOpacity onPress={() => navigation.navigate('Signup')}>
+            <TouchableOpacity onPress={() => navigation.navigate('Signup')} accessibilityRole="link">
               <Text style={[s.footerLink, { color: b.primary }]}>Registrarse</Text>
             </TouchableOpacity>
           </View>

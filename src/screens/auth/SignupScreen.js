@@ -77,7 +77,7 @@ export const SignupScreen = ({ navigation }) => {
 
       <View style={s.terms}>
         <TouchableOpacity onPress={() => setAcepta(!acepta)} style={[s.check, { backgroundColor: b.card, borderWidth: 1.5, borderColor: acepta ? b.primary : b.border }]}
-          accessibilityRole="checkbox" accessibilityState={{ checked: acepta }} accessibilityLabel="Acepto los Términos y Condiciones">
+          accessibilityRole="checkbox" accessibilityState={{ checked: acepta }} aria-checked={acepta} accessibilityLabel="Acepto los Términos y Condiciones">
           {acepta && <Ionicons name="checkmark" size={16} color={b.primary} />}
         </TouchableOpacity>
         <Text style={{ color: b.onBg, fontSize: 13 }}>
@@ -123,7 +123,7 @@ const s = StyleSheet.create({
   step: { flex: 1, height: 4, borderRadius: 2 },
   stepLabel: { fontSize: 11, marginTop: 6, marginBottom: 18 },
   terms: { flexDirection: 'row', alignItems: 'center', gap: 10, marginTop: 4 },
-  check: { width: 22, height: 22, borderRadius: 5, alignItems: 'center', justifyContent: 'center' },
+  check: { width: 28, height: 28, borderRadius: 6, alignItems: 'center', justifyContent: 'center' },
   termsError: { color: '#FFF', alignSelf: 'flex-start', fontSize: 12, fontWeight: '600', marginTop: 8, paddingHorizontal: 8, paddingVertical: 2, borderRadius: 6, overflow: 'hidden' },
   footer: { flexDirection: 'row', justifyContent: 'center', gap: 16, marginTop: 22 },
   overlay: { flex: 1, backgroundColor: 'rgba(15,23,42,0.5)', justifyContent: 'center', padding: 24 },

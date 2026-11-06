@@ -68,12 +68,14 @@ Marcar cada casilla al verificarla.
 - [ ] Como **admin**, ir a *Entrenadores* → **+ Nuevo Entrenador** y completar nombre, apellido y correo (la contraseña temporal se genera sola). Aparecen los datos de acceso para pasarle al entrenador y se abre la ventana para **asignarle sus clases**. Cerrar sesión y entrar con esa cuenta eligiendo *Entrenador*: ve las clases asignadas.
 - [ ] Entrar como `entrenador@fittime.com`: se abre el **panel del entrenador** (sin Horarios ni Usuarios).
 - [ ] *Inicio* muestra sus clases de hoy y la ocupación.
-- [ ] *Alumnos* → asignar "Fuerza Base 5x5" a un cliente con una indicación → el cliente la ve en *Rutinas → Tu rutina* con "Asignada por …" y la indicación.
+- [ ] *Alumnos* muestra **sólo los clientes que eligieron a ese entrenador** (Carlos ya eligió a Lucas Díaz).
+- [ ] *Alumnos* → asignar "Fuerza Base 5x5" a Carlos con una indicación → el cliente la ve en *Rutinas → Tu rutina* con "Asignada por …" y la indicación.
 - [ ] *Ejercicios* → editar los consejos de "Sentadilla Libre" → el cliente los ve en el detalle del ejercicio ("Consejos del entrenador").
 - [ ] *Mis clases* → marcar a un alumno como "Asistió".
 - [ ] Como cliente, el detalle del turno muestra el **Instructor** de la clase.
 
 ### R5 · Interacción entre usuarios
+- [ ] **Elegir profesor/a:** registrar un cliente nuevo → en *Rutinas* aparece *"Elegí tu profesor/a"* (no tiene rutina). Tocar el botón, elegir a **Lucas Díaz** → la tarjeta pasa a *"Esperando tu rutina"*. Entrar como `entrenador@fittime.com` → llega el aviso *"Nuevo alumno"* y el cliente aparece en *Alumnos* como *Nuevo · asignar rutina*. Asignarle una rutina → el cliente la ve en *Rutinas*.
 - [ ] Como **cliente**, reservar un turno → como **admin**, verlo en la lista de turnos de esa fecha con el nombre del cliente.
 - [ ] Como **admin**, asignar la rutina "Fuerza Base 5x5" al cliente → como **cliente**, aparece en Inicio y llega la notificación "Nueva rutina asignada".
 - [ ] Como **admin**, cancelar un turno del cliente con motivo → el cliente recibe "Turno cancelado" y el cupo se libera.
@@ -106,8 +108,9 @@ Marcar cada casilla al verificarla.
 
 ### Extra · Asistente con IA "Fiti"
 - [ ] Como **cliente**, tocar el botón ✨ (abajo a la derecha) y preguntar *"¿Qué turnos tengo esta semana?"*: responde con los turnos reales de la cuenta.
-- [ ] Pedir *"Reservame mañana a la tarde"*: muestra los horarios con lugares y, al elegir uno, aparece una tarjeta **Reservar turno** con **Confirmar**. Sin confirmar no se reserva nada; al confirmar, el turno aparece en *Turnos*.
-- [ ] Pedir *"Cancelá mi próximo turno"*: aparece la tarjeta **Cancelar turno**; al confirmar queda cancelado.
+- [ ] Pedir *"Quiero que me reserves un turno mañana"*: muestra las clases con lugares; al responder con una (ej. *"la de las 18"*) **la reserva directamente** y aparece la tarjeta ✔ **Turno reservado**. El turno ya está en *Turnos*.
+- [ ] Pedir *"Cancelá mi próximo turno"*: Fiti pregunta *"¿Seguro que querés cancelar el turno del …?"*. Responder *"sí"* → aparece ✔ **Turno cancelado** y el cupo se libera. Si se responde *"no"*, no cancela nada.
+- [ ] Pedir *"Ayudame a elegir profesor/a"*: lista los profesores con sus clases; al elegir uno aparece ✔ **Profesor/a elegido** y el entrenador recibe el aviso.
 - [ ] Preguntar *"¿Cómo hago peso muerto?"*: explica la técnica usando el catálogo de ejercicios.
 - [ ] Preguntar algo que no tiene que ver con el gimnasio: responde que sólo ayuda con temas del gimnasio.
 - [ ] Como **entrenador**, preguntar *"¿Quiénes vienen a mi clase del lunes?"*: lista sólo los alumnos de sus clases.

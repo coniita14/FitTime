@@ -86,7 +86,7 @@ export const PerfilAdmin = () => {
           <Text style={s.title}>Tema oscuro</Text>
           <Text style={s.meta}>Se guarda en este dispositivo</Text>
         </View>
-        <Switch value={isDark} onValueChange={toggleTheme} trackColor={{ true: theme.colors.primary }} />
+        <Switch accessibilityLabel="Tema oscuro" value={isDark} onValueChange={toggleTheme} trackColor={{ true: theme.colors.primary }} />
       </Card>
 
       <CustomButton title="Cerrar sesión" variant="danger" iconName="log-out-outline" onPress={salir} />
