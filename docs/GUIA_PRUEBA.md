@@ -10,7 +10,7 @@ Esta guía permite evaluar los 12 requisitos obligatorios en unos 20 minutos. No
 
 | Plataforma | Cómo entrar |
 |---|---|
-| **Android (recomendado)** | Escanear el QR de la landing o abrir https://expo.dev/accounts/conitta/projects/fittime-gym/builds/a29f718e-20f8-4bf8-bb9c-81455043bb85 → descargar → instalar (permitir "orígenes desconocidos" si lo pide). |
+| **Android (recomendado)** | Escanear el QR de la landing o abrir https://expo.dev/artifacts/eas/hFSiNfy6dfTJoox9diprSTtdedZVQwtM6mO54TeLbNg.apk → descargar → instalar (permitir "orígenes desconocidos" si lo pide). |
 | **Expo Go (desarrollo)** | Clonar el [repositorio](https://github.com/coniita14/FitTime), ejecutar `npm install` y `npx expo start`, y escanear el QR con Expo Go. |
 | **Navegador (dashboard admin y app)** | Abrir https://fittime-app-nine.vercel.app |
 | **Landing** | https://fittime-landing.vercel.app |

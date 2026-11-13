@@ -493,7 +493,8 @@
   <script>
     // ==== Links de descarga ====
     // Mientras un link empiece con "COMPLETAR", el botón lleva a la sección de descarga.
-    const APK_URL  = 'https://expo.dev/accounts/conitta/projects/fittime-gym/builds/a29f718e-20f8-4bf8-bb9c-81455043bb85';
+    // Link directo al archivo .apk de EAS: al tocarlo se descarga sin salir de la página
+    const APK_URL  = 'https://expo.dev/artifacts/eas/hFSiNfy6dfTJoox9diprSTtdedZVQwtM6mO54TeLbNg.apk';
     const WEB_URL  = 'https://fittime-app-nine.vercel.app';
     const REPO_URL = 'https://github.com/coniita14/FitTime';
     // ===========================
@@ -502,8 +503,10 @@
     const enlazar = (ids, url) => ids.forEach((id) => {
       const el = document.getElementById(id);
       if (!el) return;
-      if (listo(url)) { el.href = url; el.target = '_blank'; el.rel = 'noopener'; }
-      else { el.title = 'Disponible próximamente'; el.classList.add('pronto'); }
+      if (!listo(url)) { el.title = 'Disponible próximamente'; el.classList.add('pronto'); return; }
+      el.href = url;
+      if (url.endsWith('.apk')) el.setAttribute('download', 'FitTime.apk'); // el .apk se descarga, no abre otra página
+      else { el.target = '_blank'; el.rel = 'noopener'; }
     });
     enlazar(['ctaApk', 'btnApk'], APK_URL);
     enlazar(['ctaWeb', 'btnWeb'], WEB_URL);
