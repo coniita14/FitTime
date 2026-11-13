@@ -7,7 +7,7 @@ FitTime es una aplicación multiplataforma para gimnasios locales. Los **cliente
 | **Autora** | Constanza Castillo — constanzacastillo@epet12smandes.edu.ar |
 | **Carrera** | Técnica en Programación · Proyecto final 2026 (individual) |
 | **Landing pública** | https://fittime-landing.vercel.app |
-| **APK Android** | https://expo.dev/artifacts/eas/hFSiNfy6dfTJoox9diprSTtdedZVQwtM6mO54TeLbNg.apk |
+| **APK Android** | https://fittime-landing.vercel.app/FitTime.apk |
 | **Versión web (dashboard admin y app)** | https://fittime-app-nine.vercel.app |
 | **Guía para el profesor** | [docs/GUIA_PRUEBA.md](./docs/GUIA_PRUEBA.md) — incluye credenciales de prueba |
 
@@ -19,7 +19,7 @@ FitTime es una aplicación multiplataforma para gimnasios locales. Los **cliente
 - Registro, inicio de sesión con correo o **Google**, recuperación de contraseña por código y sesión persistente.
 - **Face ID / huella**: cada vez que el cliente entra a su cuenta (al abrir la app o al volver después de un rato) tiene que verificarse con la biometría o el código del celular.
 - **Inicio**: próximos turnos y rutina asignada.
-- **Turnos**: horarios por día con cupos libres en tiempo real, reserva y cancelación. Al reservar se abre una pantalla para **elegir con qué profesor/a entrenar en ese turno** (su profesor/a principal aparece primero); eso no cambia su profesor/a principal.
+- **Turnos**: horarios por día con cupos libres en tiempo real, reserva y cancelación. Al reservar se abre una pantalla para **elegir con qué profesor/a entrenar en ese turno** (su profesor/a principal aparece primero). Si todavía no tenía profesor/a principal, el que elige queda asignado y aparece en Rutinas.
 - **Elegir profesor/a**: el cliente elige su profesor/a (desde Rutinas o Perfil) viendo sus clases y cuántos alumnos tiene. El cliente aparece en la lista de *Alumnos* del profesor, que es quien le asigna la rutina; las cuentas nuevas empiezan sin rutina.
 - **Rutinas**: sólo las rutinas de su profesor/a, por categoría (Fuerza, Cardio, Tren superior, Tren inferior, Cuerpo completo, Movilidad), detalle de ejercicios y rutinas guardadas.
 - **Video de cada ejercicio**: en el detalle del ejercicio se reproduce solo (sin sonido y en bucle) un video de técnica de YouTube; tocándolo se activa el sonido o la pantalla completa, y hay un botón *Ver en YouTube*.

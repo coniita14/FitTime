@@ -10,7 +10,7 @@ Esta guía permite evaluar los 12 requisitos obligatorios en unos 20 minutos. No
 
 | Plataforma | Cómo entrar |
 |---|---|
-| **Android (recomendado)** | Escanear el QR de la landing o abrir https://expo.dev/artifacts/eas/hFSiNfy6dfTJoox9diprSTtdedZVQwtM6mO54TeLbNg.apk → descargar → instalar (permitir "orígenes desconocidos" si lo pide). |
+| **Android (recomendado)** | Escanear el QR de la landing o abrir https://fittime-landing.vercel.app/FitTime.apk → descargar → instalar (permitir "orígenes desconocidos" si lo pide). |
 | **Expo Go (desarrollo)** | Clonar el [repositorio](https://github.com/coniita14/FitTime), ejecutar `npm install` y `npx expo start`, y escanear el QR con Expo Go. |
 | **Navegador (dashboard admin y app)** | Abrir https://fittime-app-nine.vercel.app |
 | **Landing** | https://fittime-landing.vercel.app |
@@ -79,7 +79,7 @@ Marcar cada casilla al verificarla.
 - [ ] Como cliente, el detalle del turno muestra el **Instructor** de la clase.
 
 ### R5 · Interacción entre usuarios
-- [ ] **Reservar con profesor/a:** como cliente, *Horarios* → elegir un día → *Reservar* → se abre *"¿Con qué profesor/a querés entrenar?"*. Elegir uno → *Confirmar Reserva*. El detalle del turno muestra ese profesor/a, y en *Perfil* el profesor/a principal **no cambió**. Ese entrenador ve al alumno en *Mis clases*.
+- [ ] **Reservar con profesor/a:** como cliente, *Horarios* → elegir un día → *Reservar* → se abre *"¿Con qué profesor/a querés entrenar?"*. Elegir uno → *Confirmar Reserva*. El detalle del turno muestra ese profesor/a. Si la cuenta no tenía profesor/a, en *Rutinas* aparece la tarjeta **Tu profesor/a** con el elegido. Ese entrenador ve al alumno en *Mis clases*.
 - [ ] **Elegir profesor/a:** registrar un cliente nuevo → en *Rutinas* aparece *"Elegí tu profesor/a"* (no tiene rutina). Tocar el botón, elegir a **Lucas Díaz** → la tarjeta pasa a *"Esperando tu rutina"*. Entrar como `entrenador@fittime.com` → el cliente aparece en *Alumnos* como *Nuevo · asignar rutina*. Asignarle una rutina → el cliente la ve en *Rutinas*.
 - [ ] Como **cliente**, reservar un turno → como **admin**, verlo en la lista de turnos de esa fecha con el nombre del cliente.
 - [ ] Como **admin**, asignar la rutina "Fuerza Base 5x5" al cliente → como **cliente**, aparece en Inicio y llega la notificación "Nueva rutina asignada".

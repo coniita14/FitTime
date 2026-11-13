@@ -95,6 +95,19 @@ export const RutinasScreen = ({ navigation, campana }) => {
         </Card>
       )}
 
+      {!loading && !error && user.profesor_id && (
+        <Card style={s.cta} onPress={() => navigation.navigate('ElegirProfesor')}>
+          <View style={s.profeAvatar}>
+            <Text style={s.profeInicial}>{(profesor?.nombre || '?').charAt(0).toUpperCase()}</Text>
+          </View>
+          <View style={{ flex: 1 }}>
+            <Text style={s.sub}>Tu profesor/a</Text>
+            <Text style={s.name}>{profesor ? `${profesor.nombre}${profesor.apellido && profesor.apellido !== '-' ? ` ${profesor.apellido}` : ''}` : '…'}</Text>
+          </View>
+          <Text style={s.profeCambiar} accessibilityRole="link">Cambiar</Text>
+        </Card>
+      )}
+
       {!loading && !error && user.profesor_id && !asignada?.rutinas && (
         <Card style={s.cta}>
           <Ionicons name="hourglass-outline" size={24} color={b.warning} />
@@ -123,11 +136,6 @@ export const RutinasScreen = ({ navigation, campana }) => {
         </>
       )}
 
-      {!loading && !error && user.profesor_id && (
-        <Text style={s.profe} onPress={() => navigation.navigate('ElegirProfesor')} accessibilityRole="link">
-          Tu profesor/a: {profesor ? `${profesor.nombre}${profesor.apellido && profesor.apellido !== '-' ? ` ${profesor.apellido}` : ''}` : '…'} · Cambiar
-        </Text>
-      )}
 
       {!loading && !error && (
         <>
@@ -172,6 +180,9 @@ const createStyles = (b) => StyleSheet.create({
   item: { flexDirection: 'row', alignItems: 'center', gap: 12 },
   cta: { flexDirection: 'row', alignItems: 'center', gap: 12, marginTop: 6 },
   profe: { color: b.primary, fontSize: 13, fontWeight: '700', marginTop: -4, marginBottom: 6, paddingVertical: 6 },
+  profeAvatar: { width: 44, height: 44, borderRadius: 22, backgroundColor: b.primary, alignItems: 'center', justifyContent: 'center' },
+  profeInicial: { color: '#FFFFFF', fontSize: 18, fontWeight: '800' },
+  profeCambiar: { color: b.primary, fontWeight: '700', fontSize: 14 },
   thumb: { width: 56, height: 56, borderRadius: 10, backgroundColor: b.cardSoft, alignItems: 'center', justifyContent: 'center' },
   name: { color: b.text, fontWeight: '800', fontSize: 15 },
   sub: { color: b.textSoft, fontSize: 12 },

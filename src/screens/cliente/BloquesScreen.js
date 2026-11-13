@@ -11,11 +11,12 @@ import { fechaCorta, fechaLarga, hora } from '../../utils/fechas';
 import { FUENTES } from '../../styles/theme';
 // 2B · Lista de bloques del día con ocupación + 2C · reserva en dos pasos:
 // 1) elegir con qué profesor/a entrenar en ese turno, 2) confirmar.
-// Elegir profesor/a acá NO cambia el profesor/a principal (el que asigna rutinas).
+// Si todavía no tiene profesor/a principal, el que elige al reservar pasa a ser su profesor/a
+// (aparece en Rutinas y es quien le asigna la rutina).
 export const BloquesScreen = ({ navigation, route }) => {
   const b = useBrand();
   const s = useMemo(() => createStyles(b), [b]);
-  const { user } = useAuth();
+  const { user, patchUser } = useAuth();
   const { fecha, horarioId } = route.params;
   const [bloques, setBloques] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -59,6 +60,13 @@ export const BloquesScreen = ({ navigation, route }) => {
     try {
       const turno = await clienteService.reservar(elegido.id, fecha, profesor?.id ?? null);
       const t = Array.isArray(turno) ? turno[0] : turno;
+      // Primer profesor/a elegido: queda como su profesor/a principal
+      if (profesor && !user?.profesor_id) {
+        try {
+          await clienteService.elegirProfesor(profesor.id);
+          patchUser({ profesor_id: profesor.id });
+        } catch { /* la reserva ya quedó hecha; puede elegirlo luego desde Rutinas */ }
+      }
       if (user?.notificaciones_activas !== false) {
         try {
           await clienteService.notificarConfirmacion(elegido, fecha);
