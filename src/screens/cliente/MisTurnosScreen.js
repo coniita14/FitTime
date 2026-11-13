@@ -1,9 +1,16 @@
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
-import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
+import { View, Text, TouchableOpacity, StyleSheet, RefreshControl } from 'react-native';
 import { Screen, Card, UnderlineTabs, Pill, Loading, ErrorBox, Empty, Button, useBrand } from '../../components/cliente/ui';
 import { clienteService } from '../../api/cliente.service';
 import { mensajeDeError } from '../../utils/errores';
 import { fechaMini, hora, yaPaso } from '../../utils/fechas';
+
+// Último motivo registrado cuando el gimnasio o el profesor/a cancela el turno
+export const motivoCancelacion = (t) => {
+  if (t?.estado !== 'CANCELADO') return null;
+  const g = [...(t.gestion_turnos || [])].sort((a, c) => String(c.fecha_gestion).localeCompare(String(a.fecha_gestion)))[0];
+  return g?.motivo || null;
+};
 
 export const ESTADO_PILL = {
   CONFIRMADO: { text: 'Confirmado', tone: 'primary' },
@@ -20,6 +27,13 @@ export const MisTurnosScreen = ({ navigation, campana }) => {
   const [turnos, setTurnos] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [refrescando, setRefrescando] = useState(false);
+
+  const refrescar = async () => {
+    setRefrescando(true);
+    try { setTurnos(await clienteService.misTurnos()); } catch { /* se mantiene la lista anterior */ }
+    setRefrescando(false);
+  };
 
   const cargar = useCallback(async () => {
     setLoading(true);
@@ -48,7 +62,7 @@ export const MisTurnosScreen = ({ navigation, campana }) => {
   const lista = vista === 'proximos' ? proximos : historial;
 
   return (
-    <Screen title="Mis Turnos" right={campana}>
+    <Screen title="Mis Turnos" right={campana} refreshControl={<RefreshControl refreshing={refrescando} onRefresh={refrescar} />}>
       <UnderlineTabs
         tabs={[['proximos', `Próximos${proximos.length ? ` (${proximos.length})` : ''}`], ['historial', 'Historial']]}
         value={vista}
@@ -71,6 +85,7 @@ export const MisTurnosScreen = ({ navigation, campana }) => {
             <View style={{ flex: 1, gap: 2 }}>
               <Text style={s.date}>{fechaMini(t.fecha_turno)}</Text>
               <Text style={s.time}>{hora(t.horarios?.hora_inicio)} – {hora(t.horarios?.hora_fin)}</Text>
+              {motivoCancelacion(t) ? <Text style={s.motivo}>Motivo: {motivoCancelacion(t)}</Text> : null}
               <TouchableOpacity onPress={() => navigation.navigate('TurnoDetalle', { turno: t })} style={s.detailBtn}>
                 <Text style={s.detailText}>Ver detalle</Text>
               </TouchableOpacity>
@@ -84,6 +99,7 @@ export const MisTurnosScreen = ({ navigation, campana }) => {
 };
 
 const createStyles = (b) => StyleSheet.create({
+  motivo: { color: b.danger, fontSize: 13, fontWeight: '600', marginTop: 2 },
   card: { flexDirection: 'row', alignItems: 'flex-start', borderLeftWidth: 4, borderLeftColor: b.primary },
   date: { color: b.text, fontWeight: '800', fontSize: 15 },
   time: { color: b.textSoft, fontSize: 13 },

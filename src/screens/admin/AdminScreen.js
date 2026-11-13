@@ -1,7 +1,7 @@
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import {
   View, Text, TouchableOpacity, ScrollView, StyleSheet, useWindowDimensions, Pressable, Image, TextInput, Platform,
-  Animated, PanResponder, BackHandler,
+  Animated, PanResponder, BackHandler, KeyboardAvoidingView,
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
@@ -181,9 +181,12 @@ export const AdminScreen = ({ rol = 'ADMIN' }) => {
           </TouchableOpacity>
         </View>
 
-        <ScrollView style={{ flex: 1 }} contentContainerStyle={[s.content, esAncho && s.contentWide, { paddingBottom: 40 + insets.bottom }]}>
-          {contenido}
-        </ScrollView>
+        <KeyboardAvoidingView style={{ flex: 1 }} behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
+          <ScrollView style={{ flex: 1 }} contentContainerStyle={[s.content, esAncho && s.contentWide, { paddingBottom: 40 + insets.bottom }]}
+            keyboardShouldPersistTaps="handled" keyboardDismissMode="on-drag" automaticallyAdjustKeyboardInsets nestedScrollEnabled>
+            {contenido}
+          </ScrollView>
+        </KeyboardAvoidingView>
       </View>
 
       <AsistenteBoton onPress={() => setVerAsistente(true)} bottom={24 + insets.bottom} />

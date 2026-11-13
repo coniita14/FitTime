@@ -7,7 +7,7 @@ import { mensajeDeError } from '../../utils/errores';
 import { avisar, confirmar, DIA_LABEL } from '../../utils/dialogos';
 import { fechaLarga, hora, yaPaso, linkGoogleCalendar } from '../../utils/fechas';
 import { GIMNASIO } from '../../config/gimnasio';
-import { ESTADO_PILL } from './MisTurnosScreen';
+import { ESTADO_PILL, motivoCancelacion } from './MisTurnosScreen';
 
 import { FUENTES } from '../../styles/theme';
 // 2E · Detalle del Turno: datos, instructor, información del horario, ubicación,
@@ -62,7 +62,8 @@ export const TurnoDetalleScreen = ({ navigation, route }) => {
         <Row label="Estado:" value={pill.text} />
         <Row label="Fecha:" value={fechaLarga(turno.fecha_turno)} />
         <Row label="Hora:" value={`${hora(h.hora_inicio)} - ${hora(h.hora_fin)} hs`} />
-        <Row label="Profesor/a:" value={instructor || 'Sin elegir'} last />
+        <Row label="Profesor/a:" value={instructor || 'Sin elegir'} last={!motivoCancelacion(turno)} />
+        {motivoCancelacion(turno) ? <Row label="Motivo de la cancelación:" value={motivoCancelacion(turno)} last /> : null}
       </Card>
 
       <SectionTitle>Información del Horario</SectionTitle>

@@ -1,6 +1,7 @@
 import React, { useMemo } from 'react';
 import {
   View, Text, TouchableOpacity, ActivityIndicator, ScrollView, Modal, TextInput, StyleSheet, Pressable, Platform,
+  KeyboardAvoidingView,
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
@@ -44,14 +45,17 @@ export const Screen = ({ title, onBack, right, children, scroll = true, footer, 
         </View>
         {right}
       </View>
-      <Body
-        style={{ flex: 1 }}
-        contentContainerStyle={scroll ? [s.content, contentStyle] : undefined}
-        keyboardShouldPersistTaps="handled"
-        refreshControl={refreshControl}
-      >
-        {children}
-      </Body>
+      <KeyboardAvoidingView style={{ flex: 1 }} behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
+        <Body
+          style={{ flex: 1 }}
+          contentContainerStyle={scroll ? [s.content, contentStyle] : undefined}
+          keyboardShouldPersistTaps="handled"
+          {...(scroll ? { keyboardDismissMode: 'on-drag', automaticallyAdjustKeyboardInsets: true, nestedScrollEnabled: true } : {})}
+          refreshControl={refreshControl}
+        >
+          {children}
+        </Body>
+      </KeyboardAvoidingView>
       {footer}
     </View>
   );

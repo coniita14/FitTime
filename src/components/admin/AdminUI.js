@@ -336,6 +336,7 @@ export const FormRow = ({ children }) => <View style={{ flexDirection: 'row', ga
 export const FormModal = ({ visible, title, onClose, onSubmit, submitLabel = 'Guardar', saving, children, wide }) => {
   const s = useAdminStyles();
   const { theme } = useTheme();
+  const { height } = useWindowDimensions();
   return (
     <Modal visible={visible} transparent animationType="fade" onRequestClose={onClose}>
       <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : undefined} style={s.modalOverlay}>
@@ -346,7 +347,8 @@ export const FormModal = ({ visible, title, onClose, onSubmit, submitLabel = 'Gu
               <Ionicons name="close" size={18} color={theme.colors.textSecondary} />
             </TouchableOpacity>
           </View>
-          <ScrollView style={{ maxHeight: 560 }} contentContainerStyle={{ padding: 18 }} keyboardShouldPersistTaps="handled">
+          <ScrollView style={{ maxHeight: Math.min(560, height * 0.62) }} contentContainerStyle={{ padding: 18 }}
+            keyboardShouldPersistTaps="handled" keyboardDismissMode="on-drag" automaticallyAdjustKeyboardInsets nestedScrollEnabled>
             {children}
           </ScrollView>
           <View style={s.modalActions}>

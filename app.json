@@ -18,7 +18,8 @@
       "package": "com.constanza.fittime",
       "permissions": [
         "android.permission.RECORD_AUDIO"
-      ]
+      ],
+      "softwareKeyboardLayoutMode": "resize"
     },
     "web": {
       "bundler": "metro",

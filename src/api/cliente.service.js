@@ -58,7 +58,7 @@ export const clienteService = {
   misTurnos: () => {
     listo();
     return run(supabase.from('turnos')
-      .select('id, fecha_turno, estado, creado_en, cancelado_en, horario_id, profesor:usuarios!turnos_profesor_id_fkey(nombre, apellido), horarios(dia, hora_inicio, hora_fin, cupo_maximo, usuarios(nombre, apellido))')
+      .select('id, fecha_turno, estado, creado_en, cancelado_en, horario_id, profesor:usuarios!turnos_profesor_id_fkey(nombre, apellido), gestion_turnos(motivo, fecha_gestion), horarios(dia, hora_inicio, hora_fin, cupo_maximo, usuarios(nombre, apellido))')
       .order('fecha_turno', { ascending: false })
       .order('id', { ascending: false }));
   },
