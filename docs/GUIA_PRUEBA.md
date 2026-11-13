@@ -11,9 +11,9 @@ Esta guía permite evaluar los 12 requisitos obligatorios en unos 20 minutos. No
 | Plataforma | Cómo entrar |
 |---|---|
 | **Android (recomendado)** | Escanear el QR de la landing o abrir `[COMPLETAR: link del APK]` → descargar → instalar (permitir "orígenes desconocidos" si lo pide). |
-| **Expo Go** | Instalar Expo Go desde Play Store y escanear el QR `[COMPLETAR: link de Expo Go]`. |
-| **Navegador (dashboard admin)** | Abrir `[COMPLETAR: URL web]`. |
-| **Landing** | `[COMPLETAR: URL de la landing]` |
+| **Expo Go (desarrollo)** | Clonar el [repositorio](https://github.com/coniita14/FitTime), ejecutar `npm install` y `npx expo start`, y escanear el QR con Expo Go. |
+| **Navegador (dashboard admin y app)** | Abrir https://fittime-app-nine.vercel.app |
+| **Landing** | https://fittime-landing.vercel.app |
 
 > El inicio de sesión con Google funciona en el APK y en la web. En Expo Go usar correo y contraseña.
 

@@ -6,9 +6,9 @@ FitTime es una aplicación multiplataforma para gimnasios locales. Los **cliente
 |---|---|
 | **Autora** | Constanza Castillo — constanzacastillo@epet12smandes.edu.ar |
 | **Carrera** | Técnica en Programación · Proyecto final 2026 (individual) |
-| **Landing pública** | `[COMPLETAR: URL de la landing]` |
+| **Landing pública** | https://fittime-landing.vercel.app |
 | **APK Android** | `[COMPLETAR: link de descarga del APK]` |
-| **Dashboard web (admin)** | `[COMPLETAR: URL de la versión web]` |
+| **Versión web (dashboard admin y app)** | https://fittime-app-nine.vercel.app |
 | **Guía para el profesor** | [docs/GUIA_PRUEBA.md](./docs/GUIA_PRUEBA.md) — incluye credenciales de prueba |
 
 ---
