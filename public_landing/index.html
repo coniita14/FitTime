@@ -3,72 +3,263 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="description" content="FitTime: reservá turnos en tu gimnasio sin horarios llenos y seguí rutinas simples desde el celular.">
-  <title>FitTime — Turnos y rutinas para tu gimnasio</title>
+  <meta name="description" content="FitTime: reservá tu turno en el gimnasio en segundos, elegí tu profesor/a y seguí tus rutinas desde el celular.">
+  <meta name="theme-color" content="#0B1220">
+  <title>FitTime — Tu entrenamiento, tu tiempo</title>
   <link rel="icon" type="image/png" href="favicon.png">
-  <link rel="stylesheet" href="styles.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@500;600;700;800&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
   <style>
-    /* Complementos de styles.css para esta versión de la landing */
-    a { color: inherit; }
-    .logo { text-decoration: none; color: var(--text-main); }
-    .hero h1 .accent { color: var(--accent); }
-    .cta-note { margin-top: 14px; color: var(--text-muted); font-size: 0.9rem; }
+    :root {
+      --azul: #2563EB;
+      --azul-osc: #1D4ED8;
+      --celeste: #60A5FA;
+      --noche: #0B1220;
+      --noche-2: #111A2E;
+      --fondo: #F5F8FF;
+      --tarjeta: #FFFFFF;
+      --texto: #0F172A;
+      --suave: #475569;
+      --borde: #E2E8F0;
+      --ok: #16A34A;
+      --radio: 20px;
+      --sombra: 0 18px 50px -20px rgba(15, 23, 42, .25);
+    }
+    @media (prefers-color-scheme: dark) {
+      :root {
+        --fondo: #0B1220;
+        --tarjeta: #121C31;
+        --texto: #F1F5F9;
+        --suave: #A3B1C6;
+        --borde: #22304A;
+        --sombra: 0 18px 50px -20px rgba(0, 0, 0, .6);
+      }
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; }
+    body { font-family: Inter, system-ui, -apple-system, "Segoe UI", sans-serif; background: var(--fondo); color: var(--texto); line-height: 1.6; -webkit-font-smoothing: antialiased; }
+    h1, h2, h3, .marca { font-family: "Plus Jakarta Sans", Inter, sans-serif; letter-spacing: -0.02em; line-height: 1.15; }
+    a { color: inherit; text-decoration: none; }
+    img { display: block; max-width: 100%; }
+    .contenedor { width: min(1160px, 100% - 32px); margin-inline: auto; }
+    .etiqueta { display: inline-flex; align-items: center; gap: 8px; font-size: .78rem; font-weight: 600; letter-spacing: .08em; text-transform: uppercase; color: var(--azul); }
+    .etiqueta::before { content: ""; width: 18px; height: 2px; background: currentColor; border-radius: 2px; }
 
-    .split { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; }
-    .list-check { list-style: none; display: grid; gap: 10px; margin-top: 8px; }
-    .list-check li { color: var(--text-muted); padding-left: 28px; position: relative; }
-    .list-check li::before { content: "✕"; position: absolute; left: 0; color: var(--danger); font-weight: 700; }
-    .list-check.ok li::before { content: "✓"; color: var(--success); }
+    /* ---------- Botones ---------- */
+    .btn { display: inline-flex; align-items: center; justify-content: center; gap: 10px; padding: 14px 22px; border-radius: 14px; font-weight: 600; font-size: .98rem; transition: transform .15s ease, box-shadow .2s ease, background .2s ease; white-space: nowrap; }
+    .btn:hover { transform: translateY(-2px); }
+    .btn svg { width: 20px; height: 20px; flex: none; }
+    .btn-azul { background: var(--azul); color: #fff; box-shadow: 0 12px 30px -10px rgba(37, 99, 235, .7); }
+    .btn-azul:hover { background: var(--azul-osc); }
+    .btn-vidrio { background: rgba(255, 255, 255, .1); color: #fff; border: 1px solid rgba(255, 255, 255, .25); backdrop-filter: blur(8px); }
+    .btn-vidrio:hover { background: rgba(255, 255, 255, .18); }
+    .btn-linea { border: 1.5px solid var(--borde); color: var(--texto); background: var(--tarjeta); }
+    .btn-linea:hover { border-color: var(--azul); color: var(--azul); }
+    .pronto { opacity: .75; }
 
-    .feature-group-title { font-size: 1.1rem; color: var(--accent); margin: 8px 0 16px; font-weight: 700; }
-    .grid-features { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 16px; margin-bottom: 36px; }
-    .grid-features .card { padding: 22px; }
-    .grid-features h3 { font-size: 1.05rem; margin-bottom: 6px; }
-    .icon { font-size: 1.6rem; display: block; margin-bottom: 10px; }
+    /* ---------- Navegación ---------- */
+    .nav { position: fixed; inset: 0 0 auto; z-index: 50; transition: background .25s ease, box-shadow .25s ease; }
+    .nav.solida { background: rgba(11, 18, 32, .82); backdrop-filter: blur(14px); box-shadow: 0 1px 0 rgba(255, 255, 255, .08); }
+    .nav-fila { display: flex; align-items: center; justify-content: space-between; height: 72px; }
+    .marca { display: flex; align-items: center; gap: 10px; color: #fff; font-weight: 800; font-size: 1.3rem; }
+    .marca img { width: 36px; height: 36px; border-radius: 10px; }
+    .nav-links { display: flex; align-items: center; gap: 28px; color: rgba(255, 255, 255, .82); font-size: .95rem; font-weight: 500; }
+    .nav-links a:hover { color: #fff; }
+    .nav-links .btn { padding: 10px 16px; font-size: .9rem; color: #fff; }
 
-    .steps { list-style: none; counter-reset: paso; display: grid; gap: 16px; }
-    .steps li { counter-increment: paso; display: grid; grid-template-columns: 48px 1fr; gap: 16px; align-items: start;
-                background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius-md); padding: 20px; }
-    .steps li::before { content: counter(paso); width: 48px; height: 48px; border-radius: 50%; background: var(--primary); color: #fff;
-                        display: grid; place-items: center; font-weight: 800; font-size: 1.2rem; }
-    .steps h3 { font-size: 1.05rem; margin-bottom: 4px; }
-    .steps p { color: var(--text-muted); font-size: 0.95rem; }
+    /* ---------- Hero ---------- */
+    .hero { position: relative; min-height: 100vh; display: flex; align-items: center; color: #fff; overflow: hidden; background: var(--noche); }
+    .hero-fondo { position: absolute; inset: 0; background: url("img/gimnasio.jpg") center/cover no-repeat; transform: scale(1.06); }
+    .hero::after { content: ""; position: absolute; inset: 0; background:
+        radial-gradient(1000px 600px at 85% 30%, rgba(37, 99, 235, .45), transparent 60%),
+        linear-gradient(100deg, rgba(11, 18, 32, .96) 0%, rgba(11, 18, 32, .86) 45%, rgba(11, 18, 32, .55) 100%); }
+    .hero-grid { position: relative; z-index: 1; display: grid; grid-template-columns: 1.1fr .9fr; gap: 40px; align-items: center; padding: 120px 0 80px; }
+    .pildora { display: inline-flex; align-items: center; gap: 8px; padding: 7px 14px; border-radius: 999px; background: rgba(96, 165, 250, .14); border: 1px solid rgba(96, 165, 250, .35); color: #BFDBFE; font-size: .85rem; font-weight: 500; }
+    .pildora i { width: 8px; height: 8px; border-radius: 50%; background: #4ADE80; box-shadow: 0 0 0 4px rgba(74, 222, 128, .2); }
+    .hero h1 { font-size: clamp(2.5rem, 5.6vw, 4.4rem); font-weight: 800; margin: 22px 0 18px; }
+    .hero h1 em { font-style: normal; background: linear-gradient(90deg, #60A5FA, #93C5FD 60%, #DBEAFE); -webkit-background-clip: text; background-clip: text; color: transparent; }
+    .hero p.bajada { font-size: 1.15rem; color: rgba(226, 232, 240, .86); max-width: 540px; }
+    .hero-acciones { display: flex; flex-wrap: wrap; gap: 12px; margin: 32px 0 26px; }
+    .hero-datos { display: flex; flex-wrap: wrap; gap: 28px; color: rgba(226, 232, 240, .8); font-size: .92rem; }
+    .hero-datos b { display: block; font-family: "Plus Jakarta Sans", sans-serif; font-size: 1.5rem; color: #fff; }
 
-    .download { display: grid; grid-template-columns: auto 1fr; gap: 36px; align-items: center; }
-    .qr-box { width: 220px; height: 220px; background: #fff; border-radius: var(--radius-md); padding: 12px;
-              display: grid; place-items: center; color: #334155; text-align: center; font-size: 0.9rem; }
-    .qr-box img, .qr-box canvas { width: 196px !important; height: 196px !important; }
-    .download .cta-group { justify-content: flex-start; margin: 18px 0; }
-    .install-steps { color: var(--text-muted); padding-left: 20px; display: grid; gap: 6px; font-size: 0.95rem; }
+    /* Teléfonos */
+    .telefonos { position: relative; height: 600px; }
+    .telefono { position: absolute; width: 270px; border-radius: 42px; padding: 10px; background: linear-gradient(160deg, #2A3550, #0D1424); box-shadow: 0 40px 80px -20px rgba(0, 0, 0, .7), inset 0 0 0 1px rgba(255, 255, 255, .08); }
+    .telefono img { border-radius: 33px; width: 100%; aspect-ratio: 780 / 1688; object-fit: cover; object-position: top; }
+    .telefono::before { content: ""; position: absolute; top: 18px; left: 50%; transform: translateX(-50%); width: 80px; height: 22px; border-radius: 12px; background: #0D1424; z-index: 2; }
+    .tel-1 { right: 170px; top: 40px; transform: rotate(-6deg); animation: flota 7s ease-in-out infinite; }
+    .tel-2 { right: 0; top: 0; transform: rotate(5deg); animation: flota 7s ease-in-out -3.5s infinite; }
+    @keyframes flota { 50% { translate: 0 -12px; } }
+    .chip { position: absolute; z-index: 3; display: flex; align-items: center; gap: 10px; padding: 12px 14px; border-radius: 16px; background: rgba(255, 255, 255, .96); color: #0F172A; box-shadow: var(--sombra); font-size: .85rem; font-weight: 600; }
+    .chip small { display: block; font-weight: 500; color: #64748B; font-size: .76rem; }
+    .chip .ico { width: 34px; height: 34px; border-radius: 10px; display: grid; place-items: center; background: #DBEAFE; color: var(--azul); flex: none; }
+    .chip .ico svg { width: 18px; height: 18px; }
+    .chip-1 { left: 0; bottom: 110px; }
+    .chip-2 { right: 10px; bottom: 30px; }
+    .chip-2 .ico { background: #DCFCE7; color: var(--ok); }
 
-    .faq details { background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius-md); padding: 18px 22px; margin-bottom: 12px; }
-    .faq summary { cursor: pointer; font-weight: 600; }
-    .faq details p { color: var(--text-muted); margin-top: 10px; }
+    /* ---------- Secciones ---------- */
+    section { padding: 110px 0; }
+    .cabecera { max-width: 680px; margin-bottom: 56px; }
+    .cabecera.centro { margin-inline: auto; text-align: center; }
+    .cabecera.centro .etiqueta::after { content: ""; width: 18px; height: 2px; background: currentColor; border-radius: 2px; }
+    .cabecera h2 { font-size: clamp(2rem, 3.6vw, 2.9rem); font-weight: 800; margin: 14px 0 14px; }
+    .cabecera p { color: var(--suave); font-size: 1.08rem; }
 
-    footer a { color: var(--accent); }
+    /* Pasos */
+    .pasos { display: grid; grid-template-columns: repeat(3, 1fr); gap: 24px; }
+    .paso { background: var(--tarjeta); border: 1px solid var(--borde); border-radius: var(--radio); padding: 26px 26px 0; overflow: hidden; box-shadow: var(--sombra); display: flex; flex-direction: column; }
+    .paso .num { width: 38px; height: 38px; border-radius: 12px; background: var(--azul); color: #fff; display: grid; place-items: center; font-weight: 800; font-family: "Plus Jakarta Sans", sans-serif; }
+    .paso h3 { font-size: 1.25rem; margin: 18px 0 8px; }
+    .paso p { color: var(--suave); font-size: .97rem; }
+    .paso .recorte { margin: 24px auto 0; width: 78%; height: 250px; border-radius: 26px 26px 0 0; overflow: hidden; border: 8px solid #1A2338; border-bottom: 0; }
+    .paso .recorte img { width: 100%; }
 
-    @media (max-width: 760px) {
-      .container { padding: 0 16px; }
-      .hero { padding: 48px 0 36px; }
-      .hero h1 { font-size: 2.1rem; }
-      .section-header h2 { font-size: 1.7rem; }
-      .split, .download { grid-template-columns: 1fr; }
-      .qr-box { margin: 0 auto; }
-      .nav-links a:not(.keep) { display: none; }
-      .grid-3 { grid-template-columns: 1fr; }
+    /* Funciones (bento) */
+    .bento { display: grid; grid-template-columns: repeat(6, 1fr); gap: 20px; }
+    .caja { background: var(--tarjeta); border: 1px solid var(--borde); border-radius: var(--radio); padding: 28px; position: relative; overflow: hidden; }
+    .caja h3 { font-size: 1.2rem; margin: 16px 0 8px; }
+    .caja p { color: var(--suave); font-size: .96rem; }
+    .caja .ico { width: 46px; height: 46px; border-radius: 14px; display: grid; place-items: center; background: rgba(37, 99, 235, .1); color: var(--azul); }
+    .caja .ico svg { width: 24px; height: 24px; }
+    .c-3 { grid-column: span 3; } .c-2 { grid-column: span 2; } .c-4 { grid-column: span 4; }
+    .caja.destacada { background: linear-gradient(140deg, #1E40AF, #2563EB 55%, #3B82F6); color: #fff; border: 0; }
+    .caja.destacada p { color: rgba(239, 246, 255, .88); }
+    .caja.destacada .ico { background: rgba(255, 255, 255, .16); color: #fff; }
+    .chat { margin-top: 22px; display: grid; gap: 10px; max-width: 420px; }
+    .burbuja { padding: 11px 15px; border-radius: 16px; font-size: .9rem; width: fit-content; max-width: 88%; }
+    .burbuja.yo { margin-left: auto; background: #fff; color: #1E3A8A; border-bottom-right-radius: 4px; }
+    .burbuja.fiti { background: rgba(255, 255, 255, .14); border-bottom-left-radius: 4px; }
+    .listita { list-style: none; margin-top: 18px; display: grid; gap: 10px; }
+    .listita li { display: flex; gap: 10px; font-size: .95rem; color: var(--suave); }
+    .listita li::before { content: ""; flex: none; width: 20px; height: 20px; margin-top: 2px; border-radius: 50%; background: rgba(22, 163, 74, .14) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%2316A34A' stroke-width='3' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M20 6 9 17l-5-5'/%3E%3C/svg%3E") center/12px no-repeat; }
+    .con-video > p, .con-video .listita { max-width: calc(100% - 150px); }
+    .video-mini { position: absolute; right: -10px; bottom: -40px; width: 150px; border-radius: 22px; border: 6px solid #1A2338; transform: rotate(8deg); box-shadow: var(--sombra); }
+
+    /* Panel del gimnasio (oscuro) */
+    .oscura { background: var(--noche); color: #fff; position: relative; overflow: hidden; }
+    .oscura::before { content: ""; position: absolute; width: 700px; height: 700px; left: -250px; top: -250px; background: radial-gradient(circle, rgba(37, 99, 235, .35), transparent 65%); }
+    .oscura .cabecera p { color: rgba(203, 213, 225, .85); }
+    .oscura .etiqueta { color: var(--celeste); }
+    .panel-grid { position: relative; display: grid; grid-template-columns: .9fr 1.1fr; gap: 56px; align-items: center; }
+    .roles { display: grid; gap: 14px; }
+    .rol { display: flex; gap: 16px; padding: 18px 20px; border-radius: 16px; background: rgba(255, 255, 255, .05); border: 1px solid rgba(255, 255, 255, .09); }
+    .rol .ico { width: 42px; height: 42px; flex: none; border-radius: 12px; display: grid; place-items: center; background: rgba(96, 165, 250, .15); color: var(--celeste); }
+    .rol .ico svg { width: 22px; height: 22px; }
+    .rol h3 { font-size: 1.05rem; margin-bottom: 4px; }
+    .rol p { color: rgba(203, 213, 225, .82); font-size: .93rem; }
+    .navegador { border-radius: 16px; overflow: hidden; background: #fff; box-shadow: 0 50px 100px -30px rgba(0, 0, 0, .8); border: 1px solid rgba(255, 255, 255, .12); transform: perspective(1600px) rotateY(-8deg) rotateX(3deg); }
+    .navegador .barra { display: flex; align-items: center; gap: 7px; padding: 11px 14px; background: #1A2338; }
+    .navegador .barra i { width: 11px; height: 11px; border-radius: 50%; background: #F87171; }
+    .navegador .barra i:nth-child(2) { background: #FBBF24; } .navegador .barra i:nth-child(3) { background: #4ADE80; }
+    .navegador .barra span { margin-left: 12px; flex: 1; padding: 5px 12px; border-radius: 8px; background: rgba(255, 255, 255, .08); color: rgba(255, 255, 255, .6); font-size: .78rem; }
+
+    /* Galería */
+    .galeria { display: flex; gap: 22px; overflow-x: auto; padding: 10px 4px 26px; scroll-snap-type: x mandatory; scrollbar-width: thin; }
+    .galeria figure { flex: none; width: 230px; scroll-snap-align: start; text-align: center; }
+    .galeria img { border-radius: 30px; border: 8px solid #1A2338; box-shadow: var(--sombra); aspect-ratio: 780 / 1688; object-fit: cover; object-position: top; }
+    .galeria figcaption { margin-top: 14px; font-weight: 600; font-size: .95rem; }
+
+    /* Descarga */
+    .descarga { background: linear-gradient(135deg, #1E3A8A 0%, #2563EB 60%, #3B82F6 100%); border-radius: 32px; padding: 56px; color: #fff; display: grid; grid-template-columns: 1fr auto; gap: 48px; align-items: center; position: relative; overflow: hidden; }
+    .descarga::after { content: ""; position: absolute; right: -120px; top: -120px; width: 380px; height: 380px; border-radius: 50%; border: 60px solid rgba(255, 255, 255, .07); }
+    .descarga h2 { font-size: clamp(2rem, 3.4vw, 2.7rem); font-weight: 800; }
+    .descarga > div > p { color: rgba(239, 246, 255, .88); margin: 14px 0 26px; font-size: 1.05rem; max-width: 520px; }
+    .descarga .acciones { display: flex; flex-wrap: wrap; gap: 12px; }
+    .descarga .btn-blanco { background: #fff; color: var(--azul-osc); }
+    .qr { position: relative; z-index: 1; background: #fff; border-radius: 24px; padding: 18px; width: 236px; text-align: center; color: #334155; box-shadow: 0 30px 60px -20px rgba(0, 0, 0, .45); }
+    .qr #qr { width: 200px; height: 200px; display: grid; place-items: center; margin: 0 auto; border-radius: 12px; background: #F1F5F9; font-size: .88rem; }
+    .qr #qr img, .qr #qr canvas { width: 200px !important; height: 200px !important; }
+    .descarga .qr p { margin: 12px 0 0; font-size: .82rem; font-weight: 600; color: #334155; }
+    details.instalar { margin-top: 22px; background: rgba(255, 255, 255, .1); border-radius: 14px; padding: 14px 18px; }
+    details.instalar summary { cursor: pointer; font-weight: 600; }
+    details.instalar ol { margin: 10px 0 0 18px; display: grid; gap: 4px; color: rgba(239, 246, 255, .9); font-size: .93rem; }
+
+    /* Preguntas */
+    .faq { max-width: 820px; margin-inline: auto; display: grid; gap: 12px; }
+    .faq details { background: var(--tarjeta); border: 1px solid var(--borde); border-radius: 16px; padding: 20px 24px; }
+    .faq summary { cursor: pointer; font-weight: 600; font-size: 1.02rem; list-style: none; display: flex; justify-content: space-between; gap: 16px; }
+    .faq summary::-webkit-details-marker { display: none; }
+    .faq summary::after { content: "+"; font-size: 1.4rem; line-height: 1; color: var(--azul); transition: transform .2s; }
+    .faq details[open] summary::after { transform: rotate(45deg); }
+    .faq details p { color: var(--suave); margin-top: 12px; }
+
+    footer { padding: 48px 0; border-top: 1px solid var(--borde); color: var(--suave); font-size: .92rem; }
+    .pie { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 20px; align-items: center; }
+    .pie .marca { color: var(--texto); font-size: 1.1rem; }
+    .pie nav { display: flex; gap: 20px; flex-wrap: wrap; }
+    .pie a:hover { color: var(--azul); }
+
+    /* Aparición al hacer scroll */
+    .aparece { opacity: 0; transform: translateY(24px); transition: opacity .7s ease, transform .7s ease; }
+    .aparece.visible { opacity: 1; transform: none; }
+    @media (prefers-reduced-motion: reduce) {
+      .aparece { opacity: 1; transform: none; transition: none; }
+      .tel-1, .tel-2 { animation: none; }
+      html { scroll-behavior: auto; }
+    }
+
+    /* ---------- Responsive ---------- */
+    @media (max-width: 980px) {
+      .hero-grid, .panel-grid { grid-template-columns: 1fr; }
+      .telefonos { height: 470px; max-width: 460px; width: 100%; margin: 0 auto; }
+      .telefono { width: 210px; border-radius: 34px; }
+      .telefono img { border-radius: 26px; }
+      .tel-1 { right: auto; left: 0; top: 40px; }
+      .tel-2 { right: 0; }
+      .chip-1 { left: 10px; bottom: 30px; }
+      .chip-2 { display: none; }
+      .pasos { grid-template-columns: 1fr; }
+      .bento { grid-template-columns: 1fr; }
+      .c-2, .c-3, .c-4 { grid-column: auto; }
+      .navegador { transform: none; }
+      .descarga { grid-template-columns: 1fr; padding: 36px 24px; }
+      .qr { margin: 0 auto; }
+      .nav-links a:not(.btn) { display: none; }
+    }
+    @media (max-width: 520px) {
+      section { padding: 80px 0; }
+      .hero-acciones .btn { width: 100%; }
+      .telefonos { height: 400px; }
+      .telefono { width: 175px; }
+      .video-mini { display: none; }
+      .con-video > p, .con-video .listita { max-width: none; }
     }
   </style>
 </head>
 <body>
-  <header class="navbar">
-    <div class="container nav-content">
-      <a class="logo" href="#inicio">Fit<span>Time</span></a>
+  <!-- Íconos (se reutilizan con <use>) -->
+  <svg width="0" height="0" style="position:absolute" aria-hidden="true">
+    <defs>
+      <symbol id="i-android" viewBox="0 0 24 24"><path fill="currentColor" d="M17.6 9.48 19.44 6.3a.62.62 0 0 0-1.08-.62l-1.86 3.22a11.4 11.4 0 0 0-9 0L5.64 5.68a.62.62 0 0 0-1.08.62L6.4 9.48A10.8 10.8 0 0 0 1 18h22a10.8 10.8 0 0 0-5.4-8.52ZM7 15.25a1.25 1.25 0 1 1 0-2.5 1.25 1.25 0 0 1 0 2.5Zm10 0a1.25 1.25 0 1 1 0-2.5 1.25 1.25 0 0 1 0 2.5Z"/></symbol>
+      <symbol id="i-web" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M2 12h20M12 2a15 15 0 0 1 4 10 15 15 0 0 1-4 10 15 15 0 0 1-4-10 15 15 0 0 1 4-10Z"/></symbol>
+      <symbol id="i-cal" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="3"/><path d="M16 2v4M8 2v4M3 10h18M8 14h.01M12 14h.01M16 14h.01M8 18h.01M12 18h.01"/></symbol>
+      <symbol id="i-check" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></symbol>
+      <symbol id="i-chispa" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l1.9 5.8L20 11l-6.1 2.2L12 19l-1.9-5.8L4 11l6.1-2.2L12 3Z"/><path d="M19 3v4M17 5h4"/></symbol>
+      <symbol id="i-persona" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="4"/><path d="M4 21a8 8 0 0 1 16 0"/></symbol>
+      <symbol id="i-play" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="5" width="20" height="14" rx="3"/><path d="m10 9 5 3-5 3V9Z"/></symbol>
+      <symbol id="i-pesa" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6.5 6.5v11M17.5 6.5v11M3 9.5v5M21 9.5v5M6.5 12h11"/></symbol>
+      <symbol id="i-campana" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9M10.3 21a1.94 1.94 0 0 0 3.4 0"/></symbol>
+      <symbol id="i-huella" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 10a2 2 0 0 0-2 2c0 1.02-.1 2.51-.26 4M14 13.12c0 2.38 0 6.38-1 8.88M17.29 21.02c.12-.6.43-2.3.5-3.02M2 12a10 10 0 0 1 18-6M2 16h.01M21.8 16c.2-2 .13-5.35 0-6M5 19.5C5.5 18 6 15 6 12a6 6 0 0 1 .34-2M8.65 22c.21-.66.45-1.32.57-2M9 6.8a6 6 0 0 1 9 5.2v2"/></symbol>
+      <symbol id="i-grafico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3v18h18M7 15l4-4 3 3 5-6"/></symbol>
+      <symbol id="i-reloj" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></symbol>
+      <symbol id="i-excel" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8l-6-6Z"/><path d="M14 2v6h6M9 13l4 5M13 13l-4 5"/></symbol>
+      <symbol id="i-candado" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></symbol>
+    </defs>
+  </svg>
+
+  <!-- Navegación -->
+  <header class="nav" id="nav">
+    <div class="contenedor nav-fila">
+      <a class="marca" href="#inicio"><img src="img/logo.png" alt="" width="36" height="36">FitTime</a>
       <nav class="nav-links" aria-label="Navegación principal">
+        <a href="#como-funciona">Cómo funciona</a>
         <a href="#funciones">Funciones</a>
-        <a href="#como-empezar">Cómo empezar</a>
+        <a href="#gimnasios">Para gimnasios</a>
         <a href="#preguntas">Preguntas</a>
-        <a class="keep" href="#descarga">Descargar</a>
-        <button class="theme-toggle-btn" id="themeToggle" type="button" aria-label="Cambiar tema">🌙</button>
+        <a class="btn btn-azul" href="#descarga">Descargar</a>
       </nav>
     </div>
   </header>
@@ -76,161 +267,243 @@
   <main>
     <!-- HERO -->
     <section class="hero" id="inicio">
-      <div class="container">
-        <p class="badge">Proyecto final · Técnica en Programación · 2026</p>
-        <h1>Entrená sin esperas.<br><span class="accent">Reservá tu turno en segundos.</span></h1>
-        <p class="hero-subtitle">
-          FitTime es la app de tu gimnasio para ver horarios con lugares libres, reservar o cancelar turnos
-          y seguir rutinas simples desde el celular.
-        </p>
-        <div class="cta-group">
-          <a class="btn btn-primary" id="ctaApk" href="#descarga">⬇ Descargar para Android</a>
-          <a class="btn btn-secondary" id="ctaWeb" href="#descarga">🌐 Abrir versión web</a>
+      <div class="hero-fondo" aria-hidden="true"></div>
+      <div class="contenedor hero-grid">
+        <div>
+          <span class="pildora"><i></i> Abierto de 08:00 a 23:00 · lunes a sábado</span>
+          <h1>Tu entrenamiento,<br><em>tu tiempo.</em></h1>
+          <p class="bajada">Reservá tu turno en segundos, elegí con qué profesor/a entrenar y llevá tu rutina en el bolsillo. Sin filas, sin horarios llenos.</p>
+          <div class="hero-acciones">
+            <a class="btn btn-azul" id="ctaApk" href="#descarga"><svg><use href="#i-android"/></svg>Descargar para Android</a>
+            <a class="btn btn-vidrio" id="ctaWeb" href="#descarga"><svg><use href="#i-web"/></svg>Abrir versión web</a>
+          </div>
+          <div class="hero-datos">
+            <div><b>15</b>turnos por día</div>
+            <div><b>3 toques</b>para reservar</div>
+            <div><b>24/7</b>asistente Fiti</div>
+          </div>
         </div>
-        <p class="cta-note">Gratis para quienes entrenan · Ingreso con correo o Google</p>
+        <div class="telefonos" aria-hidden="true">
+          <div class="telefono tel-1"><img src="img/pant-horarios.jpg" alt="" loading="eager"></div>
+          <div class="telefono tel-2"><img src="img/pant-bienvenida.jpg" alt="" loading="eager"></div>
+          <div class="chip chip-1"><span class="ico"><svg><use href="#i-cal"/></svg></span><div>Turno reservado<small>Jueves · 18:00 – 19:00</small></div></div>
+          <div class="chip chip-2"><span class="ico"><svg><use href="#i-check"/></svg></span><div>Quedan 6 lugares<small>Te avisamos 1 h antes</small></div></div>
+        </div>
       </div>
     </section>
 
-    <!-- PROBLEMA / SOLUCIÓN -->
-    <section class="section">
-      <div class="container split">
-        <article class="card">
-          <h3>El problema</h3>
-          <ul class="list-check">
-            <li>Llegás al gimnasio y está lleno, sin máquinas libres.</li>
-            <li>No sabés qué horario conviene ni cuántos lugares quedan.</li>
-            <li>La rutina está en un papel que se pierde o en un mensaje viejo.</li>
-          </ul>
-        </article>
-        <article class="card">
-          <h3>La solución</h3>
-          <ul class="list-check ok">
-            <li>Cupos de cada horario en tiempo real.</li>
-            <li>Reserva con un toque y recordatorio antes de entrenar.</li>
-            <li>Tu rutina, con series y repeticiones, siempre a mano.</li>
-          </ul>
-        </article>
+    <!-- CÓMO FUNCIONA -->
+    <section id="como-funciona">
+      <div class="contenedor">
+        <div class="cabecera centro aparece">
+          <span class="etiqueta">Cómo funciona</span>
+          <h2>De la descarga a tu primer entrenamiento en dos minutos</h2>
+          <p>Creá tu cuenta con tu correo o con Google y listo: ya podés reservar.</p>
+        </div>
+        <div class="pasos">
+          <article class="paso aparece">
+            <span class="num">1</span>
+            <h3>Elegí el día y el horario</h3>
+            <p>Mirá los turnos de 08:00 a 23:00 con los lugares libres en tiempo real.</p>
+            <div class="recorte"><img src="img/pant-horarios.jpg" alt="Pantalla de horarios con calendario" loading="lazy"></div>
+          </article>
+          <article class="paso aparece">
+            <span class="num">2</span>
+            <h3>Reservá con tu profesor/a</h3>
+            <p>Elegí con quién querés entrenar en ese turno y confirmá. Te llega un recordatorio antes de la clase.</p>
+            <div class="recorte"><img src="img/pant-turnos.jpg" alt="Pantalla Mis turnos con los turnos confirmados" loading="lazy"></div>
+          </article>
+          <article class="paso aparece">
+            <span class="num">3</span>
+            <h3>Entrená con tu rutina</h3>
+            <p>Tu profesor/a te asigna la rutina: ejercicios, series, descansos y un video de técnica.</p>
+            <div class="recorte"><img src="img/pant-rutina.jpg" alt="Pantalla de detalle de rutina" loading="lazy"></div>
+          </article>
+        </div>
       </div>
     </section>
 
     <!-- FUNCIONES -->
-    <section class="section" id="funciones">
-      <div class="container">
-        <div class="section-header">
-          <h2>Qué podés hacer</h2>
-          <p>Una app para quienes entrenan y un panel para quienes administran el gimnasio.</p>
+    <section id="funciones" style="padding-top: 0">
+      <div class="contenedor">
+        <div class="cabecera aparece">
+          <span class="etiqueta">Funciones</span>
+          <h2>Todo lo que necesitás para entrenar, en una sola app</h2>
+          <p>Pensada para que reservar y seguir tu progreso sea tan simple como mandar un mensaje.</p>
         </div>
-
-        <p class="feature-group-title">Si entrenás</p>
-        <div class="grid-features">
-          <article class="card"><span class="icon">📅</span><h3>Turnos con cupo en vivo</h3><p>Elegí el día, mirá cuántos lugares quedan y reservá con un toque.</p></article>
-          <article class="card"><span class="icon">↩️</span><h3>Cancelación simple</h3><p>¿No podés ir? Cancelá y el lugar queda libre para otra persona.</p></article>
-          <article class="card"><span class="icon">💪</span><h3>Rutinas por categoría</h3><p>Fuerza, Cardio, Tren superior, Tren inferior y Cuerpo completo, con series y descansos.</p></article>
-          <article class="card"><span class="icon">🔔</span><h3>Recordatorios</h3><p>Notificación al confirmar y aviso antes de tu turno.</p></article>
-          <article class="card"><span class="icon">👤</span><h3>Tu perfil</h3><p>Datos, foto, contraseña y tema claro u oscuro.</p></article>
-          <article class="card"><span class="icon">🔐</span><h3>Acceso rápido</h3><p>Entrá con tu correo o con tu cuenta de Google.</p></article>
-        </div>
-
-        <p class="feature-group-title">Si administrás un gimnasio</p>
-        <div class="grid-features">
-          <article class="card"><span class="icon">📊</span><h3>Panel con estadísticas</h3><p>Clientes activos, turnos del día y de la semana, horarios más concurridos.</p></article>
-          <article class="card"><span class="icon">🕒</span><h3>Horarios y cupos</h3><p>Creá, editá o pausá franjas horarias y definí el cupo máximo.</p></article>
-          <article class="card"><span class="icon">📋</span><h3>Rutinas y ejercicios</h3><p>Armá rutinas con tu catálogo de ejercicios y asignalas a cada cliente.</p></article>
-          <article class="card"><span class="icon">✅</span><h3>Control de turnos</h3><p>Mirá quién reservó, marcá asistencia o cancelá con un motivo.</p></article>
+        <div class="bento">
+          <article class="caja destacada c-4 aparece">
+            <span class="ico"><svg><use href="#i-chispa"/></svg></span>
+            <h3>Fiti, tu asistente con inteligencia artificial</h3>
+            <p>Pedile lo que necesites y lo hace por vos: reserva turnos, los cancela (te pregunta antes) y te explica cada ejercicio.</p>
+            <div class="chat" aria-hidden="true">
+              <div class="burbuja yo">Reservame mañana a las 18 con Lucas</div>
+              <div class="burbuja fiti">¡Listo! Te reservé el jueves de 18:00 a 19:00 con Lucas Díaz. 💪</div>
+            </div>
+          </article>
+          <article class="caja c-2 aparece">
+            <span class="ico"><svg><use href="#i-persona"/></svg></span>
+            <h3>Elegí tu profesor/a</h3>
+            <p>Mirá las clases de cada profesor/a y elegí quién te acompaña. Es quien arma tu rutina.</p>
+          </article>
+          <article class="caja c-2 aparece">
+            <span class="ico"><svg><use href="#i-cal"/></svg></span>
+            <h3>Cupos en tiempo real</h3>
+            <p>Sabés cuántos lugares quedan antes de ir. Si no podés, cancelás y liberás tu lugar.</p>
+          </article>
+          <article class="caja c-4 con-video aparece">
+            <span class="ico"><svg><use href="#i-play"/></svg></span>
+            <h3>Videos de técnica en cada ejercicio</h3>
+            <p>Cada ejercicio trae un video que arranca solo, más los músculos que trabajás y los consejos de tu profesor/a.</p>
+            <ul class="listita">
+              <li>Series, repeticiones y descanso</li>
+              <li>Marcá cada ejercicio como completado</li>
+            </ul>
+            <img class="video-mini" src="img/pant-ejercicio.jpg" alt="" loading="lazy">
+          </article>
+          <article class="caja c-2 aparece">
+            <span class="ico"><svg><use href="#i-campana"/></svg></span>
+            <h3>Recordatorios</h3>
+            <p>Confirmación al reservar y un aviso antes de tu turno, con la anticipación que elijas.</p>
+          </article>
+          <article class="caja c-2 aparece">
+            <span class="ico"><svg><use href="#i-huella"/></svg></span>
+            <h3>Face ID y huella</h3>
+            <p>Tu cuenta se desbloquea con tu cara o tu huella cada vez que entrás.</p>
+          </article>
+          <article class="caja c-2 aparece">
+            <span class="ico"><svg><use href="#i-candado"/></svg></span>
+            <h3>Modo oscuro y accesible</h3>
+            <p>Tema claro u oscuro, buen contraste y compatible con lectores de pantalla.</p>
+          </article>
         </div>
       </div>
     </section>
 
-    <!-- CÓMO EMPEZAR -->
-    <section class="section" id="como-empezar">
-      <div class="container">
-        <div class="section-header">
-          <h2>Cómo empezar en 5 pasos</h2>
-          <p>De la descarga a tu primer entrenamiento en menos de dos minutos.</p>
+    <!-- PARA GIMNASIOS -->
+    <section class="oscura" id="gimnasios">
+      <div class="contenedor panel-grid">
+        <div class="aparece">
+          <div class="cabecera" style="margin-bottom: 32px">
+            <span class="etiqueta">Para gimnasios</span>
+            <h2>Un panel para administrar todo el gimnasio</h2>
+            <p>Desde la computadora o el celular, cada rol ve exactamente lo que necesita.</p>
+          </div>
+          <div class="roles">
+            <div class="rol"><span class="ico"><svg><use href="#i-pesa"/></svg></span><div><h3>Entrenadores</h3><p>Ven a sus alumnos y quién viene a cada clase. Cargan sus propias rutinas y se las asignan a sus alumnos.</p></div></div>
+            <div class="rol"><span class="ico"><svg><use href="#i-reloj"/></svg></span><div><h3>Horarios y cupos</h3><p>Turnos de 08:00 a 23:00 con cupo máximo por clase. Se pueden pausar o editar en un clic.</p></div></div>
+            <div class="rol"><span class="ico"><svg><use href="#i-excel"/></svg></span><div><h3>Reportes en Excel</h3><p>Turnos por período y por profesor/a, cancelaciones y usuarios, listos para descargar.</p></div></div>
+            <div class="rol"><span class="ico"><svg><use href="#i-grafico"/></svg></span><div><h3>Estadísticas al instante</h3><p>Clientes activos, turnos del día y de la semana y horarios más concurridos.</p></div></div>
+          </div>
         </div>
-        <ol class="steps">
-          <li><div><h3>Descargá la app</h3><p>Escaneá el código QR con la cámara del celular o tocá "Descargar para Android". Si tenés iPhone, usá la versión web.</p></div></li>
-          <li><div><h3>Creá tu cuenta</h3><p>Tocá <strong>Crear cuenta</strong> e ingresá tu nombre, correo y una contraseña de al menos 8 caracteres con una mayúscula, un número y un carácter especial, o tocá <strong>Continuar con Google</strong>.</p></div></li>
-          <li><div><h3>Reservá tu primer turno</h3><p>Andá a <strong>Turnos</strong>, elegí el día y tocá <strong>Reservar</strong> en un horario con lugares libres. Aceptá las notificaciones para recibir la confirmación y el recordatorio.</p></div></li>
-          <li><div><h3>Elegí tu rutina</h3><p>En <strong>Rutinas</strong> filtrá por categoría, abrí una para ver los ejercicios y guardala con la ⭐. Si tu entrenador te asigna una, aparece en <strong>Inicio</strong>.</p></div></li>
-          <li><div><h3>Personalizá tu perfil</h3><p>En <strong>Perfil</strong> podés cambiar tus datos, tu foto, tu contraseña y el tema claro u oscuro.</p></div></li>
-        </ol>
+        <div class="navegador aparece" aria-hidden="true">
+          <div class="barra"><i></i><i></i><i></i><span>fittime-app-nine.vercel.app</span></div>
+          <img src="img/panel-admin.jpg" alt="" loading="lazy">
+        </div>
+      </div>
+    </section>
+
+    <!-- GALERÍA -->
+    <section>
+      <div class="contenedor">
+        <div class="cabecera centro aparece">
+          <span class="etiqueta">Pantallas</span>
+          <h2>Diseñada para usarse con una mano</h2>
+          <p>Deslizá para ver la app por dentro.</p>
+        </div>
+        <div class="galeria" tabindex="0" aria-label="Capturas de la app">
+          <figure><img src="img/pant-bienvenida.jpg" alt="Pantalla de bienvenida" loading="lazy"><figcaption>Bienvenida</figcaption></figure>
+          <figure><img src="img/pant-horarios.jpg" alt="Calendario de horarios" loading="lazy"><figcaption>Horarios</figcaption></figure>
+          <figure><img src="img/pant-turnos.jpg" alt="Lista de mis turnos" loading="lazy"><figcaption>Mis turnos</figcaption></figure>
+          <figure><img src="img/pant-rutina.jpg" alt="Detalle de una rutina" loading="lazy"><figcaption>Tu rutina</figcaption></figure>
+          <figure><img src="img/pant-ejercicio.jpg" alt="Detalle de un ejercicio" loading="lazy"><figcaption>Ejercicio</figcaption></figure>
+          <figure><img src="img/pant-faceid.jpg" alt="Desbloqueo con Face ID" loading="lazy"><figcaption>Face ID</figcaption></figure>
+          <figure><img src="img/pant-oscuro.jpg" alt="Horarios en modo oscuro" loading="lazy"><figcaption>Modo oscuro</figcaption></figure>
+          <figure><img src="img/pant-perfil.jpg" alt="Perfil de usuario" loading="lazy"><figcaption>Perfil</figcaption></figure>
+        </div>
       </div>
     </section>
 
     <!-- DESCARGA -->
-    <section class="section" id="descarga">
-      <div class="container">
-        <div class="section-header">
-          <h2>Descargá FitTime</h2>
-          <p>Disponible para Android y en el navegador.</p>
-        </div>
-        <div class="card download">
-          <div class="qr-box" id="qr" role="img" aria-label="Código QR para descargar la app">
-            Link de descarga<br>próximamente
-          </div>
+    <section id="descarga" style="padding-top: 20px">
+      <div class="contenedor">
+        <div class="descarga aparece">
           <div>
-            <h3>Escaneá el QR con la cámara de tu celular</h3>
-            <div class="cta-group">
-              <a class="btn btn-primary" id="btnApk" href="#descarga">⬇ Descargar APK</a>
-              <a class="btn btn-secondary" id="btnWeb" href="#descarga">🌐 Versión web</a>
+            <h2>Empezá a entrenar hoy</h2>
+            <p>Descargá FitTime en tu Android o usala desde el navegador en cualquier celular o computadora, incluso iPhone.</p>
+            <div class="acciones">
+              <a class="btn btn-blanco" id="btnApk" href="#descarga"><svg><use href="#i-android"/></svg>Descargar APK</a>
+              <a class="btn btn-vidrio" id="btnWeb" href="#descarga"><svg><use href="#i-web"/></svg>Abrir versión web</a>
             </div>
-            <p><strong>Cómo instalar el APK en Android</strong></p>
-            <ol class="install-steps">
-              <li>Tocá <strong>Descargar APK</strong> y esperá a que termine.</li>
-              <li>Abrí <code>FitTime.apk</code> desde las notificaciones o desde <em>Descargas</em>.</li>
-              <li>Si el teléfono bloquea "apps desconocidas", tocá <strong>Configuración</strong> y activá <strong>Permitir de esta fuente</strong>.</li>
-              <li>Volvé atrás y tocá <strong>Instalar</strong>. Si Play Protect muestra un aviso, elegí <strong>Instalar de todas formas</strong>.</li>
-              <li>Abrí FitTime e iniciá sesión.</li>
-            </ol>
+            <details class="instalar">
+              <summary>¿Cómo instalo el APK en Android?</summary>
+              <ol>
+                <li>Tocá <b>Descargar APK</b> y esperá a que termine.</li>
+                <li>Abrí el archivo desde las notificaciones o desde <i>Descargas</i>.</li>
+                <li>Si aparece "apps desconocidas", tocá <b>Configuración</b> y activá <b>Permitir de esta fuente</b>.</li>
+                <li>Tocá <b>Instalar</b>. Si Play Protect avisa, elegí <b>Instalar de todas formas</b>.</li>
+                <li>Abrí FitTime e iniciá sesión.</li>
+              </ol>
+            </details>
+          </div>
+          <div class="qr">
+            <div id="qr" role="img" aria-label="Código QR para descargar la app">Código QR<br>disponible pronto</div>
+            <p>Escaneá con la cámara del celular</p>
           </div>
         </div>
       </div>
     </section>
 
     <!-- PREGUNTAS -->
-    <section class="section faq" id="preguntas">
-      <div class="container">
-        <div class="section-header">
-          <h2>Preguntas frecuentes</h2>
+    <section id="preguntas" style="padding-top: 40px">
+      <div class="contenedor">
+        <div class="cabecera centro aparece">
+          <span class="etiqueta">Preguntas frecuentes</span>
+          <h2>¿Tenés dudas?</h2>
         </div>
-        <details><summary>¿Es gratis?</summary><p>Sí, para quienes entrenan. Los gimnasios pueden usar el panel de administración con una suscripción mensual.</p></details>
-        <details><summary>¿Necesito internet?</summary><p>Sí, para ver los cupos en tiempo real y reservar. La sesión queda guardada, así que no tenés que iniciar sesión cada vez.</p></details>
-        <details><summary>¿Funciona en iPhone?</summary><p>Por ahora la app instalable es para Android. Desde iPhone podés usar la versión web en Safari.</p></details>
-        <details><summary>¿Qué pasa si el horario está lleno?</summary><p>La app te avisa que no quedan lugares y no te deja reservar. Probá otro horario o volvé más tarde por si alguien cancela.</p></details>
-        <details><summary>¿Mis datos están seguros?</summary><p>Las contraseñas se guardan cifradas y cada persona sólo puede ver sus propios turnos y datos.</p></details>
-        <details><summary>Olvidé mi contraseña</summary><p>En la pantalla de inicio tocá <strong>¿Olvidaste tu contraseña?</strong>. Te llega un código de 6 dígitos al correo para crear una nueva.</p></details>
+        <div class="faq">
+          <details><summary>¿Es gratis?</summary><p>Sí, para quienes entrenan. Descargás la app, creás tu cuenta y empezás a reservar.</p></details>
+          <details><summary>¿En qué horarios puedo reservar?</summary><p>El gimnasio abre de 08:00 a 23:00, de lunes a sábado. Hay turnos de una hora durante todo ese horario.</p></details>
+          <details><summary>¿Cómo elijo profesor/a?</summary><p>Desde Rutinas o Perfil elegís tu profesor/a principal, que es quien te asigna la rutina. Además, cada vez que reservás un turno elegís con quién querés entrenar en esa clase.</p></details>
+          <details><summary>¿Qué pasa si el horario está lleno?</summary><p>La app te muestra que no quedan lugares y no te deja reservar. Probá otro horario o volvé más tarde por si alguien cancela.</p></details>
+          <details><summary>¿Funciona en iPhone?</summary><p>La app instalable es para Android. Desde iPhone podés usar la versión web en Safari, con las mismas funciones.</p></details>
+          <details><summary>¿Mis datos están seguros?</summary><p>Las contraseñas se guardan cifradas y cada persona solo puede ver sus propios turnos y datos. Además podés proteger tu cuenta con Face ID o huella.</p></details>
+          <details><summary>Olvidé mi contraseña</summary><p>En la pantalla de inicio tocá <b>¿Olvidaste tu contraseña?</b>. Te llega un código de 6 dígitos al correo para crear una nueva.</p></details>
+        </div>
       </div>
     </section>
   </main>
 
   <footer>
-    <div class="container">
-      <p><strong>FitTime</strong> — Turnos y rutinas para gimnasios locales.</p>
-      <p>Desarrollado por Constanza Castillo · Técnica en Programación · 2026</p>
-      <p>
-        <a href="mailto:constanzacastillo@epet12smandes.edu.ar">constanzacastillo@epet12smandes.edu.ar</a>
-        · <a id="lnkRepo" href="#">Documentación técnica</a>
-      </p>
+    <div class="contenedor pie">
+      <div>
+        <a class="marca" href="#inicio"><img src="img/logo.png" alt="" width="30" height="30">FitTime</a>
+        <p style="margin-top: 8px">Desarrollado por Constanza Castillo · Técnica en Programación · 2026</p>
+      </div>
+      <nav aria-label="Enlaces del pie">
+        <a href="#como-funciona">Cómo funciona</a>
+        <a href="#funciones">Funciones</a>
+        <a id="lnkRepo" href="#">Documentación técnica</a>
+        <a href="mailto:constanzacastillo@epet12smandes.edu.ar">Contacto</a>
+      </nav>
     </div>
   </footer>
 
   <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
   <script>
-    // ==== COMPLETAR ANTES DE PUBLICAR ====
-    // Pegá acá los links reales. Mientras empiecen con "COMPLETAR", la página muestra "próximamente".
+    // ==== Links de descarga ====
+    // Mientras un link empiece con "COMPLETAR", el botón lleva a la sección de descarga.
     const APK_URL  = 'COMPLETAR_link_del_APK_de_EAS';
     const WEB_URL  = 'https://fittime-app-nine.vercel.app';
     const REPO_URL = 'https://github.com/coniita14/FitTime';
-    // =====================================
+    // ===========================
 
     const listo = (url) => url && !url.startsWith('COMPLETAR');
-
     const enlazar = (ids, url) => ids.forEach((id) => {
       const el = document.getElementById(id);
       if (!el) return;
       if (listo(url)) { el.href = url; el.target = '_blank'; el.rel = 'noopener'; }
-      else { el.title = 'Disponible próximamente'; }
+      else { el.title = 'Disponible próximamente'; el.classList.add('pronto'); }
     });
     enlazar(['ctaApk', 'btnApk'], APK_URL);
     enlazar(['ctaWeb', 'btnWeb'], WEB_URL);
@@ -239,25 +512,26 @@
     if (listo(APK_URL) && window.QRCode) {
       const qr = document.getElementById('qr');
       qr.textContent = '';
-      new QRCode(qr, { text: APK_URL, width: 196, height: 196, correctLevel: QRCode.CorrectLevel.M });
+      qr.style.background = '#fff';
+      new QRCode(qr, { text: APK_URL, width: 200, height: 200, colorDark: '#0F172A', correctLevel: QRCode.CorrectLevel.M });
     }
 
-    // Tema claro / oscuro (respeta la preferencia del sistema)
-    const root = document.documentElement;
-    const btn = document.getElementById('themeToggle');
-    const aplicar = (tema) => {
-      if (tema === 'light') root.setAttribute('data-theme', 'light'); else root.removeAttribute('data-theme');
-      btn.textContent = tema === 'light' ? '🌙' : '☀️';
-    };
-    let tema = null;
-    try { tema = localStorage.getItem('fittime-tema'); } catch (e) {}
-    if (!tema) tema = window.matchMedia('(prefers-color-scheme: light)').matches ? 'light' : 'dark';
-    aplicar(tema);
-    btn.addEventListener('click', () => {
-      tema = tema === 'light' ? 'dark' : 'light';
-      aplicar(tema);
-      try { localStorage.setItem('fittime-tema', tema); } catch (e) {}
-    });
+    // Barra de navegación sólida al bajar
+    const nav = document.getElementById('nav');
+    const fijar = () => nav.classList.toggle('solida', window.scrollY > 40);
+    fijar();
+    window.addEventListener('scroll', fijar, { passive: true });
+
+    // Animación de aparición
+    const items = document.querySelectorAll('.aparece');
+    if ('IntersectionObserver' in window) {
+      const io = new IntersectionObserver((entradas) => entradas.forEach((e) => {
+        if (e.isIntersecting) { e.target.classList.add('visible'); io.unobserve(e.target); }
+      }), { threshold: 0.12 });
+      items.forEach((el) => io.observe(el));
+    } else {
+      items.forEach((el) => el.classList.add('visible'));
+    }
   </script>
 </body>
 </html>

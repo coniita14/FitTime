@@ -1,5 +1,6 @@
 import React from 'react';
 import { StatusBar } from 'expo-status-bar';
+import { useFonts } from 'expo-font';
 import * as Notifications from 'expo-notifications';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 import { AuthProvider } from './src/context/AuthContext';
@@ -27,6 +28,12 @@ const AppContent = () => {
 };
 
 export default function App() {
+  // Fuente de títulos; si falla la carga, la app sigue con la fuente del sistema
+  const [fuentesListas, errorFuentes] = useFonts({
+    Fraunces_600SemiBold: require('./assets/fonts/Fraunces_600SemiBold.ttf'),
+    Fraunces_500Medium_Italic: require('./assets/fonts/Fraunces_500Medium_Italic.ttf'),
+  });
+  if (!fuentesListas && !errorFuentes) return null;
   return (
     <SafeAreaProvider>
       <ThemeProvider>

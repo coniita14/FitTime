@@ -5,9 +5,12 @@ import {
 import { Ionicons } from '@expo/vector-icons';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useTheme } from '../../context/ThemeContext';
+import { useAuth } from '../../context/AuthContext';
+import { FUENTES } from '../../styles/theme';
 
-// Kit visual de la app del cliente, basado en los wireframes de FitTime:
-// fondo azul, encabezado blanco, tarjetas blancas redondeadas y botones índigo.
+// Kit visual de la app del cliente. Mantiene los colores de FitTime y usa:
+// títulos grandes con serif (Fraunces), saludo en las pantallas principales,
+// tarjetas con borde fino, botones tipo pastilla y barra inferior flotante.
 
 export const useBrand = () => {
   const { theme } = useTheme();
@@ -24,17 +27,21 @@ export const Screen = ({ title, onBack, right, children, scroll = true, footer, 
   const s = useS();
   const b = useBrand();
   const insets = useSafeAreaInsets();
+  const { user } = useAuth();
   const Body = scroll ? ScrollView : View;
+  const nombre = user?.nombre ? user.nombre.split(' ')[0] : '';
   return (
     <View style={s.screen}>
-      <View style={[s.header, { paddingTop: insets.top + 10 }]}>
+      <View style={[s.header, { paddingTop: insets.top + 12 }, onBack && s.headerPush]}>
         {onBack ? (
           <TouchableOpacity onPress={onBack} style={s.backBtn} accessibilityLabel="Volver" accessibilityRole="button">
-            <Ionicons name="arrow-back" size={22} color={b.text} />
+            <Ionicons name="chevron-back" size={22} color={b.text} />
           </TouchableOpacity>
         ) : null}
-        <Text style={s.headerTitle} numberOfLines={1}>{title}</Text>
-        <View style={{ flex: 1 }} />
+        <View style={{ flex: 1 }}>
+          {!onBack && nombre ? <Text style={s.saludo}>Hola, {nombre}</Text> : null}
+          <Text style={[s.headerTitle, onBack && s.headerTitlePush]} numberOfLines={1} accessibilityRole="header">{title}</Text>
+        </View>
         {right}
       </View>
       <Body
@@ -154,7 +161,7 @@ export const UnderlineTabs = ({ tabs, value, onChange }) => {
   return (
     <View style={s.utabs}>
       {tabs.map(([key, label]) => (
-        <TouchableOpacity key={key} style={[s.utab, value === key && s.utabActive]} onPress={() => onChange(key)}>
+        <TouchableOpacity key={key} style={[s.utab, value === key && s.utabActive]} onPress={() => onChange(key)} accessibilityRole="tab" accessibilityState={{ selected: value === key }}>
           <Text style={[s.utabText, value === key && s.utabTextActive]}>{label}</Text>
         </TouchableOpacity>
       ))}
@@ -250,69 +257,76 @@ export const TabBar = ({ tabs, value, onChange }) => {
   const b = useBrand();
   const insets = useSafeAreaInsets();
   return (
-    <View style={[s.tabbar, { paddingBottom: Math.max(insets.bottom, 8) }]} accessibilityRole="tablist">
-      {tabs.map((t) => {
-        const active = t.key === value;
-        return (
-          <TouchableOpacity key={t.key} style={s.tab} onPress={() => onChange(t.key)} accessibilityRole="tab" accessibilityState={{ selected: active }}>
-            {active && <View style={s.tabIndicator} />}
-            <Ionicons name={active ? t.icon : `${t.icon}-outline`} size={22} color={active ? b.navActive : b.navInactive} />
-            <Text style={[s.tabText, { color: active ? b.navActive : b.navInactive }, active && { fontWeight: '700' }]}>{t.label}</Text>
-          </TouchableOpacity>
-        );
-      })}
+    <View style={[s.tabbarWrap, { paddingBottom: Math.max(insets.bottom, 12) }]}>
+      <View style={s.tabbar} accessibilityRole="tablist">
+        {tabs.map((t) => {
+          const active = t.key === value;
+          return (
+            <TouchableOpacity key={t.key} style={[s.tab, active && s.tabActive]} onPress={() => onChange(t.key)}
+              accessibilityRole="tab" accessibilityState={{ selected: active }} accessibilityLabel={t.label}>
+              <Ionicons name={active ? t.icon : `${t.icon}-outline`} size={20} color={active ? '#FFFFFF' : b.navInactive} />
+              {active ? <Text style={s.tabText} numberOfLines={1}>{t.label}</Text> : null}
+            </TouchableOpacity>
+          );
+        })}
+      </View>
     </View>
   );
 };
 
+const serif = (tam) => ({ fontFamily: FUENTES.titulo, fontSize: tam, fontWeight: undefined, letterSpacing: -0.3 });
+
 const createStyles = (b) => StyleSheet.create({
   screen: { flex: 1, backgroundColor: b.bg },
-  header: {
-    flexDirection: 'row', alignItems: 'center', gap: 10, paddingHorizontal: 18, paddingBottom: 12,
-    backgroundColor: b.card, borderBottomWidth: 1, borderBottomColor: b.border,
+  header: { flexDirection: 'row', alignItems: 'flex-end', gap: 12, paddingHorizontal: 20, paddingBottom: 14, backgroundColor: b.bg },
+  headerPush: { alignItems: 'center', paddingBottom: 10 },
+  backBtn: {
+    width: 40, height: 40, borderRadius: 20, alignItems: 'center', justifyContent: 'center',
+    backgroundColor: b.card, borderWidth: 1, borderColor: b.border,
   },
-  backBtn: { padding: 4, marginLeft: -4 },
-  headerTitle: { fontSize: 18, fontWeight: '800', color: b.text, flexShrink: 1 },
-  content: { padding: 16, paddingBottom: 104, width: '100%', maxWidth: 720, alignSelf: 'center' },
-  bell: { width: 38, height: 38, borderRadius: 19, alignItems: 'center', justifyContent: 'center', backgroundColor: b.cardSoft },
+  saludo: { color: b.textSoft, fontSize: 14, marginBottom: 2 },
+  headerTitle: { ...serif(30), color: b.text, flexShrink: 1 },
+  headerTitlePush: { ...serif(22) },
+  content: { padding: 16, paddingTop: 6, paddingBottom: 110, width: '100%', maxWidth: 720, alignSelf: 'center' },
+  bell: {
+    width: 42, height: 42, borderRadius: 21, alignItems: 'center', justifyContent: 'center',
+    backgroundColor: b.card, borderWidth: 1, borderColor: b.border,
+  },
   bellBadge: {
-    position: 'absolute', top: -3, right: -3, minWidth: 18, height: 18, borderRadius: 9, paddingHorizontal: 4,
-    backgroundColor: b.danger, alignItems: 'center', justifyContent: 'center',
+    position: 'absolute', top: -2, right: -2, minWidth: 18, height: 18, borderRadius: 9, paddingHorizontal: 4,
+    backgroundColor: b.danger, alignItems: 'center', justifyContent: 'center', borderWidth: 2, borderColor: b.bg,
   },
   bellBadgeText: { color: '#FFF', fontSize: 10, fontWeight: '800' },
-  card: {
-    backgroundColor: b.card, borderRadius: 14, padding: 14, marginBottom: 12,
-    ...Platform.select({ web: { boxShadow: '0px 2px 6px rgba(15, 23, 42, 0.08)' }, default: { elevation: 1 } }),
-  },
+  card: { backgroundColor: b.card, borderRadius: 20, padding: 16, marginBottom: 12, borderWidth: 1, borderColor: b.border },
   cardMuted: { opacity: 0.6 },
-  sectionTitle: { color: b.onBg, fontWeight: '800', fontSize: 15, marginTop: 6, marginBottom: 10 },
-  row: { flexDirection: 'row', justifyContent: 'space-between', paddingVertical: 10, gap: 12 },
+  sectionTitle: { ...serif(20), color: b.onBg, marginTop: 10, marginBottom: 12 },
+  row: { flexDirection: 'row', justifyContent: 'space-between', paddingVertical: 11, gap: 12 },
   rowBorder: { borderBottomWidth: 1, borderBottomColor: b.border },
   rowLabel: { color: b.textSoft, fontSize: 13 },
   rowValue: { color: b.text, fontSize: 13, fontWeight: '700', flexShrink: 1, textAlign: 'right' },
   pill: { paddingHorizontal: 12, paddingVertical: 5, borderRadius: 999, alignSelf: 'flex-start' },
   pillSmall: { paddingHorizontal: 9, paddingVertical: 3 },
   pillText: { fontSize: 12, fontWeight: '700' },
-  btn: { minHeight: 50, borderRadius: 12, alignItems: 'center', justifyContent: 'center', paddingHorizontal: 18 },
-  btnSmall: { minHeight: 36, borderRadius: 999, paddingHorizontal: 14 },
-  btnWhite: { backgroundColor: b.card, borderWidth: 1.5, borderColor: b.border },
+  btn: { minHeight: 52, borderRadius: 999, alignItems: 'center', justifyContent: 'center', paddingHorizontal: 22 },
+  btnSmall: { minHeight: 36, borderRadius: 999, paddingHorizontal: 16 },
+  btnWhite: { backgroundColor: 'transparent', borderWidth: 1.5, borderColor: b.text },
   btnRow: { flexDirection: 'row', alignItems: 'center', gap: 8 },
   btnText: { fontSize: 15, fontWeight: '700' },
   chip: {
-    flexDirection: 'row', alignItems: 'center', paddingHorizontal: 14, paddingVertical: 7, borderRadius: 999,
-    backgroundColor: b.card, marginRight: 8, marginBottom: 8,
+    flexDirection: 'row', alignItems: 'center', paddingHorizontal: 14, paddingVertical: 8, borderRadius: 999,
+    backgroundColor: b.card, marginRight: 8, marginBottom: 8, borderWidth: 1, borderColor: b.border,
   },
-  chipActive: { backgroundColor: b.primary },
+  chipActive: { backgroundColor: b.text, borderColor: b.text },
   chipText: { color: b.text, fontSize: 13, fontWeight: '600' },
-  utabs: { flexDirection: 'row', backgroundColor: b.card, borderRadius: 12, marginBottom: 14, overflow: 'hidden' },
-  utab: { flex: 1, alignItems: 'center', paddingVertical: 12, borderBottomWidth: 3, borderBottomColor: 'transparent' },
-  utabActive: { borderBottomColor: b.primary },
+  utabs: { flexDirection: 'row', backgroundColor: b.card, borderRadius: 999, marginBottom: 14, padding: 4, borderWidth: 1, borderColor: b.border },
+  utab: { flex: 1, alignItems: 'center', paddingVertical: 10, borderRadius: 999 },
+  utabActive: { backgroundColor: b.primary },
   utabText: { color: b.textMuted, fontWeight: '600' },
-  utabTextActive: { color: b.text, fontWeight: '800' },
+  utabTextActive: { color: '#FFFFFF', fontWeight: '800' },
   fieldLabel: { color: b.onBg, fontWeight: '700', fontSize: 13, marginBottom: 6 },
   field: {
-    flexDirection: 'row', alignItems: 'center', backgroundColor: b.card, borderRadius: 12, minHeight: 50,
-    paddingHorizontal: 14, borderWidth: 1, borderColor: b.border,
+    flexDirection: 'row', alignItems: 'center', backgroundColor: b.card, borderRadius: 16, minHeight: 52,
+    paddingHorizontal: 16, borderWidth: 1, borderColor: b.border,
   },
   fieldInput: { flex: 1, color: b.text, fontSize: 15, paddingVertical: 10, ...Platform.select({ web: { outlineStyle: 'none' }, default: {} }) },
   fieldError: { color: '#FFFFFF', backgroundColor: b.danger, alignSelf: 'flex-start', fontSize: 12, fontWeight: '600', marginTop: 6, paddingHorizontal: 8, paddingVertical: 2, borderRadius: 6, overflow: 'hidden' },
@@ -320,12 +334,17 @@ const createStyles = (b) => StyleSheet.create({
   centerText: { color: b.onBgSoft, fontWeight: '600' },
   sheetOverlay: { flex: 1, backgroundColor: 'rgba(15, 23, 42, 0.45)', justifyContent: 'flex-end' },
   sheet: {
-    backgroundColor: b.card, borderTopLeftRadius: 22, borderTopRightRadius: 22, padding: 20, paddingBottom: 34,
+    backgroundColor: b.card, borderTopLeftRadius: 28, borderTopRightRadius: 28, padding: 22, paddingBottom: 34,
     width: '100%', maxWidth: 720, alignSelf: 'center',
   },
   sheetHandle: { alignSelf: 'center', width: 44, height: 5, borderRadius: 3, backgroundColor: b.border, marginBottom: 14 },
-  tabbar: { flexDirection: 'row', backgroundColor: b.navBg, borderTopWidth: 1, borderTopColor: b.border, paddingTop: 6 },
-  tab: { flex: 1, alignItems: 'center', gap: 2, paddingTop: 4 },
-  tabIndicator: { position: 'absolute', top: -7, width: 48, height: 3, borderRadius: 2, backgroundColor: b.navActive },
-  tabText: { fontSize: 11 },
+  tabbarWrap: { paddingHorizontal: 16, paddingTop: 8, backgroundColor: b.bg },
+  tabbar: {
+    flexDirection: 'row', alignItems: 'center', backgroundColor: b.navBg, borderRadius: 30, padding: 6,
+    borderWidth: 1, borderColor: b.border, width: '100%', maxWidth: 520, alignSelf: 'center',
+    ...Platform.select({ web: { boxShadow: '0px 10px 30px rgba(15, 23, 42, 0.12)' }, default: { elevation: 6, shadowColor: '#0F172A', shadowOpacity: 0.12, shadowRadius: 16, shadowOffset: { width: 0, height: 8 } } }),
+  },
+  tab: { flex: 1, flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 6, height: 46, borderRadius: 24 },
+  tabActive: { flex: 1.6, backgroundColor: b.navActive },
+  tabText: { color: '#FFFFFF', fontSize: 13, fontWeight: '700' },
 });

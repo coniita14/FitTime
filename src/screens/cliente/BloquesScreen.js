@@ -8,6 +8,7 @@ import { useAuth } from '../../context/AuthContext';
 import { mensajeDeError } from '../../utils/errores';
 import { fechaCorta, fechaLarga, hora } from '../../utils/fechas';
 
+import { FUENTES } from '../../styles/theme';
 // 2B · Lista de bloques del día con ocupación + 2C · reserva en dos pasos:
 // 1) elegir con qué profesor/a entrenar en ese turno, 2) confirmar.
 // Elegir profesor/a acá NO cambia el profesor/a principal (el que asigna rutinas).
@@ -186,7 +187,7 @@ const createStyles = (b) => StyleSheet.create({
   reservarText: { color: '#FFF', fontWeight: '700', fontSize: 12 },
   reserved: { flexDirection: 'row', alignItems: 'center', gap: 4 },
   reservedText: { fontWeight: '700', fontSize: 12 },
-  sheetTitle: { color: b.text, fontSize: 18, fontWeight: '800', marginBottom: 8 },
+  sheetTitle: { color: b.text, fontSize: 21, fontFamily: FUENTES.titulo, fontWeight: undefined, marginBottom: 8 },
   profe: { flexDirection: 'row', alignItems: 'center', gap: 12, paddingVertical: 10, borderBottomWidth: 1, borderBottomColor: b.track },
   avatar: { width: 40, height: 40, borderRadius: 20, alignItems: 'center', justifyContent: 'center' },
   avatarText: { color: '#FFF', fontWeight: '800', fontSize: 16 },

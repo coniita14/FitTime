@@ -7,6 +7,7 @@ import { useAuth } from '../../context/AuthContext';
 import { mensajeDeError } from '../../utils/errores';
 import { avisar, CATEGORIA_LABEL, NIVEL_LABEL } from '../../utils/dialogos';
 
+import { FUENTES } from '../../styles/theme';
 // 3A · Detalle de rutina: progreso del día, lista de ejercicios (con check) y ⭐ guardar.
 export const RutinaDetalleScreen = ({ navigation, route }) => {
   const b = useBrand();
@@ -121,7 +122,7 @@ export const RutinaDetalleScreen = ({ navigation, route }) => {
 
 const createStyles = (b) => StyleSheet.create({
   top: { backgroundColor: b.card, marginHorizontal: -16, paddingHorizontal: 20, paddingVertical: 16, marginBottom: 16 },
-  title: { color: b.text, fontSize: 22, fontWeight: '800' },
+  title: { color: b.text, fontSize: 26, fontFamily: FUENTES.titulo, fontWeight: undefined },
   meta: { color: b.textSoft, fontSize: 13, marginTop: 4 },
   progress: { color: b.textSoft, fontSize: 12, marginTop: 6 },
   note: { flexDirection: 'row', gap: 8, backgroundColor: b.cardSoft, borderRadius: 10, padding: 10, marginTop: 12 },

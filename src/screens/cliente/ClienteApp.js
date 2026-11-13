@@ -95,7 +95,7 @@ export const ClienteApp = () => {
       </View>
       <TabBar tabs={TABS} value={tab} onChange={cambiarTab} />
       {/* Asistente con IA: sólo en las pantallas principales para no tapar botones de abajo */}
-      {pilas[tab].length === 1 && <AsistenteBoton onPress={() => setVerAsistente(true)} bottom={78 + insets.bottom} />}
+      {pilas[tab].length === 1 && <AsistenteBoton onPress={() => setVerAsistente(true)} bottom={96 + insets.bottom} />}
       <AsistenteModal visible={verAsistente} onClose={() => setVerAsistente(false)} onCambio={() => setVersion((v) => v + 1)} />
       <NotificacionesModal visible={verNotif} onClose={() => setVerNotif(false)} onLeidas={() => setNoLeidas(0)} />
     </View>

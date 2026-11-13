@@ -7,6 +7,7 @@ import { Ionicons } from '@expo/vector-icons';
 import { useTheme } from '../../context/ThemeContext';
 import { CustomButton } from '../CustomButton';
 
+import { FUENTES } from '../../styles/theme';
 // Kit del panel web (wireframes 3A–3E): encabezado "Gestión de …", barra de
 // herramientas con buscador y filtros, tabla con paginación y modales.
 
@@ -360,9 +361,9 @@ export const FormModal = ({ visible, title, onClose, onSubmit, submitLabel = 'Gu
 
 const createStyles = (theme) => StyleSheet.create({
   screenHeader: { flexDirection: 'row', alignItems: 'center', gap: 12, marginBottom: 14, flexWrap: 'wrap' },
-  screenTitle: { fontSize: 20, fontWeight: '800', color: theme.colors.textPrimary },
+  screenTitle: { fontSize: 26, fontFamily: FUENTES.titulo, fontWeight: undefined, color: theme.colors.textPrimary, letterSpacing: -0.3 },
   screenSubtitle: { fontSize: 13, color: theme.colors.textSecondary, marginTop: 2 },
-  pbtn: { flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 6, paddingHorizontal: 16, minHeight: 38, borderRadius: 6 },
+  pbtn: { flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 6, paddingHorizontal: 16, minHeight: 40, borderRadius: 999 },
   pbtnOutline: { backgroundColor: theme.colors.surface, borderWidth: 1, borderColor: theme.colors.border },
   pbtnText: { fontWeight: '700', fontSize: 13 },
   toolbar: { flexDirection: 'row', alignItems: 'center', gap: 10, marginBottom: 12, flexWrap: 'wrap' },
@@ -382,7 +383,7 @@ const createStyles = (theme) => StyleSheet.create({
   selectOption: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', paddingHorizontal: 10, paddingVertical: 10, borderRadius: 6 },
   selectOptionActive: { backgroundColor: `${theme.colors.primary}12` },
   selectOptionText: { color: theme.colors.textPrimary, fontSize: 14 },
-  tableBox: { backgroundColor: theme.colors.surface, borderRadius: 8, borderWidth: 1, borderColor: theme.colors.border, overflow: 'hidden', marginBottom: 16 },
+  tableBox: { backgroundColor: theme.colors.surface, borderRadius: 16, borderWidth: 1, borderColor: theme.colors.border, overflow: 'hidden', marginBottom: 16 },
   thead: { flexDirection: 'row', backgroundColor: theme.colors.inputBackground, borderBottomWidth: 1, borderBottomColor: theme.colors.border, paddingHorizontal: 14 },
   th: { paddingVertical: 10, paddingRight: 8, fontSize: 11, fontWeight: '800', color: theme.colors.textSecondary, textTransform: 'uppercase', letterSpacing: 0.4 },
   tr: { flexDirection: 'row', alignItems: 'center', paddingHorizontal: 14, borderBottomWidth: 1, borderBottomColor: theme.colors.border, minHeight: 52 },
@@ -403,7 +404,7 @@ const createStyles = (theme) => StyleSheet.create({
   mutedText: { color: theme.colors.textMuted, fontSize: 13, textAlign: 'center' },
   bodyText: { color: theme.colors.textPrimary, fontSize: 14 },
   card: {
-    backgroundColor: theme.colors.surface, borderRadius: 8, borderWidth: 1, borderColor: theme.colors.border, padding: 16, marginBottom: 12,
+    backgroundColor: theme.colors.surface, borderRadius: 16, borderWidth: 1, borderColor: theme.colors.border, padding: 16, marginBottom: 12,
   },
   cardMuted: { opacity: 0.55 },
   badge: { borderWidth: 1, borderRadius: 999, paddingHorizontal: 9, paddingVertical: 2, alignSelf: 'flex-start' },
@@ -430,7 +431,7 @@ const createStyles = (theme) => StyleSheet.create({
     flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', paddingHorizontal: 18, paddingVertical: 14,
     borderBottomWidth: 1, borderBottomColor: theme.colors.border,
   },
-  modalTitle: { fontSize: 15, fontWeight: '800', color: theme.colors.textPrimary },
+  modalTitle: { fontSize: 19, fontFamily: FUENTES.titulo, fontWeight: undefined, color: theme.colors.textPrimary },
   modalClose: { width: 26, height: 26, borderRadius: 13, backgroundColor: theme.colors.inputBackground, alignItems: 'center', justifyContent: 'center' },
   modalActions: {
     flexDirection: 'row', justifyContent: 'space-between', gap: 12, paddingHorizontal: 18, paddingVertical: 12,

@@ -5,6 +5,7 @@ import { useTheme } from '../../context/ThemeContext';
 import { clienteService } from '../../api/cliente.service';
 import { mensajeDeError } from '../../utils/errores';
 
+import { FUENTES } from '../../styles/theme';
 const ICONO = {
   CONFIRMACION_TURNO: { name: 'checkmark-circle', tone: 'success' },
   CANCELACION_TURNO: { name: 'close-circle', tone: 'danger' },
@@ -102,7 +103,7 @@ const createStyles = (theme) => StyleSheet.create({
     width: '100%', maxWidth: 560, alignSelf: 'center',
   },
   header: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 12 },
-  title: { color: theme.colors.textPrimary, fontSize: 20, fontWeight: '800' },
+  title: { color: theme.colors.textPrimary, fontSize: 22, fontFamily: FUENTES.titulo, fontWeight: undefined },
   item: { flexDirection: 'row', gap: 12, padding: 12, borderRadius: 14, marginBottom: 8, backgroundColor: theme.colors.inputBackground },
   itemNew: { borderWidth: 1, borderColor: `${theme.colors.primary}88` },
   itemTitle: { color: theme.colors.textPrimary, fontWeight: '700' },

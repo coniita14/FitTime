@@ -9,6 +9,7 @@ import { fechaLarga, hora, yaPaso, linkGoogleCalendar } from '../../utils/fechas
 import { GIMNASIO } from '../../config/gimnasio';
 import { ESTADO_PILL } from './MisTurnosScreen';
 
+import { FUENTES } from '../../styles/theme';
 // 2E · Detalle del Turno: datos, instructor, información del horario, ubicación,
 // "Agregar al Calendario" y "Cancelar Turno".
 export const TurnoDetalleScreen = ({ navigation, route }) => {
@@ -87,7 +88,7 @@ export const TurnoDetalleScreen = ({ navigation, route }) => {
 
 const createStyles = (b) => StyleSheet.create({
   titleRow: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginBottom: 4 },
-  title: { color: b.text, fontSize: 18, fontWeight: '800' },
+  title: { color: b.text, fontSize: 21, fontFamily: FUENTES.titulo, fontWeight: undefined },
   map: {
     backgroundColor: b.cardSoft, borderRadius: 14, alignItems: 'center', justifyContent: 'center', paddingVertical: 26, gap: 4,
     marginBottom: 16, borderWidth: 1, borderColor: b.border, borderStyle: 'dashed',

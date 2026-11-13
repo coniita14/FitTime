@@ -135,3 +135,9 @@ export const lightTheme = {
 };
 
 export const getTheme = (isDark) => (isDark ? theme : lightTheme);
+
+// Tipografía de títulos (misma que la landing). Se carga en App.js con expo-font.
+export const FUENTES = {
+  titulo: 'Fraunces_600SemiBold',
+  cursiva: 'Fraunces_500Medium_Italic',
+};

@@ -19,6 +19,7 @@ import { PerfilAdmin } from './PerfilAdmin';
 import { DashboardEntrenador } from './DashboardEntrenador';
 import { AsistenteBoton, AsistenteModal } from '../../components/AsistenteChat';
 
+import { FUENTES } from '../../styles/theme';
 // Menú lateral (wireframes 3A–3E)
 const SECCIONES = {
   ADMIN: [
@@ -210,7 +211,7 @@ const createStyles = (theme, isDark) => StyleSheet.create({
   root: { flex: 1, backgroundColor: theme.colors.background },
   sidebar: { width: 230, backgroundColor: isDark ? '#0A1222' : '#0F1E3D', paddingVertical: 18, paddingHorizontal: 12 },
   brandRow: { flexDirection: 'row', alignItems: 'center', gap: 8, paddingHorizontal: 8, marginBottom: 22 },
-  brand: { color: '#FFF', fontSize: 18, fontWeight: '900' },
+  brand: { color: '#FFF', fontSize: 20, fontFamily: FUENTES.titulo, fontWeight: undefined },
   sideItem: { flexDirection: 'row', alignItems: 'center', gap: 10, paddingVertical: 10, paddingHorizontal: 12, borderRadius: 6 },
   sideItemActive: { backgroundColor: theme.colors.primary },
   sideText: { color: '#FFF', fontSize: 14, fontWeight: '600' },
@@ -226,7 +227,7 @@ const createStyles = (theme, isDark) => StyleSheet.create({
     flexDirection: 'row', alignItems: 'center', gap: 10, paddingHorizontal: 18, paddingBottom: 12,
     backgroundColor: theme.colors.surface, borderBottomWidth: 1, borderBottomColor: theme.colors.border,
   },
-  topTitle: { flex: 1, fontSize: 18, fontWeight: '800', color: theme.colors.textPrimary },
+  topTitle: { flex: 1, fontSize: 21, fontFamily: FUENTES.titulo, fontWeight: undefined, color: theme.colors.textPrimary },
   topSearch: {
     flexDirection: 'row', alignItems: 'center', gap: 6, backgroundColor: theme.colors.inputBackground, borderRadius: 6,
     paddingHorizontal: 10, minHeight: 34, width: 240,

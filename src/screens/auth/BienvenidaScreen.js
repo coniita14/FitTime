@@ -7,6 +7,7 @@ import { Button } from '../../components/cliente/ui';
 import { FondoGimnasio } from '../../components/FondoGimnasio';
 import { GIMNASIO } from '../../config/gimnasio';
 
+import { FUENTES } from '../../styles/theme';
 const LOGO = require('../../../assets/icon.png');
 
 // 1B · Bienvenida: foto del gimnasio de fondo, logo y una tarjeta translúcida
@@ -82,7 +83,7 @@ const s = StyleSheet.create({
     }),
   },
   hello: { fontSize: 15 },
-  title: { fontSize: 32, fontWeight: '900', marginVertical: 2 },
+  title: { fontSize: 36, fontFamily: FUENTES.titulo, fontWeight: undefined, marginVertical: 2, letterSpacing: -0.4 },
   sub: { fontSize: 15, lineHeight: 21 },
   support: { fontSize: 12, textDecorationLine: 'underline' },
   trainer: { flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 6, paddingVertical: 6 },

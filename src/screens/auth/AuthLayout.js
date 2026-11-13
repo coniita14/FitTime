@@ -7,6 +7,7 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useTheme } from '../../context/ThemeContext';
 import { FondoGimnasio } from '../../components/FondoGimnasio';
 
+import { FUENTES } from '../../styles/theme';
 // Estructura común de Login / Registro / Recuperar:
 // foto del gimnasio difuminada de fondo, tarjeta translúcida centrada con un
 // ícono circular arriba, título y subtítulo.
@@ -61,6 +62,6 @@ const s = StyleSheet.create({
     position: 'absolute', top: -38, alignSelf: 'center', width: 76, height: 76, borderRadius: 38, borderWidth: 4,
     alignItems: 'center', justifyContent: 'center',
   },
-  title: { fontSize: 26, fontWeight: '800', textAlign: 'center' },
+  title: { fontSize: 30, fontFamily: FUENTES.titulo, fontWeight: undefined, textAlign: 'center', letterSpacing: -0.3 },
   subtitle: { fontSize: 14, marginTop: 6, textAlign: 'center' },
 });
