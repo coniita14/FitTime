@@ -55,7 +55,7 @@ FitTime es una aplicación multiplataforma para gimnasios locales. Los **cliente
 
 | Capa | Tecnología |
 |---|---|
-| Frontend | React Native 0.86 + Expo SDK 57 (Android, iOS y Web con React Native Web) |
+| Frontend | React Native 0.88 + Expo SDK 58 (Android, iOS y Web con React Native Web) |
 | Backend | Supabase: Auth (JWT + Google OAuth), API REST (PostgREST), Storage |
 | Base de datos | PostgreSQL con Row Level Security y funciones SQL |
 | Notificaciones | `expo-notifications` (locales) + tabla `notificaciones` |
